@@ -1,0 +1,36 @@
+{
+	"brand": "BXFinance",
+	"menus": {
+		"primary": [
+			{
+				"title": "Banking",
+				"url": "/banking"
+			},
+			{
+				"title": "Credit Cards",
+				"url": "/credit-cards"
+			},
+			{
+				"title": "Investments",
+				"url": "/investments"
+			},
+			{
+				"title": "Loans & Mortgages",
+				"url": "/loans"
+			},
+			{
+				"title": "Business Banking",
+				"url": "/any-wealth-advisor"
+			}
+		],
+		"utility": {
+			"search": "Search",
+			"locations": "Find a Branch",
+			"support": "Get Support",
+			"register_intro": "Not enrolled?",
+			"register": "Create an account",
+			"login": "Sign In",
+			"logout": "Sign Out"
+		}
+	}
+}

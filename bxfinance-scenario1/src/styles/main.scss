@@ -1,0 +1,58 @@
+@import './variables.scss';
+@import '~bootstrap/scss/bootstrap.scss';
+
+@import url("https://fonts.googleapis.com/css?family=Rubik:300,400,500,600,700,900|Roboto:300,400,700,900&display=swap");
+
+@import './forms.scss';
+@import './modals.scss';
+
+/* Global */
+body {
+  margin: 0;
+  font-family: "Rubik";
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Rubik", Sans-serif;
+  font-weight: 300;
+}
+
+p {
+  color: rgb(31, 15, 17);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.btn-primary,
+.btn-secondary {
+  color: white;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 12px 25px;
+  border-radius: 6px;
+  border: 0;
+}
+
+.btn-secondary {
+  &:hover,
+  &:focus {
+    color: white;
+    background-color: theme-color("primary");
+  }
+}
+
+.module {
+  background: rgb(255, 255, 255);
+  border-radius: 11px;
+  padding: 35px;
+}
