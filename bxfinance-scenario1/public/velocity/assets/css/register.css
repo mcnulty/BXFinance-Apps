@@ -53,37 +53,6 @@
   }
 }
 
-.card-register .card-body .form-row.form-row-light .form-group label {
-  color: #6c757d;
-}
-
-.card-register .card-body .form-row.form-row-light .form-group .form-control::-webkit-input-placeholder {
-  color: #6c757d;
-}
-
-.card-register .card-body .form-row.form-row-light .form-group .form-control:-ms-input-placeholder {
-  color: #6c757d;
-}
-
-.card-register .card-body .form-row.form-row-light .form-group .form-control::-ms-input-placeholder {
-  color: #6c757d;
-}
-
-.card-register .card-body .form-row.form-row-light .form-group .form-control::placeholder {
-  color: #6c757d;
-}
-
-.card-register .card-body .form-group {
-  margin-bottom: 1.5rem;
-}
-
-.card-register .card-body .form-group label {
-  color: #212529;
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: .5rem;
-}
-
 .card-register .card-body .form-group .form-check-inline {
   display: inline-flex;
 }
@@ -99,5 +68,4 @@
 
 .card-register .card-body .icon-info {
   width: 16px;
-  margin-left: 0.5rem;
 }

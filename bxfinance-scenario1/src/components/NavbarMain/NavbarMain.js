@@ -14,6 +14,7 @@ import { Link, NavLink as RRNavLink } from 'react-router-dom';
 // Components
 import ModalRegister from '../ModalRegister';
 import ModalRegisterConfirm from '../ModalRegisterConfirm';
+import ModalLogin from '../ModalLogin';
 
 // Styles
 import './NavbarMain.scss';
@@ -37,6 +38,9 @@ class NavbarMain extends React.Component {
   }
   triggerModalRegisterConfirm() {
     this.refs.modalRegisterConfirm.toggle();
+  }
+  triggerModalLogin() {
+    this.refs.modalLogin.toggle();
   }
   toggle() {
     this.setState({
@@ -68,7 +72,7 @@ class NavbarMain extends React.Component {
                   <NavLink><img src="/images/icons/support.svg" alt={data.menus.utility.support} /></NavLink>
                 </NavItem>
                 <NavItem className="login">
-                  <NavLink><img src="/images/icons/user.svg" alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
+                  <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src="/images/icons/user.svg" alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
                 </NavItem>
                 <NavItem className="logout d-none">
                   <Link to="/" className="nav-link"><img src="/images/icons/user.svg" alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
@@ -102,7 +106,7 @@ class NavbarMain extends React.Component {
             <Link to="/" className="navbar-brand"><img src="/images/logo-white.png" alt={data.brand} /></Link>
           </div>
           <div className="mobilenav-login">
-            <NavLink className="login">Sign In</NavLink>
+            <NavLink href="#" className="login" onClick={this.triggerModalLogin.bind(this)}>Sign In</NavLink>
             <Link to="/" className="nav-link logout d-none">Sign Out</Link>
           </div>
           <Collapse isOpen={this.state.isOpen} navbar>
@@ -126,7 +130,7 @@ class NavbarMain extends React.Component {
                 <NavLink><img src="/images/icons/support.svg" alt={data.menus.utility.support} className="mr-1" /> {data.menus.utility.support}</NavLink>
               </NavItem>
               <NavItem className="login">
-                <NavLink><img src="/images/icons/user.svg" alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
+                <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src="/images/icons/user.svg" alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
               </NavItem>
               <NavItem className="logout d-none">
                 <Link to="/" className="nav-link"><img src="/images/icons/user.svg" alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
@@ -139,6 +143,7 @@ class NavbarMain extends React.Component {
         </Navbar>
         <ModalRegister ref="modalRegister" onSubmit={this.onModalRegisterSubmit.bind(this)} />
         <ModalRegisterConfirm ref="modalRegisterConfirm" />
+        <ModalLogin ref="modalLogin" />
       </section>
     );
   }
