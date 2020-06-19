@@ -1,7 +1,7 @@
 form {
 
   label {
-    color: rgb(140, 143, 143);
+    color: #9ca4ab;
     font-size: 14px;
     line-height: 26px;
     margin: 0;
@@ -13,6 +13,17 @@ form {
     background: url(/images/icons/dropdown.png) no-repeat right 12px top 15px #ddd;
     background-size: 8px 6px;
     -webkit-appearance: none;
+  }
+
+  .form-group {
+    .form-control::placeholder {
+      color: #9ca4ab;
+      font-style: italic;
+    }
+  }
+
+  input[type="password"] {
+    background: url("/images/icons/password-hide.svg") 95% center no-repeat;
   }
 
   .input-currency {
@@ -44,6 +55,31 @@ form {
     &.disabled {
       background: rgb(198, 205, 207);
       border-color: rgb(198, 205, 207);
+    }
+  }
+}
+
+// Custom Radio Button
+.custom-radio .custom-control-input {
+  ~ .custom-control-label {
+    cursor: pointer;
+  }
+
+  &:checked {
+    ~ .custom-control-label::before {
+      border-color: rgb(198, 205, 207);
+      background-color: #fff;
+    }
+
+    ~ .custom-control-label::after {
+      background-image: url(/images/icons/radio.png);
+      width: 24px;
+      height: 24px;
+      top: 0.012rem;
+      left: -1.75rem;
+      @include media-breakpoint-up(md) {
+        top: 0.026rem;
+      }
     }
   }
 }

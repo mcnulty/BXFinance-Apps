@@ -35,29 +35,9 @@
             }
           }
         }
-
-        &.form-row-light {
-          .form-group {
-            label {
-              color: $gray-600;
-            }
-            .form-control::placeholder {
-              color: $gray-600;
-            }
-          }
-        }
       }
 
       .form-group {
-        margin-bottom: 1.5rem;
-
-        label {
-          color: #212529;
-          font-size: 1rem;
-          line-height: 1.5;
-          margin-bottom: .5rem;
-        }
-
         .form-check-inline {
           display: inline-flex;
         }

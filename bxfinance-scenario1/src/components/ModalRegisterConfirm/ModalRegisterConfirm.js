@@ -36,13 +36,13 @@ class ModalRegisterConfirm extends React.Component {
           <ModalHeader toggle={this.toggle.bind(this)}></ModalHeader>
           <ModalBody>
             <Row>
-              <Col md="6" lg="4" className="col-download">
+              <Col lg="6" xl="4" className="col-download">
                 <h4>{data.download.title}</h4>
                 <p dangerouslySetInnerHTML={{__html: data.download.content}}></p>
                 <div className="mb-3"><img src="/images/app-store-logos.svg" /></div>
                 <p dangerouslySetInnerHTML={{__html: data.download.learn}}></p>
               </Col>
-              <Col md="6" lg="8" className="col-content">
+              <Col lg="6" xl="8" className="col-content">
                 <img src="/images/logo.svg" alt="logo" />
                 <h4>{data.confirmation.title}</h4>
                 <div dangerouslySetInnerHTML={{__html: data.confirmation.content}}></div>

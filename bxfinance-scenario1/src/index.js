@@ -3,11 +3,23 @@ import ReactDOM from 'react-dom';
 import './styles/main.scss';
 import { Switch, Route, BrowserRouter as Router } from 'react-router-dom'
 import Home from './pages/home';
+import AccountsDashboard from './pages/accounts-dashboard';
+import AccountsPayTransfer from './pages/pay-transfer/index';
+import AccountsTransfer from './pages/pay-transfer/accounts-transfer';
 import * as serviceWorker from './serviceWorker';
 
 const routing = (
   <Router>
     <Switch>
+      <Route path="/banking/pay-and-transfer">
+        <AccountsPayTransfer />
+      </Route>
+      <Route path="/banking/transfer-money">
+        <AccountsTransfer />
+      </Route>
+      <Route path="/banking">
+        <AccountsDashboard />
+      </Route>
       <Route path="/">
         <Home />
       </Route>
