@@ -114,7 +114,7 @@ class AccountsTransfer extends React.Component {
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
                         <Button className="cancel" disabled>{data.form.buttons.cancel.label}</Button>
-                        <Button className="start-transfer" onClick={ this.showStep2 }>{data.form.buttons.start_transfer.label}</Button>
+                        <Button color="primary" className="start-transfer" onClick={ this.showStep2 }>{data.form.buttons.start_transfer.label}</Button>
                       </Col>
                     </Row>
                   </Form>
@@ -139,15 +139,16 @@ class AccountsTransfer extends React.Component {
                     </div>
                   </div>                  
                   <div className="app-approval-banner">
+                    <img src={process.env.PUBLIC_URL + "/images/icons/phone.jpg"} className="img-phone" alt="phone" />
                     <h3>Requires your approval:</h3>
                     <p>This transaction will take place after you approve it using your BXFinance app on iPhone. <a>What is this?</a></p>
-                    <img src="/images/app-store-logos.svg" className="app-store-logos" />
+                    <img src={process.env.PUBLIC_URL + "/images/app-store-logos.svg"} className="app-store-logos" />
                   </div>
                   <Form>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
                         <Button className="cancel" disabled>{data.form.buttons.cancel.label}</Button>
-                        <Button className="start-transfer" onClick={ this.showStep3 }>{data.form.buttons.start_transfer.label}</Button>
+                        <Button color="primary" className="start-transfer" onClick={ this.showStep3 }>{data.form.buttons.start_transfer.label}</Button>
                       </Col>
                     </Row>
                   </Form>
@@ -174,7 +175,7 @@ class AccountsTransfer extends React.Component {
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
                         <Button className="cancel" disabled>{data.form.buttons.close.label}</Button>
-                        <Button className="start-transfer" onClick={ this.showStep1 }>{data.form.buttons.start_new_transfer.label}</Button>
+                        <Button color="primary" className="start-transfer" onClick={ this.showStep1 }>{data.form.buttons.start_new_transfer.label}</Button>
                       </Col>
                     </Row>
                   </Form>

@@ -18,7 +18,7 @@ class CardRewards extends React.Component {
             <CardText>{data.content}</CardText>
             <Button color="link" className="text-info">{data.button}</Button>
           </CardBody>
-          <img src="/images/home-hero-card.png" className="img-credit-card" alt="card" />
+          <img src={process.env.PUBLIC_URL + "/images/home-hero-card.png"} className="img-credit-card" alt="card" />
         </Card>
       </div>
     );

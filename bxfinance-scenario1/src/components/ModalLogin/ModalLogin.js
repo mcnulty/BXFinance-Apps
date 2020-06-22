@@ -60,7 +60,7 @@ class ModalLogin extends React.Component {
     return (
       <div>
         <Modal isOpen={this.state.isOpen} toggle={this.toggle.bind(this)} onClosed={this.onClosed.bind(this)} className="modal-login">
-          <ModalHeader toggle={this.toggle.bind(this)} close={closeBtn}><img src="/images/logo.svg" alt="logo" /></ModalHeader>
+          <ModalHeader toggle={this.toggle.bind(this)} close={closeBtn}><img src={process.env.PUBLIC_URL + "/images/logo.svg"} alt="logo" /></ModalHeader>
           <ModalBody>
             <form>
               <TabContent activeTab={this.state.activeTab}>
@@ -74,7 +74,7 @@ class ModalLogin extends React.Component {
                     <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
                   </FormGroup>
                   <div className="mb-3">
-                    <Button type="button" color="secondary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button>
+                    <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button>
                   </div>
                   <div>
                     <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={this.toggle.bind(this)}>{data.form.buttons.reset}</Button>
@@ -90,14 +90,14 @@ class ModalLogin extends React.Component {
                     </div>
                   </FormGroup>
                   <div className="mb-4 text-center">
-                    <Button type="button" color="secondary" disabled={this.state.loginMethodUnset} onClick={() => { this.toggleTab('3'); }}>{data.form.buttons.login}</Button>
+                    <Button type="button" color="primary" disabled={this.state.loginMethodUnset} onClick={() => { this.toggleTab('3'); }}>{data.form.buttons.login}</Button>
                   </div>
                   <div className="text-center">
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
                 <TabPane tabId="3">
-                  <div className="mobile-loading">
+                  <div className="mobile-loading" style={{backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)`}}>
                     <div className="spinner">
                       <FontAwesomeIcon icon={faCircleNotch} size="3x" className="fa-spin" />
                     </div>
