@@ -63,7 +63,7 @@
   "sections": [
     {
       "title": "Pay Bills",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse iaculis commodo vulputate. Nulla dictum leo sed dolor laoreet elementum.",
+      "description": "Pay nearly anyone using direct online payments from your accounts. One-time or recurring, electronically or by mail.",
       "white": true,
       "curved": true,
       "button_text": "Pay",
@@ -71,7 +71,7 @@
     },
     {
       "title": "Transfer Money",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse iaculis commodo vulputate. Nulla dictum leo sed dolor laoreet elementum.",
+      "description": "Move money between your BXFinance accounts, and even to accounts you have with other financial institutions.",
       "white": false,
       "curved": false,
       "button_text": "Transfer",
@@ -79,7 +79,7 @@
     },
     {
       "title": "Wire Money",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse iaculis commodo vulputate. Nulla dictum leo sed dolor laoreet elementum.",
+      "description": "Send money to recipients around the world, domestically or internationally. It’s an instant way to get cash just about anywhere.",
       "white": true,
       "curved": false,
       "button_text": "Wire",
@@ -87,7 +87,7 @@
     },
     {
       "title": "Payment Activity",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse iaculis commodo vulputate. Nulla dictum leo sed dolor laoreet elementum.",
+      "description": "Set, edit, and monitor your payments through any of your BXFinance accounts.",
       "white": false,
       "curved": false,
       "button_text": "Review",
@@ -95,7 +95,7 @@
     },
     {
       "title": "Fastpay with Zelle",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse iaculis commodo vulputate. Nulla dictum leo sed dolor laoreet elementum.",
+      "description": "Fastpay makes it easy to send and receive money from anyone—no matter where they bank in the U.S.",
       "white": true,
       "curved": false,
       "button_text": "Review",

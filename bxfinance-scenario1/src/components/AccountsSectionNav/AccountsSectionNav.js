@@ -15,7 +15,7 @@ const AccountsSectionNav = (props) => {
         <h4>{props.data.title}</h4>
         <p>{props.data.description}</p>
       </div>
-      <Link to={props.data.button_href}><Button>{props.data.button_text}</Button></Link>
+      <Link to={props.data.button_href}><Button color="primary">{props.data.button_text}</Button></Link>
     </div>
   );
 };

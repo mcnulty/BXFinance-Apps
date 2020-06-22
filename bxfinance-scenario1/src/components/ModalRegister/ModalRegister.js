@@ -146,7 +146,7 @@ class ModalRegister extends React.Component {
                 <Col md={6}>
                 </Col>
                 <Col md={6}>
-                  <Button type="button" color="secondary" onClick={this.props.onSubmit}>{data.form.buttons.submit}</Button>
+                  <Button type="button" color="primary" onClick={this.props.onSubmit}>{data.form.buttons.submit}</Button>
                   <Button type="button" color="link text-info" className="ml-3" onClick={this.toggle.bind(this)}>{data.form.buttons.cancel}</Button>
                 </Col>
               </Row>

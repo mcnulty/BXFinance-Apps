@@ -10,6 +10,7 @@
 body {
   margin: 0;
   font-family: "Rubik";
+  color: #211012;
 }
 
 code {
@@ -33,6 +34,10 @@ p {
   line-height: 1.4;
 }
 
+a {
+  color: theme-color("info");
+}
+
 .btn-primary,
 .btn-secondary {
   color: white;
@@ -43,11 +48,11 @@ p {
   border: 0;
 }
 
-.btn-secondary {
+.btn-primary {
   &:hover,
   &:focus {
     color: white;
-    background-color: theme-color("primary");
+    background-color: theme-color("secondary");
   }
 }
 
