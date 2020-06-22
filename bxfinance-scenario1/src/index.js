@@ -9,7 +9,7 @@ import AccountsTransfer from './pages/pay-transfer/accounts-transfer';
 import * as serviceWorker from './serviceWorker';
 
 const routing = (
-  <Router>
+  <Router basename={`${process.env.PUBLIC_URL}`}>
     <Switch>
       <Route path="/banking/pay-and-transfer">
         <AccountsPayTransfer />

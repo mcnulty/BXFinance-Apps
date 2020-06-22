@@ -5,7 +5,6 @@
 @import '~bootstrap/scss/bootstrap-grid';
 
 .jumbotron-hero-home {
-  background: url("/images/home-hero-background.jpg");
   background-size: cover;
   position: relative;
   margin: 0;
@@ -71,7 +70,7 @@
 }
 
 section.section-home-cta-bar {
-  background: theme-color("primary");
+  background: theme-color("secondary");
   padding-top: 2.1rem;
   padding-bottom: 2rem;
 

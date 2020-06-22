@@ -5,6 +5,7 @@
 @import '~bootstrap/scss/bootstrap-grid';
 
 .modal-register-confirm {
+
   @include media-breakpoint-up(md) {
     margin-top: 6rem;
   }
@@ -26,6 +27,8 @@
     .modal-body {
       margin: 0;
       padding: 0;
+      height: 600px;
+      overflow: hidden;
 
       .row {
          margin: 0;
@@ -35,8 +38,7 @@
           border-bottom-left-radius: 14px;
           text-align: center;
           padding: 2.5rem 2.5rem 0 2.5rem;
-          background: url("/images/device-with-logo.png") center 250px no-repeat $gray-100;
-          background-size: 270px;
+          background: $gray-100;
 
           @include media-breakpoint-down(md) {
             background-position: center 340px;
@@ -50,6 +52,10 @@
 
           h4 {
             margin-bottom: 1.5rem;
+          }
+
+          img.device-with-logo {
+            width: 270px;
           }
         }
 

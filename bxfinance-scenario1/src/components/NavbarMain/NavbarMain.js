@@ -58,27 +58,27 @@ class NavbarMain extends React.Component {
         {/* DESKTOP NAV */}
         <Navbar color="dark" dark expand="md" className="navbar-desktop">
           <Container>
-            <Link to="/" className="navbar-brand"><img src="/images/logo-white.png" alt={data.brand} /></Link>
+            <Link to="/" className="navbar-brand"><img src={process.env.PUBLIC_URL + "/images/logo-white.png"} alt={data.brand} /></Link>
             <NavbarToggler onClick={this.toggle.bind(this)} />
             <Collapse isOpen={this.state.isOpen} navbar>
               <Nav className="justify-content-end ml-auto navbar-nav-utility" navbar>
                 <NavItem>
-                  <NavLink><img src="/images/icons/search.svg" alt={data.menus.utility.search} /></NavLink>
+                  <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/search.svg"} alt={data.menus.utility.search} /></NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink><img src="/images/icons/map-marker.svg" alt={data.menus.utility.locations} /></NavLink>
+                  <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/map-marker.svg"} alt={data.menus.utility.locations} /></NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink><img src="/images/icons/support.svg" alt={data.menus.utility.support} /></NavLink>
+                  <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} /></NavLink>
                 </NavItem>
                 <NavItem className="login">
-                  <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src="/images/icons/user.svg" alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
+                  <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
                 </NavItem>
                 <NavItem className="logout d-none">
-                  <Link to="/" className="nav-link"><img src="/images/icons/user.svg" alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
+                  <Link to="/" className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
                 </NavItem>
                 <NavItem className="register">
-                  <NavLink href="https://demo.bxfinance.xyz/sp/startSSO.ping?SpSessionAuthnAdapterId=idprofiledefaultIdentityProfile&TargetResource=https%3A%2F%2Fdemo.bxfinance.xyz%2Fpf%2Fidprofile.ping&PolicyAction=identity.registration">{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
+                  <NavLink href={process.env.PUBLIC_URL + "/velocity/register.html"}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
                 </NavItem>
               </Nav>
             </Collapse>
@@ -103,7 +103,7 @@ class NavbarMain extends React.Component {
             <NavbarToggler onClick={this.toggle.bind(this)} />
           </div>
           <div className="mobilenav-brand">
-            <Link to="/" className="navbar-brand"><img src="/images/logo-white.png" alt={data.brand} /></Link>
+            <Link to="/" className="navbar-brand"><img src={process.env.PUBLIC_URL + "/images/logo-white.png"} alt={data.brand} /></Link>
           </div>
           <div className="mobilenav-login">
             <NavLink href="#" className="login" onClick={this.triggerModalLogin.bind(this)}>Sign In</NavLink>
@@ -121,22 +121,22 @@ class NavbarMain extends React.Component {
             </Nav>
             <Nav className="navbar-nav-utility" navbar>
               <NavItem>
-                <NavLink><img src="/images/icons/search.svg" alt={data.menus.utility.search} className="mr-1" /> {data.menus.utility.search}</NavLink>
+                <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/search.svg"} alt={data.menus.utility.search} className="mr-1" /> {data.menus.utility.search}</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink><img src="/images/icons/map-marker.svg" alt={data.menus.utility.locations} className="mr-1" /> {data.menus.utility.locations}</NavLink>
+                <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/map-marker.svg"} alt={data.menus.utility.locations} className="mr-1" /> {data.menus.utility.locations}</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink><img src="/images/icons/support.svg" alt={data.menus.utility.support} className="mr-1" /> {data.menus.utility.support}</NavLink>
+                <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} className="mr-1" /> {data.menus.utility.support}</NavLink>
               </NavItem>
               <NavItem className="login">
-                <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src="/images/icons/user.svg" alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
+                <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
               </NavItem>
               <NavItem className="logout d-none">
-                <Link to="/" className="nav-link"><img src="/images/icons/user.svg" alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
+                <Link to="/" className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
               </NavItem>
               <NavItem className="register">
-                <NavLink href="https://demo.bxfinance.xyz/sp/startSSO.ping?SpSessionAuthnAdapterId=idprofiledefaultIdentityProfile&TargetResource=https%3A%2F%2Fdemo.bxfinance.xyz%2Fpf%2Fidprofile.ping&PolicyAction=identity.registration"><img src="/images/icons/user.svg" alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.register}</NavLink>
+                <NavLink href={process.env.PUBLIC_URL + "/velocity/register.html"}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.register}</NavLink>
               </NavItem>
             </Nav>
           </Collapse>

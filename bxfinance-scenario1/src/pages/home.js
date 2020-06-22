@@ -17,13 +17,13 @@ function Home() {
   return (
     <div className="home">
       <NavbarMain></NavbarMain>
-      <Jumbotron fluid className="jumbotron-hero-home">
+      <Jumbotron fluid className="jumbotron-hero-home" style={{backgroundImage: `url(${process.env.PUBLIC_URL}/images/home-hero-background.jpg)`}}>
         <Container>
           <Row>
             <Col md="6" lg="8">
               <h1 className="display-3" dangerouslySetInnerHTML={{__html: data.hero.title}}></h1>
               <p className="lead">{data.hero.subtitle}</p>
-              <Button color="secondary">{data.hero.button}</Button>
+              <Button color="primary">{data.hero.button}</Button>
             </Col>
             <Col md="6" lg="4">
               <CardRewards />

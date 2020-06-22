@@ -27,12 +27,9 @@
       display: block;
       position: absolute;
       right: 5px;
-      top: 9px;
-      content: '';
-      background: url("/images/icons/collapsed.svg") 0 0 no-repeat;
-      background-size: 9px 6px;
-      height: 6px;
-      width: 9px;
+      top: 0;
+      content: "▾";
+      font-style: normal;
     }
   }
 }
