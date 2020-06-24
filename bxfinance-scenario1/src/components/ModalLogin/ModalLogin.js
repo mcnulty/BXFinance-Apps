@@ -25,11 +25,13 @@ import data from './data.json';
 class ModalLogin extends React.Component {
   constructor() {
     super();
+    // PING INTEGRATION: added userName property.
     this.state = {
       isOpen: false,
       activeTab: '1',
       loginMethodUnset: true,
-      loginMethodFormGroupClass: ''
+      loginMethodFormGroupClass: '',
+      userName: ''
     };
   }
   onClosed() {
@@ -45,6 +47,7 @@ class ModalLogin extends React.Component {
     });
   }
   toggleTab(tab) {
+    this.handleSubmit(); /* PING INTEGRATION */
     this.setState({
       activeTab: tab
     });
@@ -55,6 +58,15 @@ class ModalLogin extends React.Component {
       loginMethodFormGroupClass: 'form-group-light'
     });
   }
+  // BEGIN PING INTEGRATIONS
+  handleChange(event){
+    this.setState({userName: event.target.value});
+  }
+  handleSubmit() {
+    console.log(this.state.userName);
+  }
+  // END PING INTEGRATIONS
+
   render() {
     const closeBtn = <div />;
     return (
@@ -68,13 +80,13 @@ class ModalLogin extends React.Component {
                   <h4>{data.titles.welcome}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
-                    <Input type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} />
+                    <Input onChange={this.handleChange.bind(this)} type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} /> {/* PING INTEGRATION added onChange. */}
                   </FormGroup>
                   <FormGroup className="form-group-light">
                     <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
                   </FormGroup>
                   <div className="mb-3">
-                    <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button>
+                    <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button> {/* PING INTEGRATION see onClick function. */}
                   </div>
                   <div>
                     <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={this.toggle.bind(this)}>{data.form.buttons.reset}</Button>
