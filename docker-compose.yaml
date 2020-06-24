@@ -1,0 +1,11 @@
+version: '3.3'
+services:
+    BXFinance:
+        volumes:
+            - '${PWD}:/app'
+            - /app/node_modules
+        ports:
+            - '5000:5000'
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+        image: 'BXFinance:dev'
