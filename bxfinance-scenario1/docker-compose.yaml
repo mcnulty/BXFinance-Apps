@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+    bxfinance:
+        stdin_open: true # docker run -i -> Dev only. These two lines are required so
+        tty: true        # docker run -t -> react-scripts does not exit after the container starts.
+        volumes:
+            - '.:/app'
+            - '/app/node_modules'
+        ports:
+            - '5000:5000'
+        environment:
+            - 'CHOKIDAR_USEPOLLING=true'
+        image: 'bxfinance:dev'
