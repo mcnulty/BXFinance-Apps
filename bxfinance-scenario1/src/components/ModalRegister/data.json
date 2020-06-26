@@ -50,7 +50,7 @@
 				},
 				"options": {
 					"default": "Choose your Method",
-					"mobile": "With my Mobile Device or One-Time Password",
+					"mobile": "With my Mobile Device or One-Time Passcode",
 					"password": "With my Password"
 				}
 			}

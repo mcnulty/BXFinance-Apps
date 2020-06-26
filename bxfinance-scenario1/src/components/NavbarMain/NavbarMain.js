@@ -87,13 +87,23 @@ class NavbarMain extends React.Component {
         <Navbar color="dark" dark expand="md" className="navbar-desktop">
           <Container>
             <Nav className="mr-auto navbar-nav-main" navbar>
-              {data.menus.primary.map((item, i) => {
-                return (
-                  <NavItem key={i}>
-                    <NavLink to={item.url} activeClassName="active" tag={RRNavLink}>{item.title}</NavLink>
-                  </NavItem>
-                );
-              })}
+              { this.props && this.props.data && this.props.data.menus && this.props.data.menus.primary ? (
+                this.props.data.menus.primary.map((item, i) => {
+                  return (
+                    <NavItem key={i}>
+                      <NavLink to={item.url} activeClassName="active" exact tag={RRNavLink}>{item.title}</NavLink>
+                    </NavItem>
+                  );
+                })
+              ) : (
+                data.menus.primary.map((item, i) => {
+                  return (
+                    <NavItem key={i}>
+                      <NavLink to={item.url} activeClassName="active" tag={RRNavLink}>{item.title}</NavLink>
+                    </NavItem>
+                  );
+                })
+              )}
             </Nav>
           </Container>
         </Navbar>
@@ -111,13 +121,23 @@ class NavbarMain extends React.Component {
           </div>
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="navbar-nav-main navbar-light bg-light" navbar>
-              {data.menus.primary.map((item, i) => {
-                return (
-                  <NavItem key={i}>
-                    <NavLink to={item.url} activeClassName="active" exact tag={RRNavLink}>{item.title}</NavLink>
-                  </NavItem>
-                );
-              })}
+              { this.props && this.props.data && this.props.data.menus && this.props.data.menus.primary ? (
+                this.props.data.menus.primary.map((item, i) => {
+                  return (
+                    <NavItem key={i}>
+                      <NavLink to={item.url} activeClassName="active" exact tag={RRNavLink}>{item.title}</NavLink>
+                    </NavItem>
+                  );
+                })
+              ) : (
+                data.menus.primary.map((item, i) => {
+                  return (
+                    <NavItem key={i}>
+                      <NavLink to={item.url} activeClassName="active" exact tag={RRNavLink}>{item.title}</NavLink>
+                    </NavItem>
+                  );
+                })
+              )}
             </Nav>
             <Nav className="navbar-nav-utility" navbar>
               <NavItem>
