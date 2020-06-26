@@ -31,7 +31,8 @@ class ModalLogin extends React.Component {
       activeTab: '1',
       loginMethodUnset: true,
       loginMethodFormGroupClass: '',
-      userName: ''
+      userName: '',
+      flowId: '0'
     };
   }
   onClosed() {
@@ -63,7 +64,20 @@ class ModalLogin extends React.Component {
     this.setState({userName: event.target.value});
   }
   handleSubmit() {
-    console.log(this.state.userName);
+    var myHeaders = new Headers();
+    myHeaders.append("Cookie", "PF=MmNRTmlxfAboTbulViYmzR");
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'manual'
+    };
+
+    fetch("https://demo.bxfinance.xyz/idp/startSSO.ping?PartnerSpId=Dummy-SAML", requestOptions)
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('error', error));
+
   }
   // END PING INTEGRATIONS
 
@@ -83,7 +97,7 @@ class ModalLogin extends React.Component {
                     <Input onChange={this.handleChange.bind(this)} type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} /> {/* PING INTEGRATION added onChange. */}
                   </FormGroup>
                   <FormGroup className="form-group-light">
-                    <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
+                    <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} /> {/* TODO PING INTEGRATION: need to get remember me if checked. */}
                   </FormGroup>
                   <div className="mb-3">
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button> {/* PING INTEGRATION see onClick function. */}

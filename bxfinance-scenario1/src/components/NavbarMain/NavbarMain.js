@@ -48,10 +48,26 @@ class NavbarMain extends React.Component {
     });
   }
   componentDidMount () {
-    if ( window.location.search ) {
-      this.refs.modalRegisterConfirm.toggle();
+    // TODO BEGIN PING INTEGRATION: there must be a more efficient ES6 way to do this.
+    if (window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("flowId")) {
+        console.log("FlowId", params.get("flowId"))
+        this.refs.modalLogin.toggle(); /* PING INTEGRATION: changed this to pop the modalLogin instead of reg. */
+      }
+      else if (params.get("REF")) {
+        console.log("RefId", params.get("REF"));
+      }
     }
+    // END PING INTEGRATION
+    
+    // TODO delete this if we dont need it. Currently replaced with above logic. 
+    // if ( window.location.search ) {
+      // this.refs.modalRegisterConfirm.toggle();
+      // this.refs.modalLogin.toggle();/* PING INTEGRATION: changed this to pop the modalLogin instead of reg. */
+    // } 
   }
+
   render() {
     return (
       <section className="navbar-main">
