@@ -32,7 +32,8 @@ class ModalLogin extends React.Component {
       loginMethodUnset: true,
       loginMethodFormGroupClass: '',
       userName: '',
-      flowId: '0'
+      flowId: '0',
+      refId: '0'
     };
   }
   onClosed() {
