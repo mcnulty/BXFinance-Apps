@@ -16,11 +16,11 @@
 			},
 			{
 				"title": "Loans & Mortgages",
-				"url": "/loans"
+				"url": "/loans-mortgages"
 			},
 			{
 				"title": "Business Banking",
-				"url": "/any-wealth-advisor"
+				"url": "/business-banking"
 			}
 		],
 		"utility": {

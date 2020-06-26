@@ -6,11 +6,27 @@ import Home from './pages/home';
 import AccountsDashboard from './pages/accounts-dashboard';
 import AccountsPayTransfer from './pages/pay-transfer/index';
 import AccountsTransfer from './pages/pay-transfer/accounts-transfer';
+import AccountsProfileSettings from './pages/profile-settings/index';
+import CommunicationPrefernces from './pages/profile-settings/communications-preferences';
+import PrivacySecurity from './pages/profile-settings/privacy-security';
+import AnyWealthAdvisor from './pages/any-wealth-advisor';
+import Advisor from './pages/advisor/index';
+import AdvisorClient from './pages/advisor/client';
+import AnyMarketing from './pages/any-marketing';
 import * as serviceWorker from './serviceWorker';
 
 const routing = (
   <Router basename={`${process.env.PUBLIC_URL}`}>
     <Switch>
+      <Route path="/privacy-security">
+        <PrivacySecurity />
+      </Route>
+      <Route path="/communication-preferences">
+        <CommunicationPrefernces />
+      </Route>
+      <Route path="/banking/profile-settings">
+        <AccountsProfileSettings />
+      </Route>
       <Route path="/banking/pay-and-transfer">
         <AccountsPayTransfer />
       </Route>
@@ -19,6 +35,18 @@ const routing = (
       </Route>
       <Route path="/banking">
         <AccountsDashboard />
+      </Route>
+      <Route path="/any-wealth-advisor">
+        <AnyWealthAdvisor />
+      </Route>
+      <Route path="/advisor/client">
+        <AdvisorClient />
+      </Route>
+      <Route path="/advisor">
+        <Advisor />
+      </Route>
+      <Route path="/any-marketing">
+        <AnyMarketing />
       </Route>
       <Route path="/">
         <Home />
