@@ -95,7 +95,7 @@ class NavbarMain extends React.Component {
                 </NavItem>
                 <NavItem className="register">
                   {/* PING INTEGRATION: added env var and link to PF LIP reg form. */}
-                  <NavLink href={process.env.REACT_APP_HOST + "/sp/startSSO.ping?SpSessionAuthnAdapterId=idprofiledefaultIdentityProfile&TargetResource=https%3A%2F%2Fdemo.bxfinance.xyz%2Fpf%2Fidprofile.ping&PolicyAction=identity.registration"}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
+                  <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
                 </NavItem>
               </Nav>
             </Collapse>
@@ -174,7 +174,7 @@ class NavbarMain extends React.Component {
               </NavItem>
               <NavItem className="register">
                 {/* PING INTEGRATION: added env var and link to PF LIP reg form. */}
-                <NavLink href={process.env.REACT_APP_HOST + "/sp/startSSO.ping?SpSessionAuthnAdapterId=idprofiledefaultIdentityProfile&TargetResource=https%3A%2F%2Fdemo.bxfinance.xyz%2Fpf%2Fidprofile.ping&PolicyAction=identity.registration"}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.register}</NavLink>
+                <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.register}</NavLink>
               </NavItem>
             </Nav>
           </Collapse>

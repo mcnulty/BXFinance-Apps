@@ -1,5 +1,6 @@
 {
 	"brand": "BXFinance",
+	"pfRegURI": "/sp/startSSO.ping?SpSessionAuthnAdapterId=idprofiledefaultIdentityProfile&TargetResource=https%3A%2F%2Fdemo.bxfinance.xyz%2Fpf%2Fidprofile.ping&PolicyAction=identity.registration",
 	"menus": {
 		"primary": [
 			{
