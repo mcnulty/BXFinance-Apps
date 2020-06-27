@@ -57,6 +57,7 @@ class NavbarMain extends React.Component {
       }
       else if (params.get("REF")) {
         console.log("RefId", params.get("REF"));
+        // TODO grab REF and TargetResource params for agentless pickup and redirect to target app.
       }
     }
     // END PING INTEGRATION

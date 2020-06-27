@@ -1,4 +1,5 @@
 {
+	"startSSOURI": "/idp/startSSO.ping?PartnerSpId=httpbin-bxfinance",
 	"titles": {
 		"welcome": "Welcome back",
 		"login_method": "How would you like to sign in?"
