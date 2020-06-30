@@ -113,7 +113,7 @@ class AccountsTransfer extends React.Component {
                     </Row>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <Button className="cancel" disabled>{data.form.buttons.cancel.label}</Button>
+                        <a href="/" class="text-info cancel">{data.form.buttons.cancel.label}</a>
                         <Button color="primary" className="start-transfer" onClick={ this.showStep2 }>{data.form.buttons.start_transfer.label}</Button>
                       </Col>
                     </Row>
@@ -147,7 +147,7 @@ class AccountsTransfer extends React.Component {
                   <Form>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <Button className="cancel" disabled>{data.form.buttons.cancel.label}</Button>
+                        <a href="/" class="text-info cancel">{data.form.buttons.cancel.label}</a>
                         <Button color="primary" className="start-transfer" onClick={ this.showStep3 }>{data.form.buttons.start_transfer.label}</Button>
                       </Col>
                     </Row>
@@ -174,7 +174,7 @@ class AccountsTransfer extends React.Component {
                   <Form>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <Button className="cancel" disabled>{data.form.buttons.close.label}</Button>
+                        <a href="/" class="text-link cancel">{data.form.buttons.close.label}</a>
                         <Button color="primary" className="start-transfer" onClick={ this.showStep1 }>{data.form.buttons.start_new_transfer.label}</Button>
                       </Col>
                     </Row>

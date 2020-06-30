@@ -122,10 +122,10 @@
 	"alerts": {
 		"title": "Alerts",
 		"messages": [
-			"You have <a href=\"#\">5 new messages</a> from AWA Marketing Leads.",
-			"You have <a href=\"#\">2 new alerts</a> from AWA Ops."
+			"You have <a href=\"#\">5 new messages</a> from <br> AWA Marketing Leads.",
+			"You have <a href=\"#\">2 new alerts</a> from <br> AWA Ops."
 		],
-		"button": "Messaging Center"
+		"button": "Message Center"
 	},
 	"dashboard": {
 		"title": "Activity Dashboard",

@@ -52,6 +52,11 @@ $theme-colors: (
     color: theme-color("primary");
     padding-left: 0;
 
+    &:hover {
+      font-weight: bold;
+      text-decoration: none;
+    }
+
     &::after {
       content: " >";
     }
@@ -268,9 +273,13 @@ $theme-colors: (
       position: relative;
 
       .form-control {
-        width: 250px;
+        width: 200px;
         border-radius: 0px;
         border: 2px solid rgb(162, 162, 162);
+
+        @include media-breakpoint-up(lg) {
+          width: 250px;
+        }
 
         &::placeholder {
           color: #9ca4ab;

@@ -68,8 +68,8 @@
   "steps": [
     {
       "title": "How should we communicate with you?",
-      "description": "Let's review settings for how we can communicate with you about your accounts. Please make any adjustements.",
-      "table_title": "Account-Related Communications",
+      "description": "Let's review settings for how we communicate with you about loan offers, mortgage rates, and other products we offer.",
+      "table_title": "Marketing Communications",
       "communication_types": [
         {
           "name": "sms",

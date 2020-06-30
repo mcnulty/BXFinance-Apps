@@ -72,23 +72,22 @@ form {
     width: 0;
     
     &:checked ~ .checkmark {
-      background-color: #fff;
+      background-color: transparent;
       span {
         width: calc(100% - 4px);
         height: calc(100% - 4px);
         margin: 2px;
         display: block;
         position: relative;
-        background-color: theme-color("info");
         &:after {
           content: "";
           position: absolute;
           display: block;
           left: 4px;
-          top: 1px;
+          top: 0px;
           width: 4px;
-          height: 8px;
-          border: solid white;
+          height: 10px;
+          border: solid theme-color("info");
           border-width: 0 2px 2px 0;
           -webkit-transform: rotate(45deg);
           -ms-transform: rotate(45deg);
@@ -104,7 +103,7 @@ form {
     height: 20px;
     width: 20px;
     border: 2px solid rgb(198, 205, 207);
-    background-color: #fff;
+    background-color: transparent;
   }
 }
 

@@ -67,8 +67,8 @@
 	"alerts": {
 		"title": "Alerts",
 		"messages": [
-			"You have <a href=\"#\">5 new messages</a> from AWA Marketing Leads.",
-			"You have <a href=\"#\">2 new alerts</a> from AWA Ops."
+			"You have <a href=\"#\">5 new messages</a> <br> from clients.",
+			"You have <a href=\"#\">2 new messages</a> <br> from BXFinance."
 		],
 		"button": "View Messaging Center"
 	},

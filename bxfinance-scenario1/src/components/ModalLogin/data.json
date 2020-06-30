@@ -1,10 +1,15 @@
 {
 	"titles": {
 		"welcome": "Welcome back",
-		"login_method": "How would you like to sign in?"
+		"login_method": "How would you like to sign in?",
+		"recover_username_success": "Email sent!"
 	},
 	"form": {
 		"fields": {
+			"email": {
+				"label": "Email",
+				"placeholder": ""
+			},
 			"username": {
 				"label": "Username",
 				"placeholder": ""
@@ -24,7 +29,8 @@
 			"next": "Next",
 			"reset": "Forgot your username?",
 			"login": "Sign In",
-			"help": "Need help signing in?"
+			"help": "Need help signing in?",
+			"recover_username": "Recover Username"
 		}
 	},
 	"mobile": {
