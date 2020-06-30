@@ -14,44 +14,47 @@ import Advisor from './pages/advisor/index';
 import AdvisorClient from './pages/advisor/client';
 import AnyMarketing from './pages/any-marketing';
 import * as serviceWorker from './serviceWorker';
+import { AuthNProvider } from './components/context/AuthNContext'; /* PING INTEGRATION */
 
 const routing = (
   <Router basename={`${process.env.PUBLIC_URL}`}>
-    <Switch>
-      <Route path="/privacy-security">
-        <PrivacySecurity />
-      </Route>
-      <Route path="/communication-preferences">
-        <CommunicationPrefernces />
-      </Route>
-      <Route path="/banking/profile-settings">
-        <AccountsProfileSettings />
-      </Route>
-      <Route path="/banking/pay-and-transfer">
-        <AccountsPayTransfer />
-      </Route>
-      <Route path="/banking/transfer-money">
-        <AccountsTransfer />
-      </Route>
-      <Route path="/banking">
-        <AccountsDashboard />
-      </Route>
-      <Route path="/any-wealth-advisor">
-        <AnyWealthAdvisor />
-      </Route>
-      <Route path="/advisor/client">
-        <AdvisorClient />
-      </Route>
-      <Route path="/advisor">
-        <Advisor />
-      </Route>
-      <Route path="/any-marketing">
-        <AnyMarketing />
-      </Route>
-      <Route path="/">
-        <Home />
-      </Route>
-    </Switch>
+    <AuthNProvider> {/* PING INTEGRATION */}
+      <Switch>
+        <Route path="/privacy-security">
+          <PrivacySecurity />
+        </Route>
+        <Route path="/communication-preferences">
+          <CommunicationPrefernces />
+        </Route>
+        <Route path="/banking/profile-settings">
+          <AccountsProfileSettings />
+        </Route>
+        <Route path="/banking/pay-and-transfer">
+          <AccountsPayTransfer />
+        </Route>
+        <Route path="/banking/transfer-money">
+          <AccountsTransfer />
+        </Route>
+        <Route path="/banking">
+          <AccountsDashboard />
+        </Route>
+        <Route path="/any-wealth-advisor">
+          <AnyWealthAdvisor />
+        </Route>
+        <Route path="/advisor/client">
+          <AdvisorClient />
+        </Route>
+        <Route path="/advisor">
+          <Advisor />
+        </Route>
+        <Route path="/any-marketing">
+          <AnyMarketing />
+        </Route>
+        <Route path="/">
+          <Home />
+        </Route>
+      </Switch>
+    </AuthNProvider>
   </Router>
 )
 

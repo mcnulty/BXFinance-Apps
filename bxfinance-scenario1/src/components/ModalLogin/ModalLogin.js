@@ -22,18 +22,18 @@ import "./ModalLogin.scss";
 // Data
 import data from './data.json';
 
+// Context - PING INTEGRATION
+import { AuthNConsumer } from '../context/AuthNContext';
+
 class ModalLogin extends React.Component {
   constructor() {
     super();
-    // PING INTEGRATION: added userName property.
+
     this.state = {
       isOpen: false,
       activeTab: '1',
       loginMethodUnset: true,
-      loginMethodFormGroupClass: '',
-      userName: '',
-      flowId: '0',
-      refId: '0'
+      loginMethodFormGroupClass: ''
     };
   }
   onClosed() {
