@@ -22,15 +22,24 @@ import "./ModalLogin.scss";
 // Data
 import data from './data.json';
 
+/* BEGIN PING INTEGRATION */
+// TODO Context for local user sessions.
+// import { AuthNConsumer } from '../context/AuthNContext';
+import PingAuthN from '../Utils/PingAuthN';
+/* END PING INTEGRATION */
+
 class ModalLogin extends React.Component {
   constructor() {
     super();
+
     this.state = {
       isOpen: false,
       activeTab: '1',
       loginMethodUnset: true,
-      loginMethodFormGroupClass: ''
+      loginMethodFormGroupClass: '',
+      userName: '', /* PING INTEGRATION */
     };
+    this.PingAuthN = new PingAuthN();
   }
   onClosed() {
     this.setState({
@@ -45,9 +54,15 @@ class ModalLogin extends React.Component {
     });
   }
   toggleTab(tab) {
-    this.setState({
-      activeTab: tab
-    });
+  /* BEGIN PING INTEGRATION: tab 2 modal is device selection which we don't use so we don't change state. Only call our handler. */
+    if (tab = 2) {
+      this.handleSubmit(); 
+    } else {
+      /* END PING INTEGRATION */
+      this.setState({
+        activeTab: tab
+      });
+    }
   }
   setLoginMethod() {
     this.setState({
@@ -55,6 +70,27 @@ class ModalLogin extends React.Component {
       loginMethodFormGroupClass: 'form-group-light'
     });
   }
+  // BEGIN PING INTEGRATIONS
+  handleIDChange(event) {
+    // grabbing whatever the user is typing in the ID first form as they type, and
+    // saving it to state. (Controlled input).
+    this.setState({ userName: event.target.value });
+  }
+
+  // Handler for Next button on IDF form.
+  handleSubmit() {
+    if (window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      const flowId = params.get('flowId');
+
+      this.PingAuthN.authnAPI("GET", flowId)
+        .then(response => response.json())
+        .then(jsonResult => this.PingAuthN.handleFlowStatus(jsonResult, this.state.userName))
+        .catch(error => console.error('HANDLESUBMIT ERROR', error));
+    }
+  }
+  // END PING INTEGRATIONS
+
   render() {
     const closeBtn = <div />;
     return (
@@ -68,13 +104,13 @@ class ModalLogin extends React.Component {
                   <h4>{data.titles.welcome}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
-                    <Input type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} />
+                    <Input onChange={this.handleIDChange.bind(this)} type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} /> {/* PING INTEGRATION added onChange. */}
                   </FormGroup>
                   <FormGroup className="form-group-light">
                     <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
                   </FormGroup>
                   <div className="mb-3">
-                    <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button>
+                    <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button> {/* PING INTEGRATION see onClick function. */}
                   </div>
                   <div>
                     <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('4'); }}>{data.form.buttons.reset}</Button>
@@ -97,7 +133,7 @@ class ModalLogin extends React.Component {
                   </div>
                 </TabPane>
                 <TabPane tabId="3">
-                  <div className="mobile-loading" style={{backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)`}}>
+                  <div className="mobile-loading" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)` }}>
                     <div className="spinner">
                       <FontAwesomeIcon icon={faCircleNotch} size="3x" className="fa-spin" />
                     </div>

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<!-- %REACT_APP_HOST% -->
+<!-- %REACT_APP_HOST% --> <!-- PING INTEGRATION: added env. var comment for verification. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+    <!-- BEGIN PING INTEGRATIONS: optional meta tags and recommended content security policies. -->
     <meta
       name="description"
       content="A live demo of financial industry customer applications secured and  protected by Ping Identity solutions." />
@@ -19,10 +20,12 @@
         X.509, Kerberos, RADIUS, authentication, authorization" />
     <meta 
       http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; style-src 'self' fonts.googleapis.com fonts.gstatic.com 'unsafe-inline'; script-src 'self'; img-src 'self'; frame-src 'self'; form-action 'self';" />
+      content="default-src 'self'; style-src 'self' 'unsafe-inline' fonts.googleapis.com use.typekit.net p.typekit.net; font-src 'self' use.typekit.net fonts.gstatic.com; 
+      script-src 'self' 'unsafe-inline'; img-src 'self'; frame-src 'self'; form-action 'self'; connect-src 'self';" />
     <meta 
       name="author"
       content="Technical Enablement - Ping Identity" />
+      <!-- END PING INTEGRATIONS -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a

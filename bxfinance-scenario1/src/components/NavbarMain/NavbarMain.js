@@ -15,6 +15,7 @@ import { Link, NavLink as RRNavLink } from 'react-router-dom';
 import ModalRegister from '../ModalRegister';
 import ModalRegisterConfirm from '../ModalRegisterConfirm';
 import ModalLogin from '../ModalLogin';
+import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
 
 // Styles
 import './NavbarMain.scss';
@@ -26,8 +27,12 @@ class NavbarMain extends React.Component {
   constructor() {
     super();
     this.state = {
-      isOpen: false
+      isOpen: false,
+      userName: '',
+      firstName: '',
+      lastName: ''
     };
+    this.PingAuthN = new PingAuthN();
   }
   triggerModalRegister() {
     this.refs.modalRegister.toggle();
@@ -40,6 +45,11 @@ class NavbarMain extends React.Component {
     this.refs.modalRegisterConfirm.toggle();
   }
   triggerModalLogin() {
+    /* BEGIN PING INTEGRATION */
+    if (!window.location.search) {
+      window.location.href = process.env.REACT_APP_HOST + data.startSSOURI
+    }/* END PING INTEGRATION */
+    //We're not triggering the login modal unless we come back with a flowId.
     this.refs.modalLogin.toggle();
   }
   toggle() {
@@ -48,10 +58,37 @@ class NavbarMain extends React.Component {
     });
   }
   componentDidMount () {
-    if ( window.location.search ) {
-      this.refs.modalRegisterConfirm.toggle();
+    // BEGIN PING INTEGRATION
+    // Check for and create a query string params object
+    if (window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      // Coming back from authN API so pop the login modal dialog
+      if (params.get("flowId")) {
+        this.refs.modalLogin.toggle();
+      }
+      // Coming back as authenticated user from Agentless IK.
+      else if (params.get("REF")) {
+        const REF = params.get("REF");
+        const targetApp = decodeURIComponent(params.get("TargetResource"));
+
+        this.PingAuthN.pickUpAPI(REF)
+        .then(response => response.json())
+        .then(data => console.info("REF Data", data));
+
+        // TODO this needs to move into the context object so we can read it on any component.
+        this.setState({
+          userName: data.ImmutableID,
+          firstName: data.FirstName,
+          lastName: data.lastName
+        })
+        
+        // Send them to the target app
+        window.location.href = targetApp;
+      }
     }
+    // END PING INTEGRATION
   }
+
   render() {
     return (
       <section className="navbar-main">
@@ -78,7 +115,8 @@ class NavbarMain extends React.Component {
                   <Link to="/" className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
                 </NavItem>
                 <NavItem className="register">
-                  <NavLink href={process.env.PUBLIC_URL + "/velocity/register.html"}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
+                  {/* PING INTEGRATION: added env var and link to PF LIP reg form. */}
+                  <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
                 </NavItem>
               </Nav>
             </Collapse>
@@ -156,7 +194,8 @@ class NavbarMain extends React.Component {
                 <Link to="/" className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
               </NavItem>
               <NavItem className="register">
-                <NavLink href={process.env.PUBLIC_URL + "/velocity/register.html"}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.register}</NavLink>
+                {/* PING INTEGRATION: added env var and link to PF LIP reg form. */}
+                <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.register}</NavLink>
               </NavItem>
             </Nav>
           </Collapse>
