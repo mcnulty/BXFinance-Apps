@@ -1,0 +1,36 @@
+/* HeroHome */
+
+@import '../../styles/variables.scss';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/bootstrap-grid';
+@import '../../styles/typography.scss';
+
+.book-appointment {
+  border: 0;
+  border-radius: 13px;
+  overflow: hidden;
+  margin: 20px 0 0;
+
+  .card-body {
+    z-index: 1;
+
+    img {
+      margin: 0 0 20px 0;
+    }
+  
+    h3.card-title {
+      @include capitolium-2-bold;
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 14px;
+      margin: 10px 0;
+    }
+
+    .btn-link {
+      padding-left: 0;
+      font-size: 16px;
+    }
+  }
+}

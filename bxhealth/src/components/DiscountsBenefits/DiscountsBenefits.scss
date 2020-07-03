@@ -1,0 +1,58 @@
+/* HeroHome */
+
+@import '../../styles/variables.scss';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/bootstrap-grid';
+@import '../../styles/typography.scss';
+
+.discounts-events-module {
+  border: 0;
+  border-radius: 13px;
+  overflow: hidden;
+  margin: 20px 0 0;
+  padding: 20px 10px 0 10px;
+
+  .card-body {
+    position: relative;
+
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -40px;
+      left: -30px;
+      z-index: 1;
+      width: 130px;
+      height: 130px;
+      background: url(/images/icons/money-gray.svg) 0 0 no-repeat;
+    }
+
+    h3.card-title {
+      @include capitolium-2-bold;
+      font-size: 24px;
+      @include media-breakpoint-down(md) {
+        font-size: 20px;
+      }
+      position: relative;
+      z-index: 2;
+      margin: 0 0 !important;
+      &:after {
+        display: none;
+      }
+    }
+
+    p {
+      position: relative;
+      z-index: 2;
+      font-size: 14px;
+      margin: 10px 0 15px 0;
+    }
+
+    .btn-link {
+      position: relative;
+      z-index: 2;
+      padding-left: 0;
+      font-size: 16px;
+    }
+  }
+}

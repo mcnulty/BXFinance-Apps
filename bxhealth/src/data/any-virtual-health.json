@@ -1,0 +1,121 @@
+{
+	"brand": "AnyVirtualHealth",
+	"menus": {
+		"primary": [
+			{
+				"title": "My Account",
+				"url": "/any-virtual-health"
+			},
+			{
+				"title": "My Family",
+				"url": "/any-virtual-health/family"
+			},
+			{
+				"title": "My Records",
+				"url": "/any-virtual-health/records"
+			},
+			{
+				"title": "Appointments",
+				"url": "/any-virtual-health/appointments"
+			},
+			{
+				"title": "Messages",
+				"url": "/any-virtual-health/messages"
+			}
+		],
+		"utility": {
+			"search": "Search",
+			"locations": "Find a Location",
+			"support": "Get Support",
+			"logout": "Sign Out"
+		},
+		"footer": [
+			{
+				"title": "Our Company",
+				"url": "/",
+				"children": [
+					{
+						"title": "Investor Relations",
+						"url": "/"
+					},
+					{
+						"title": "Corporate Citizenship",
+						"url": "/"
+					},
+					{
+						"title": "News",
+						"url": "/"
+					},
+					{
+						"title": "Locations",
+						"url": "/"
+					}
+				]
+			},
+			{
+				"title": "800.543.2276",
+				"url": "/",
+				"children": [
+					{
+						"title": "help@anyvirtualhealth.com",
+						"url": "/"
+					},
+					{
+						"title": "Chat with Us",
+						"url": "/"
+					}
+				]
+			},
+			{
+				"title": "Privacy & Security",
+				"url": "/",
+				"children": [
+					{
+						"title": "Terms of Use",
+						"url": "/"
+					},
+					{
+						"title": "Disclosures",
+						"url": "/"
+					},
+					{
+						"title": "Accessibility",
+						"url": "/"
+					}
+				]
+			}
+		]
+	},
+	"welcome_bar": "Welcome, Jane",
+	"subnav": [
+		{
+			"title": "Locations",
+			"href": "#",
+			"open": false
+		},
+		{
+			"title": "Client Service",
+			"href": "#",
+			"open": false
+		},
+		{
+			"title": "Resources",
+			"href": "#",
+			"open": false
+		},
+		{
+			"title": "My Setting/Profile",
+			"href": "#",
+			"open": false
+		}
+	],
+	"notice": {
+		"content": "AnyVirtualHealth is a partner provider to BXHealth members and their families for a range of your healthcare services.",
+		"button": "Learn More"
+	},
+	"dashboard": {
+		"title": "Your AnyVirtualHealth Portal",
+		"select": "Things I Can Do"
+	},
+	"copyright": "© AnyVirtualHealth, 2020"
+}

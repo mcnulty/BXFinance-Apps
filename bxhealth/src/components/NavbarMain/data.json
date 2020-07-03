@@ -1,0 +1,38 @@
+{
+	"brand": "BXHealth",
+	"menus": {
+		"primary": [
+			{
+				"title": "Patient Care",
+				"url": "/dashboard"
+			},
+			{
+				"title": "Health Plans",
+				"url": "/health-plans"
+			},
+			{
+				"title": "Education",
+				"url": "/education"
+			},
+			{
+				"title": "Tools & Resources",
+				"url": "/tools-resources"
+			},
+			{
+				"title": "Learning",
+				"url": "/learning"
+			}
+		],
+		"utility": {
+			"search": "Search",
+			"locations": "Find a Branch",
+			"support": "Get Support",
+			"register_intro": "Not enrolled? Create an account:",
+			"register": "Member",
+			"register_caregiver": "Caregiver",
+			"login": "Member Sign In",
+			"login_caregiver": "Caregiver Sign In",
+			"logout": "Sign Out"
+		}
+	}
+}

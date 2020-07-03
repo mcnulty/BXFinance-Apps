@@ -1,0 +1,94 @@
+{
+	"title": "Caregiver Access",
+	"subnav": [
+    {
+      "title": "Coverage & Benefits",
+      "href": "#",
+      "open": false
+    },
+    {
+      "title": "Claims & Accounts",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "Perscriptions & Pharmacies",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "Health Resources",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "My Settings",
+      "open": true,
+      "href": "/dashboard/profile-settings",
+      "links": [
+        {
+          "title": "Personal Details",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Communications Preferences",
+          "active": false,
+          "href": "/dashboard/communication-preferences"
+        },
+        {
+          "title": "Privacy & Security Settings",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Sign In & Password",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Caregiver Access",
+          "active": false,
+          "href": "/dashboard/caregiver-access"
+        }
+      ]
+    },
+    {
+      "title": "Passwords & Security",
+      "open": false,
+      "href": "#"
+    }
+  ],
+  "dropdown": "Things I Can Do",
+  "steps": [
+    {
+      "title": "Let’s set your Caregiver Access Options",
+      "description": "BXHealth allows you to grant Caregivers access to your healthcare information. You control what is shared.",
+      "email_title": "Grant Caregiver Access:",
+      "email_placeholder": "Enter Caregiver email",
+      "table_title": "Allow Caregiver to:",
+      "communication_types": [
+        {
+          "name": "sms",
+          "label": "Manage Appointments"
+        },
+        {
+          "name": "email",
+          "label": "Message Doctors"
+        },
+        {
+          "name": "mail",
+          "label": "View Test Results"
+        }
+      ],
+      "button": "Update"
+    },
+    {
+      "title": "Let’s set your Caregiver Access Options"
+    },
+    {
+      "title": "Your Caregiver's Access",
+      "description": "You've set Alex Smith as your Caregiver. Alex has access to the following:"
+    }
+  ]
+}

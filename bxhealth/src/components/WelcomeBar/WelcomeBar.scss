@@ -1,0 +1,14 @@
+@import '../../styles/typography.scss';
+
+.welcome-bar {
+  padding: 20px;
+  background: #fff;
+
+  p {
+    color: rgb(31, 15, 17);
+    @include capitolium-2-bold;
+    font-size: 36px;
+    line-height: 48px;
+    margin: 0 !important;
+  }
+}

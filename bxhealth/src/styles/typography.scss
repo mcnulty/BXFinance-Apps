@@ -1,0 +1,45 @@
+@import url("https://use.typekit.net/rem0kse.css");
+@import url("https://fonts.googleapis.com/css?family=Rubik:300,400,500,600,700,900|Roboto:300,400,700,900&display=swap");
+
+/* Fonts */
+@mixin capitolium-2-reg {
+  font-family: capitolium-2, serif;
+  font-weight: 400;
+}
+.capitolium-2-bold { @include capitolium-2-reg; }
+
+@mixin capitolium-2-bold {
+  font-family: capitolium-2, serif;
+  font-weight: 700;
+}
+.capitolium-2-bold { @include capitolium-2-bold; }
+
+@mixin filson-soft-light {
+  font-family: filson-soft, sans-serif;
+  font-weight: 200;
+}
+.filson-soft-book { @include filson-soft-light; }
+
+@mixin filson-soft-book {
+  font-family: filson-soft, sans-serif;
+  font-weight: 300;
+}
+.filson-soft-book { @include filson-soft-book; }
+
+@mixin filson-soft-medium {
+  font-family: filson-soft, sans-serif;
+  font-weight: 500;
+}
+.filson-soft-medium { @include filson-soft-medium; }
+
+@mixin filson-soft-bold {
+  font-family: filson-soft, sans-serif;
+  font-weight: 700;
+}
+.filson-soft-bold { @include filson-soft-bold; }
+
+@mixin filson-soft-heavy {
+  font-family: filson-soft, sans-serif;
+  font-weight: 900;
+}
+.filson-soft-heavy { @include filson-soft-heavy; }

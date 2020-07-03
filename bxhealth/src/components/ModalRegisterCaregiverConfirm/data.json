@@ -1,0 +1,15 @@
+{
+	"download": {
+		"title": "Get the BXHealth App",
+		"content": "A faster, easier way to access all your accounts from anywhere.",
+		"learn": "<small>or <a href=\"#\" class=\"text-info\">Learn More</a></small>"
+	},
+	"confirmation": {
+		"title": "We've Created Your Account",
+		"content": "<p>TBD</p>",
+		"buttons": {
+			"learn": "Sign In",
+			"close": "Close"
+		}
+	}
+}

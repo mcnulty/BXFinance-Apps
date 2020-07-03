@@ -1,0 +1,105 @@
+{
+	"title": "My Settings",
+	"subnav": [
+    {
+      "title": "Coverage & Benefits",
+      "href": "#",
+      "open": false
+    },
+    {
+      "title": "Claims & Accounts",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "Perscriptions & Pharmacies",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "Health Resources",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "My Settings",
+      "open": true,
+      "href": "/dashboard/profile-settings",
+      "links": [
+        {
+          "title": "Personal Details",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Communications Preferences",
+          "active": false,
+          "href": "/dashboard/communication-preferences"
+        },
+        {
+          "title": "Privacy & Security Settings",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Sign In & Password",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Caregiver Access",
+          "active": false,
+          "href": "/dashboard/caregiver-access"
+        }
+      ]
+    },
+    {
+      "title": "Passwords & Security",
+      "open": false,
+      "href": "#"
+    }
+  ],
+  "dropdown": "Things I Can Do",
+  "sections": [
+    {
+      "title": "Personal Details",
+      "description": "Make changes to your name, address, phone number and other details of your account.",
+      "white": true,
+      "curved": true,
+      "button_text": "Update",
+      "button_href": "#"
+    },
+    {
+      "title": "Communications Preferences",
+      "description": "Review how we communicate with you about your account.",
+      "white": false,
+      "curved": false,
+      "button_text": "Modify",
+      "button_href": "/dashboard/communication-preferences"
+    },
+    {
+      "title": "Privacy & Security Settings",
+      "description": "Review and update the tools you use to keep your account secure. ",
+      "white": true,
+      "curved": false,
+      "button_text": "Review",
+      "button_href": "#"
+    },
+    {
+      "title": "Sign In & Password",
+      "description": "Make secure changes to your username and password. ",
+      "white": false,
+      "curved": false,
+      "button_text": "Modify",
+      "button_href": "#"
+    },
+    {
+      "title": "Caregiver Access",
+      "description": "Review and modify sharing settings for Caregivers and others. ",
+      "white": true,
+      "curved": false,
+      "button_text": "Set",
+      "button_href": "/dashboard/caregiver-access"
+    }
+  ]
+}

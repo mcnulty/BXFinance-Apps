@@ -1,0 +1,15 @@
+{
+	"download": {
+		"title": "Get the BXHealth App",
+		"content": "A faster, easier way to access all your accounts from anywhere.",
+		"learn": "<small>or <a href=\"#\" class=\"text-info\">Learn More</a></small>"
+	},
+	"confirmation": {
+		"title": "We've Created Your Account",
+		"content": "<p>You can now access your BXHealth accounts, events, and other tools online with your username and password.</p><p>Here's just a sample of the things you can do:</p> <ul><li>Access your BXHealth account</li><li>Review your benefits</li><li>Submit, review, and track claims</li><li>Schedule appointments, online or in the office</li><li>Browse member heathcare resources, like events and special offers</li></ul> <p>You can <a href=\"#\">learn more</a> about all the things you can do, or simply sign in below.</p>",
+		"buttons": {
+			"learn": "Sign In",
+			"close": "Close"
+		}
+	}
+}

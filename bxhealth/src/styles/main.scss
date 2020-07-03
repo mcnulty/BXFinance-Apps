@@ -1,0 +1,88 @@
+@import './variables.scss';
+@import '~bootstrap/scss/bootstrap.scss';
+@import './typography.scss';
+@import './forms.scss';
+@import './modals.scss';
+
+
+/* Global */
+body {
+  margin: 0;
+  @include filson-soft-book;
+  color: #211012;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @include capitolium-2-bold;
+}
+
+p {
+  color: rgb(31, 15, 17);
+  line-height: 1.7;
+  margin-bottom: .3rem;
+}
+
+a,
+.text-info {
+  @include filson-soft-medium;
+  color: theme-color("info");
+
+  &:hover,
+  &:focus {
+    @include filson-soft-bold;
+    color: theme-color("info");
+    text-decoration: none;
+  }
+
+  &.cancel {
+    margin: 0 20px 0 0;
+  }
+}
+
+.btn-primary,
+.btn-secondary {
+  color: white;
+  font-size: 16px;
+  font-weight: 400;
+  padding: 10px 25px;
+  border-radius: 24px;
+  border: 0;
+  @include filson-soft-book;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:disabled {
+    background: rgb(209, 209, 209);
+
+    &:hover {
+      background: rgb(209, 209, 209);
+    }
+  }
+}
+
+.btn-primary {
+  &:hover,
+  &:focus {
+    color: white;
+    background-color: theme-color("secondary");
+  }
+}
+
+.module {
+  background: rgb(255, 255, 255);
+  border-radius: 11px;
+  padding: 20px;
+  margin-bottom: 20px;
+}

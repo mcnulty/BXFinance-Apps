@@ -1,0 +1,108 @@
+{
+	"title": "Communication Preferences",
+	"subnav": [
+    {
+      "title": "Coverage & Benefits",
+      "href": "#",
+      "open": false
+    },
+    {
+      "title": "Claims & Accounts",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "Perscriptions & Pharmacies",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "Health Resources",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "My Settings",
+      "open": true,
+      "href": "/dashboard/profile-settings",
+      "links": [
+        {
+          "title": "Personal Details",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Communications Preferences",
+          "active": false,
+          "href": "/dashboard/communication-preferences"
+        },
+        {
+          "title": "Privacy & Security Settings",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Sign In & Password",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Caregiver Access",
+          "active": false,
+          "href": "/dashboard/caregiver-access"
+        }
+      ]
+    },
+    {
+      "title": "Passwords & Security",
+      "open": false,
+      "href": "#"
+    }
+  ],
+  "dropdown": "Things I Can Do",
+  "steps": [
+    {
+      "title": "How should we communicate with you?",
+      "description": "Let's review settings for how we can communicate with you about your accounts. Please make any adjustements.",
+      "table_title": "Account Related Communications",
+      "communication_types": [
+        {
+          "name": "sms",
+          "label": "SMS/Text Messages (555.239.9685)"
+        },
+        {
+          "name": "email",
+          "label": "Email (janelakesmith@gmail.com)"
+        },
+        {
+          "name": "mail",
+          "label": "Mail (1278 Sutherland Dr. Roebuck, IL 60610) "
+        }
+      ],
+      "button": "Update"
+    },
+    {
+      "title": "Changes Confirmed",
+      "description": "Your communications preferences now are as follows:",
+      "communication_types": [            
+        {
+          "checked": true,
+          "name": "sms",
+          "label": "SMS/Text Messages (555.239.9685)"
+        },
+        {
+          "checked": true,
+          "name": "email",
+          "label": "Email (janelakesmith@gmail.com)"
+        },
+        {
+          "checked": false,
+          "name": "mail",
+          "label": "Mail (1278 Sutherland Dr. Roebuck, IL 60610)"
+        }
+      ],
+      "other_things": "<p>Other things you can do</p><ul><li>Review other <a href=\"#\">Privacy &amp; Security Settings</a></li></ul>",
+      "btn_back": "Close"
+    }
+  ]
+}

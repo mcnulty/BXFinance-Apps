@@ -1,0 +1,147 @@
+{
+	"title": "Classes & Events",
+  "dropdown": "Things I Can Do",
+  "subnav": [
+    {
+      "title": "Coverage & Benefits",
+      "href": "#",
+      "open": false
+    },
+    {
+      "title": "Claims & Accounts",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "Perscriptions & Pharmacies",
+      "open": false,
+      "href": "#"
+    },
+    {
+      "title": "Health Resources",
+      "open": true,
+      "href": "#",
+      "links": [
+        {
+          "title": "Online FAQs/Videos",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Nutrition Guidance",
+          "active": false,
+          "href": "#"
+        },
+        {
+          "title": "Classes & Events",
+          "active": true,
+          "href": "#"
+        },
+        {
+          "title": "Newsletters, Emails, and More",
+          "active": false,
+          "href": "#"
+        }
+      ]
+    },
+    {
+      "title": "My Settings",
+      "open": false,
+      "href": "/dashboard/profile-settings"
+    },
+    {
+      "title": "Passwords & Security",
+      "open": false,
+      "href": "#"
+    }
+  ],
+  "subtitle": "Sign Up for Upcoming BXHealth Events",
+  "description": "Your local BXHealth provider has an ongoing series of upcoming events. You can <strong>register to attend instantly</strong> simply by clicking the \"Register Me\".",
+  "events" : [
+    {
+      "date": "May 17th, 7 PM (CST)",
+      "title": "Going Veggie",
+      "description": "<strong>Step By Step Guide</strong><br>to Modifying Your Diet with Dr. Moira Gundy BXHealth, SE Illinois 1546 S. First St., Suite 3 Roebuck, IL  63456<br>312.487.5667",
+      "text_link": "Learn More",
+      "links": [
+        {
+          "text": "Register Me",
+          "href": "#",
+          "trigger_modal": true
+        }
+      ],
+      "links_registered": [
+        {
+          "text": "Learn More",
+          "href": "#"
+        },
+        {
+          "text": "Get Directions",
+          "href": "#"
+        },
+        {
+          "text": "Add to My Calendar",
+          "href": "#"
+        }
+      ]
+    },
+    {
+      "date": "June 10th, 7 PM (CST)",
+      "title": "Mini Workouts",
+      "description": "<strong>Finding Daily Moments of Health</strong><br>with Lisa Grimes BXHealth Clinic 237 W. Lanyon Dr. Roebuck, IL  63457 312.622.8956",
+      "text_link": "Learn More",
+      "links": [
+        {
+          "text": "Register Me",
+          "href": "#",
+          "trigger_modal": true
+        }
+      ],
+      "links_registered": [
+        {
+          "text": "Learn More",
+          "href": "#"
+        },
+        {
+          "text": "Get Directions",
+          "href": "#"
+        },
+        {
+          "text": "Add to My Calendar",
+          "href": "#"
+        }
+      ]
+    },
+    {
+      "date": "July 22nd, 6:30 PM (CST)",
+      "title": "Diet Myths",
+      "description": "<strong>Judge New Emerging Trends  with Jason Faraday</strong><br>BXHealth Nutrition 1560 Barry Ln. Fourth Floor Roebuck, IL  63457 312.424.8451",
+      "text_link": "Learn More",
+      "links": [
+        {
+          "text": "Register Me",
+          "href": "#",
+          "trigger_modal": true
+        }
+      ],
+      "links_registered": [
+        {
+          "text": "Learn More",
+          "href": "#"
+        },
+        {
+          "text": "Get Directions",
+          "href": "#"
+        },
+        {
+          "text": "Add to My Calendar",
+          "href": "#"
+        }
+      ]
+    }
+  ],
+  "modal": {
+    "title": "You’re Confirmed",
+    "description": "<p>Thanks for registering for this upcoming event. We've sent you an email confirmation of your reservation, along with more details about the event (location, parking, etc.). </p><p>Check your email inbox for details. See you at the event!</p>"
+  }
+}
