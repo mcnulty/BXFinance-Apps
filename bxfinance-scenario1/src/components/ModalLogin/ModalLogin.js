@@ -22,8 +22,11 @@ import "./ModalLogin.scss";
 // Data
 import data from './data.json';
 
-// Context - PING INTEGRATION
-import { AuthNConsumer } from '../context/AuthNContext';
+/* BEGIN PING INTEGRATION */
+// TODO Context for local user sessions.
+// import { AuthNConsumer } from '../context/AuthNContext';
+import PingAuthN from '../Utils/PingAuthN';
+/* END PING INTEGRATION */
 
 class ModalLogin extends React.Component {
   constructor() {
@@ -33,8 +36,10 @@ class ModalLogin extends React.Component {
       isOpen: false,
       activeTab: '1',
       loginMethodUnset: true,
-      loginMethodFormGroupClass: ''
+      loginMethodFormGroupClass: '',
+      userName: '', /* PING INTEGRATION */
     };
+    this.PingAuthN = new PingAuthN();
   }
   onClosed() {
     this.setState({
@@ -49,10 +54,15 @@ class ModalLogin extends React.Component {
     });
   }
   toggleTab(tab) {
-    this.handleSubmit(); /* PING INTEGRATION */
-    this.setState({
-      activeTab: tab
-    });
+  /* BEGIN PING INTEGRATION: tab 2 modal is device selection which we don't use so we don't change state. Only call our handler. */
+    if (tab = 2) {
+      this.handleSubmit(); 
+    } else {
+      /* END PING INTEGRATION */
+      this.setState({
+        activeTab: tab
+      });
+    }
   }
   setLoginMethod() {
     this.setState({
@@ -61,24 +71,23 @@ class ModalLogin extends React.Component {
     });
   }
   // BEGIN PING INTEGRATIONS
-  handleChange(event){
-    this.setState({userName: event.target.value});
+  handleIDChange(event) {
+    // grabbing whatever the user is typing in the ID first form as they type, and
+    // saving it to state. (Controlled input).
+    this.setState({ userName: event.target.value });
   }
+
+  // Handler for Next button on IDF form.
   handleSubmit() {
-    var myHeaders = new Headers();
-    // myHeaders.append("Cookie", "PF=MmNRTmlxfAboTbulViYmzR");
+    if (window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      const flowId = params.get('flowId');
 
-    var requestOptions = {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'manual'
-    };
-
-    fetch(process.env.REACT_APP_HOST + data.startSSOURI, requestOptions)
-      .then(response => response.text())
-      .then(result => console.log("Results:",result))
-      .catch(error => console.log('error', error));
-
+      this.PingAuthN.authnAPI("GET", flowId)
+        .then(response => response.json())
+        .then(jsonResult => this.PingAuthN.handleFlowStatus(jsonResult, this.state.userName))
+        .catch(error => console.error('HANDLESUBMIT ERROR', error));
+    }
   }
   // END PING INTEGRATIONS
 
@@ -95,7 +104,7 @@ class ModalLogin extends React.Component {
                   <h4>{data.titles.welcome}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
-                    <Input onChange={this.handleChange.bind(this)} type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} /> {/* PING INTEGRATION added onChange. */}
+                    <Input onChange={this.handleIDChange.bind(this)} type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} /> {/* PING INTEGRATION added onChange. */}
                   </FormGroup>
                   <FormGroup className="form-group-light">
                     <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
@@ -124,7 +133,7 @@ class ModalLogin extends React.Component {
                   </div>
                 </TabPane>
                 <TabPane tabId="3">
-                  <div className="mobile-loading" style={{backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)`}}>
+                  <div className="mobile-loading" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)` }}>
                     <div className="spinner">
                       <FontAwesomeIcon icon={faCircleNotch} size="3x" className="fa-spin" />
                     </div>

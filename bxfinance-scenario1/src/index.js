@@ -14,11 +14,11 @@ import Advisor from './pages/advisor/index';
 import AdvisorClient from './pages/advisor/client';
 import AnyMarketing from './pages/any-marketing';
 import * as serviceWorker from './serviceWorker';
-import { AuthNProvider } from './components/context/AuthNContext'; /* PING INTEGRATION */
+// import { AuthNProvider } from './components/context/AuthNContext'; /* PING INTEGRATION */
 
 const routing = (
   <Router basename={`${process.env.PUBLIC_URL}`}>
-    <AuthNProvider> {/* PING INTEGRATION */}
+    {/* <AuthNProvider> PING INTEGRATION */}
       <Switch>
         <Route path="/privacy-security">
           <PrivacySecurity />
@@ -54,7 +54,7 @@ const routing = (
           <Home />
         </Route>
       </Switch>
-    </AuthNProvider>
+    {/* </AuthNProvider> */}
   </Router>
 )
 

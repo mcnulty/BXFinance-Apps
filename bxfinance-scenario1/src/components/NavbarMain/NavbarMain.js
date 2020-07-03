@@ -15,6 +15,7 @@ import { Link, NavLink as RRNavLink } from 'react-router-dom';
 import ModalRegister from '../ModalRegister';
 import ModalRegisterConfirm from '../ModalRegisterConfirm';
 import ModalLogin from '../ModalLogin';
+import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
 
 // Styles
 import './NavbarMain.scss';
@@ -26,8 +27,12 @@ class NavbarMain extends React.Component {
   constructor() {
     super();
     this.state = {
-      isOpen: false
+      isOpen: false,
+      userName: '',
+      firstName: '',
+      lastName: ''
     };
+    this.PingAuthN = new PingAuthN();
   }
   triggerModalRegister() {
     this.refs.modalRegister.toggle();
@@ -40,6 +45,11 @@ class NavbarMain extends React.Component {
     this.refs.modalRegisterConfirm.toggle();
   }
   triggerModalLogin() {
+    /* BEGIN PING INTEGRATION */
+    if (!window.location.search) {
+      window.location.href = process.env.REACT_APP_HOST + data.startSSOURI
+    }/* END PING INTEGRATION */
+    //We're not triggering the login modal unless we come back with a flowId.
     this.refs.modalLogin.toggle();
   }
   toggle() {
@@ -48,25 +58,35 @@ class NavbarMain extends React.Component {
     });
   }
   componentDidMount () {
-    // TODO BEGIN PING INTEGRATION: there must be a more efficient ES6 way to do this.
+    // BEGIN PING INTEGRATION
+    // Check for and create a query string params object
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
+      // Coming back from authN API so pop the login modal dialog
       if (params.get("flowId")) {
-        console.log("FlowId", params.get("flowId"))
-        this.refs.modalLogin.toggle(); /* PING INTEGRATION: changed this to pop the modalLogin instead of reg. */
+        this.refs.modalLogin.toggle();
       }
+      // Coming back as authenticated user from Agentless IK.
       else if (params.get("REF")) {
-        console.log("RefId", params.get("REF"));
-        // TODO grab REF and TargetResource params for agentless pickup and redirect to target app.
+        const REF = params.get("REF");
+        const targetApp = decodeURIComponent(params.get("TargetResource"));
+
+        this.PingAuthN.pickUpAPI(REF)
+        .then(response => response.json())
+        .then(data => console.info("REF Data", data));
+
+        // TODO this needs to move into the context object so we can read it on any component.
+        this.setState({
+          userName: data.ImmutableID,
+          firstName: data.FirstName,
+          lastName: data.lastName
+        })
+        
+        // Send them to the target app
+        window.location.href = targetApp;
       }
     }
     // END PING INTEGRATION
-    
-    // TODO delete this if we dont need it. Currently replaced with above logic. 
-    // if ( window.location.search ) {
-      // this.refs.modalRegisterConfirm.toggle();
-      // this.refs.modalLogin.toggle();/* PING INTEGRATION: changed this to pop the modalLogin instead of reg. */
-    // } 
   }
 
   render() {
