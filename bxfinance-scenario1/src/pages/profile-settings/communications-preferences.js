@@ -66,59 +66,58 @@ class CommunicationPreferences extends React.Component {
                 <h1>{data.title}</h1>
                 <AccountsDropdown text={data.dropdown} />
               </div>
-              <div className="module">
-                { this.state.step == 1 &&
-                  <>
-                    <h2>{data.steps[0].title}</h2>
-                    <p>{data.steps[0].description}</p>
-                    <h3>{data.steps[0].table_title}</h3>
-                    <Form>
-                      {
-                        Object.keys(data.steps[0].communication_types).map(index => {
-                          return (
-                            <>
-                              <FormGroup className={classNames({ "gray": (index % 2) })}>
-                                <Label for={data.steps[0].communication_types[index].name}>{data.steps[0].communication_types[index].label}</Label>
-                                <CustomInput type="radio" id={`${data.steps[0].communication_types[index].name}_yes`} name={data.steps[0].communication_types[index].name} label="Yes" />
-                                <CustomInput type="radio" id={`${data.steps[0].communication_types[index].name}_no`} name={data.steps[0].communication_types[index].name} checked label="No" />
-                              </FormGroup>
-                            </>
-                          );
-                        })      
-                      }
-                      <FormGroup className="buttons submit-buttons">
-                        <Button color="primary" onClick={ this.showStep2 }>Save</Button>
-                        <Button className="cancel" disabled>Cancel</Button>
-                      </FormGroup>
-                    </Form>
-                  </>
-                }
-                { this.state.step == 2 &&
-                  <>
-                    <h2 className="confirmation">{data.steps[1].title}</h2>
-                    <p>{data.steps[1].description}</p>  
-                    <Form>
-                      {
-                        Object.keys(data.steps[1].communication_types).map(index => {
-                          return (
-                            <>
-                              <FormGroup className={classNames({ "gray": (index % 2) })}>
-                                <Label for={data.steps[0].communication_types[index].name}>{data.steps[0].communication_types[index].label}</Label>
-                                <CustomInput type="radio" disabled id={`${data.steps[0].communication_types[index].name}_yes`} name={data.steps[0].communication_types[index].name} label="Yes" />
-                                <CustomInput type="radio" disabled id={`${data.steps[0].communication_types[index].name}_no`} name={data.steps[0].communication_types[index].name} checked label="No" />
-                              </FormGroup>
-                            </>
-                          );
-                        })      
-                      }
-                      <div dangerouslySetInnerHTML={{__html: data.steps[1].other_things}} />                    
-                      <FormGroup className="buttons submit-buttons">
-                        <Button color="primary" onClick={ this.showStep1 }>{data.steps[1].btn_back}</Button>
-                      </FormGroup>
-                    </Form>
-                  </>
-                }
-              </div>
+              { this.state.step == 1 &&
+                <div className="module module-step1">
+                  <h2>{data.steps[0].title}</h2>
+                  <p>{data.steps[0].description}</p>
+                  <h3>{data.steps[0].table_title}</h3>
+                  <Form>
+                    {
+                      Object.keys(data.steps[0].communication_types).map(index => {
+                        return (
+                          <>
+                            <FormGroup className={classNames({ "gray": (index % 2) })}>
+                              <Label for={data.steps[0].communication_types[index].name}>{data.steps[0].communication_types[index].label}</Label>
+                              <CustomInput type="radio" id={`${data.steps[0].communication_types[index].name}_yes`} name={data.steps[0].communication_types[index].name} label="Yes" />
+                              <CustomInput type="radio" id={`${data.steps[0].communication_types[index].name}_no`} name={data.steps[0].communication_types[index].name} checked label="No" />
+                            </FormGroup>
+                          </>
+                        );
+                      })      
+                    }
+                    <FormGroup className="buttons submit-buttons">
+                      <Button color="primary" onClick={ this.showStep2 }>Save</Button>
+                      <a href="/banking/profile-settings" className="text-info cancel">Cancel</a>                        
+                    </FormGroup>
+                  </Form>
+                </div>
+              }
+              { this.state.step == 2 &&                  
+                <div className="module module-step2">
+                  <h2 className="confirmation">{data.steps[1].title}</h2>
+                  <p>{data.steps[1].description}</p>  
+                  <h3>{data.steps[0].table_title}</h3>
+                  <Form>
+                    {
+                      Object.keys(data.steps[1].communication_types).map(index => {
+                        return (
+                          <>
+                            <FormGroup className={classNames({ "gray": (index % 2) })}>
+                              <Label for={data.steps[0].communication_types[index].name}>{data.steps[0].communication_types[index].label}</Label>
+                              <CustomInput type="radio" disabled id={`${data.steps[0].communication_types[index].name}_yes`} name={data.steps[0].communication_types[index].name} label="Yes" />
+                              <CustomInput type="radio" disabled id={`${data.steps[0].communication_types[index].name}_no`} name={data.steps[0].communication_types[index].name} checked label="No" />
+                            </FormGroup>
+                          </>
+                        );
+                      })      
+                    }
+                    <div dangerouslySetInnerHTML={{__html: data.steps[1].other_things}} />                    
+                    <FormGroup className="buttons submit-buttons">
+                      <Button color="primary" onClick={ this.showStep1 }>{data.steps[1].btn_back}</Button>
+                    </FormGroup>
+                  </Form>
+                </div>
+              }
             </div>
           </div>
         </Container>

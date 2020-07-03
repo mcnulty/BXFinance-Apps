@@ -34,8 +34,21 @@ p {
   line-height: 1.4;
 }
 
-a {
+a,
+.text-info {
+  font-weight: 500;
   color: theme-color("info");
+
+  &:hover,
+  &:focus {
+    font-weight: bold;
+    color: theme-color("info-hover");
+    text-decoration: none;
+  }
+
+  &.cancel {
+    margin: 0 20px 0 0;
+  }
 }
 
 .btn-primary,
@@ -60,4 +73,5 @@ a {
   background: rgb(255, 255, 255);
   border-radius: 11px;
   padding: 35px;
+  margin-bottom: 20px;
 }

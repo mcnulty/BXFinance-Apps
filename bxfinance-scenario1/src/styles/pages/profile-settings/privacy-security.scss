@@ -37,10 +37,22 @@
         }
   
         a.partner-overlay {
-          color: rgb(102, 176, 192);
+          position: relative;
           font-size: 12px;
           font-weight: 500;
           line-height: 22px;
+          padding-left: 20px;
+
+          &:before {
+            position: absolute;
+            content: '';
+            top: 0;
+            left: 0;
+            display: block;
+            background: url(/images/icons/info.png) 0 0 no-repeat;
+            width: 14px;
+            height: 14px;
+          }
         }
       }
     }
@@ -48,6 +60,7 @@
     // Account Access Dropdown
     .accounts-access {
       display: none;
+      background: rgb(243, 243, 243);
   
       &.visible {
         display: block;
@@ -58,7 +71,10 @@
         clear: both;
       }
       p {
-        margin: 0;
+        margin: 0 0 5px 0;
+        font-size: 12px;
+        line-height: 22px;
+        font-weight: normal;
       }
       .form-check {
         float: left;
@@ -71,9 +87,13 @@
   .confirmation {
     // Confirmation Title
     h3 {
-      font-size: 36px;
-      line-height: 48px;
       margin: 0;
+      font-size: 24px;
+      line-height: 30px;
+      @media only screen and (min-width: 992px) {
+        font-size: 36px;
+        line-height: 48px;
+      }
     }
 
     // P Tags
@@ -83,12 +103,17 @@
       &.form-header {
         font-weight: 500;
         margin-top: 20px;
+        margin-bottom: 10px;
       }
     }
       
     ul {
       margin: 0;
       padding: 0 0 0 20px;
+
+      li {
+        margin: 4px 0;
+      }
     }
 
     // Form

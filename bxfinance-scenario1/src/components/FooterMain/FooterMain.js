@@ -38,6 +38,7 @@ const FooterMain = (props) => {
               </NavItem>
             </Nav>
             <p dangerouslySetInnerHTML={{__html: data.copyright}}></p>
+            <p><a href="https://iconify.design/" target="_blank" className="text-muted">Iconify</a></p>
           </Col>
           <Col md="6" lg="8" xl="6" className="order-1 order-md-2">
             <Nav className="nav-main">

@@ -176,14 +176,14 @@ class Advisor extends React.Component {
                 <div>
                   <h5 className="mb-4">{data.news.title}</h5>
                   <Row>
-                    <Col md="6">
+                    <Col md="6" className="mb-4">
                       <h5>{data.news.webinar.title}</h5>
-                      <p dangerouslySetInnerHTML={{__html: data.news.webinar.content}}></p>
+                      <p className="mb-2" dangerouslySetInnerHTML={{__html: data.news.webinar.content}}></p>
                       <Button color="link">{data.news.webinar.button}</Button>
                     </Col>
-                    <Col md="6">
+                    <Col md="6" className="mb-4">
                       <h5>{data.news.schedules.title}</h5>
-                      <p dangerouslySetInnerHTML={{__html: data.news.schedules.content}}></p>
+                      <p className="mb-2" dangerouslySetInnerHTML={{__html: data.news.schedules.content}}></p>
                       <Button color="link">{data.news.schedules.button}</Button>
                     </Col>
                   </Row>

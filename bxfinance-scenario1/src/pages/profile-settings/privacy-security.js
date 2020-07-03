@@ -89,9 +89,9 @@ class PrivacySecurity extends React.Component {
                         }                        
                         <Row>
                           <Col>
-                            <FormGroup className="buttons submit-buttons">
+                            <FormGroup className="buttons submit-buttons">  
                               <Button color="primary" onClick={ this.showStep2 }>{data.steps[0].btn_save}</Button>
-                              <Button className="cancel" disabled>{data.steps[0].btn_cancel}</Button>
+                              <a href="/banking/profile-settings" className="text-info cancel">{data.steps[0].btn_cancel}</a> 
                             </FormGroup>
                           </Col>
                         </Row>
@@ -114,8 +114,9 @@ class PrivacySecurity extends React.Component {
                                 const permission = data.steps[1].partners[index].permissions[index2];
                                 return (
                                   <FormGroup check>
-                                    <Label check>
+                                    <Label className="custom-checkbox" check>
                                       <Input type="checkbox" checked={permission.checked} disabled /> {permission.label}
+                                      <span class="checkmark"><span></span></span>
                                     </Label>
                                   </FormGroup>
                                 )

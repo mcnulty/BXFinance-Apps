@@ -245,7 +245,7 @@ class AnyMarketing extends React.Component {
                     );
                   })      
                 }
-                <Button color="link">{data.alerts.button}</Button>
+                <Button color="link" className="mb-4">{data.alerts.button}</Button>
               </Col>
               <Col lg="9">
                 <div>
