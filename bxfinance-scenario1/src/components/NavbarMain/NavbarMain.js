@@ -16,6 +16,7 @@ import ModalRegister from '../ModalRegister';
 import ModalRegisterConfirm from '../ModalRegisterConfirm';
 import ModalLogin from '../ModalLogin';
 import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
+import Session from '../Utils/Session'; /* PING INTEGRATION */
 
 // Styles
 import './NavbarMain.scss';
@@ -24,15 +25,14 @@ import './NavbarMain.scss';
 import data from './data.json';
 
 class NavbarMain extends React.Component {
+
   constructor() {
     super();
     this.state = {
       isOpen: false,
-      userName: '',
-      firstName: '',
-      lastName: ''
     };
-    this.PingAuthN = new PingAuthN();
+    this.PingAuthN = new PingAuthN(); /* PING INTEGRATION */
+    this.Session = new Session(); /* PING INTEGRATION */
   }
   triggerModalRegister() {
     this.refs.modalRegister.toggle();
@@ -73,20 +73,20 @@ class NavbarMain extends React.Component {
 
         this.PingAuthN.pickUpAPI(REF)
         .then(response => response.json())
-        .then(data => console.info("REF Data", data));
+        .then((jsonData) => {
+          this.Session.setAuthenticatedUserItem("mail", jsonData.email);
+          this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
+          this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
+          this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
+          this.Session.setAuthenticatedUserItem("pfSessionId", jsonData.sessionid);
+        });
 
-        // TODO this needs to move into the context object so we can read it on any component.
-        this.setState({
-          userName: data.ImmutableID,
-          firstName: data.FirstName,
-          lastName: data.lastName
-        })
-        
         // Send them to the target app
         window.location.href = targetApp;
       }
     }
     // END PING INTEGRATION
+    // Original T3 code in this lifecycle method removed.
   }
 
   render() {
@@ -112,7 +112,7 @@ class NavbarMain extends React.Component {
                   <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
                 </NavItem>
                 <NavItem className="logout d-none">
-                  <Link to="/" className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
+                  <Link to="/" onClick={()=>this.Session.killAuthenticatedUser()} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
                 </NavItem>
                 <NavItem className="register">
                   {/* PING INTEGRATION: added env var and link to PF LIP reg form. */}

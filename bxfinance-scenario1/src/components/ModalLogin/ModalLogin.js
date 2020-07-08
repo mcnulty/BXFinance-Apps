@@ -22,11 +22,7 @@ import "./ModalLogin.scss";
 // Data
 import data from './data.json';
 
-/* BEGIN PING INTEGRATION */
-// TODO Context for local user sessions.
-// import { AuthNConsumer } from '../context/AuthNContext';
-import PingAuthN from '../Utils/PingAuthN';
-/* END PING INTEGRATION */
+import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
 
 class ModalLogin extends React.Component {
   constructor() {
@@ -37,7 +33,7 @@ class ModalLogin extends React.Component {
       activeTab: '1',
       loginMethodUnset: true,
       loginMethodFormGroupClass: '',
-      userName: '', /* PING INTEGRATION */
+      userName: '' /* PING INTEGRATION */
     };
     this.PingAuthN = new PingAuthN();
   }
@@ -77,7 +73,7 @@ class ModalLogin extends React.Component {
     this.setState({ userName: event.target.value });
   }
 
-  // Handler for Next button on IDF form.
+  // Handler for "Next" button on IDfirst form (ModalLogin).
   handleSubmit() {
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);

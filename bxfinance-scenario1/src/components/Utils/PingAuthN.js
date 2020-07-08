@@ -57,10 +57,6 @@ export default class PingAuthN {
         };
 
         const url = process.env.REACT_APP_HOST + this.pfPickupURI
-        /* fetch(url + refId, requestOptions)
-            .then(response => response.json())
-            .then(result => console.info("PICKUP RESULTS:", result))
-            .catch(error => console.error('ERROR', error)); */
 
         return fetch(url + refId, requestOptions);
     }
@@ -83,7 +79,7 @@ export default class PingAuthN {
                 window.location.href = flowResponse.resumeUrl;
                 break;
             default:
-                console.warn("WTF", "handleFlowStatus defaulted with flowId = " + flowResponse.id);
+                console.warn("WTF", "handleFlowStatus() defaulted with flowId = " + flowResponse.id);
         }
     }
 }
