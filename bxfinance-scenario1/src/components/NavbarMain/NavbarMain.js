@@ -74,12 +74,15 @@ class NavbarMain extends React.Component {
         this.PingAuthN.pickUpAPI(REF)
         .then(response => response.json())
         .then((jsonData) => {
-          this.Session.setAuthenticatedUserItem("mail", jsonData.email);
+          this.Session.setAuthenticatedUserItem("email", jsonData.Email);
           this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
           this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
           this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
+          this.Session.setAuthenticatedUserItem("uid", jsonData.uid);
           this.Session.setAuthenticatedUserItem("pfSessionId", jsonData.sessionid);
-        });
+
+        })
+        .catch(error => console.error("Pickup Error:", error));
 
         // Send them to the target app
         window.location.href = targetApp;

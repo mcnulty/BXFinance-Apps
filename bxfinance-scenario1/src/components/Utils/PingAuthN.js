@@ -29,14 +29,14 @@ export default class PingAuthN {
 
         let tmp = contentType !== undefined && headers.append('Content-Type', contentType);
 
-        const options = {
+        const requestOptions = {
             headers: headers,
             method: method,
             body: body,
             credentials: 'include'
         }
         const url = process.env.REACT_APP_HOST + this.pfAuthnAPIURI + flowId;
-        return fetch(url, options);
+        return fetch(url, requestOptions);
     }
 
     /* 
@@ -46,11 +46,11 @@ export default class PingAuthN {
      */
     pickUpAPI(REF) {
         const refId = REF;
-        let myHeaders = new Headers();
+        const myHeaders = new Headers();
         myHeaders.append("ping.instanceid", this.pfSPRefIdAdapterInstanceId);
-        myHeaders.append("Authorization", "Basic cmVhY3QtdXNlcjoyRmVkZXJhdGVNMHJl"); /* TODO this should be obfuscated somehow. Client exposure risk. */
+        myHeaders.append("Authorization", "Basic cmVhY3QtdXNlcjoyRmVkZXJhdGVNMHJl"); /* TODO this should be obfuscated somehow. */
 
-        let requestOptions = {
+        const requestOptions = {
             method: 'POST',
             headers: myHeaders,
             redirect: 'follow'
@@ -69,7 +69,7 @@ export default class PingAuthN {
     handleFlowStatus(flowResponse, userName) {
         switch (flowResponse.status) {
             case "IDENTIFIER_REQUIRED":
-                let payload = '{\n  \"identifier\": \"' + userName + '\"\n}';
+                const payload = '{\n  \"identifier\": \"' + userName + '\"\n}';
                 this.authnAPI("POST", flowResponse.id, "application/vnd.pingidentity.submitIdentifier+json", payload)
                     .then(response => response.json())
                     .then(data => this.handleFlowStatus(data))

@@ -10,6 +10,8 @@ import AccountsDropdown from '../components/AccountsDropdown';
 import AccountsBalance from '../components/AccountsBalance';
 import CardRewards from '../components/CardRewards';
 import Session from '../components/Utils/Session'; /* PING INTEGRATION */
+import PingData from '../components/Utils/PingData'; /* PING INTEGRATION */
+import JSONSearch from '../components/Utils/JSONSearch'; /* PING INTEGRATION */
 
 // Data
 import data from '../data/accounts-dashboard.json';
@@ -20,14 +22,30 @@ import "../styles/pages/accounts.scss";
 class AccountsDashboard extends React.Component {
   constructor() {
     super();
-    this.Session = new Session();
+    this.Session = new Session(); /* PING INTEGRATION */
+    this.PingData = new PingData(); /* PING INTEGRATION */
+    this.JSONSearch = new JSONSearch(); /* PING INTEGRATION: */
   }
+
+  /* BEGIN PING INTEGRATION: */
+  componentDidMount() {
+    let tmpArr = [];
+    this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid"))
+    .then(response => response.json())
+      .then(jsonData => console.log("test:", this.JSONSearch.findValuesHelper(jsonData, "bxFinanceUserAccountIDs")))
+    //.then(jsonData => console.log("test:", JSON.stringify(jsonData)))
+    /* .then(jsonData => {
+      tmpArr = this.JSONSearch.getValues(jsonData, "bxFinanceUserAccountIDs");
+      console.info("Search Results:", tmpArr);
+    }) */;
+  }
+  /* END PING INTEGRATION: */
   
   render() {
     return(
       <div className="accounts accounts-dashboard">
         <NavbarMain />
-        <WelcomeBar firstName={this.Session.getAuthenticatedUserItem('firstName')} />
+        <WelcomeBar firstName={this.Session.getAuthenticatedUserItem('firstName')} /> {/* PING INTEGRATION: added passing of firstName prop. */}
         <Container>
           <div className="inner">
             <div className="sidebar">
