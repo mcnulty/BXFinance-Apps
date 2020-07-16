@@ -23,6 +23,7 @@ import "./ModalLogin.scss";
 import data from './data.json';
 
 import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
+import Session from '../Utils/Session'; /* PING INTEGRATION: */
 
 class ModalLogin extends React.Component {
   constructor() {
@@ -33,9 +34,11 @@ class ModalLogin extends React.Component {
       activeTab: '1',
       loginMethodUnset: true,
       loginMethodFormGroupClass: '',
-      userName: '' /* PING INTEGRATION */
+      userName: '', /* PING INTEGRATION */
+      email: '' /* PING INTEGRATION */
     };
     this.PingAuthN = new PingAuthN();
+    this.Session = new Session();
   }
   onClosed() {
     this.setState({
@@ -44,15 +47,27 @@ class ModalLogin extends React.Component {
       loginMethodFormGroupClass: ''
     });
   }
-  toggle() {
+  toggle(tab) {
     this.setState({
       isOpen: !this.state.isOpen
     });
+    /* BEGIN PING INTEGRATION: calling from NavbarMain upon return.
+    Can't call toggleTab or we'll end up in endless loop. */
+    if (tab == '4') {
+      this.setState({
+        activeTab: tab
+      });
+    }
+    /* END PING INTEGRATION: */
   }
   toggleTab(tab) {
-  /* BEGIN PING INTEGRATION: tab 2 modal is device selection which we don't use so we don't change state. Only call our handler. */
-    if (tab = 2) {
-      this.handleSubmit(); 
+    /* BEGIN PING INTEGRATION: tab 2 modal is device selection 
+    which we don't use so we don't change state. Only call our handler. 
+    Tab 4 is forgot username, so send them to PF endpoint. */
+    if (tab == '2' || tab == '5') {
+      this.handleSubmit(tab);
+    } else if (tab == '4') {
+      window.location.href = process.env.REACT_APP_HOST + data.pfAcctRecoveryURI;
     } else {
       /* END PING INTEGRATION */
       this.setState({
@@ -72,18 +87,33 @@ class ModalLogin extends React.Component {
     // saving it to state. (Controlled input).
     this.setState({ userName: event.target.value });
   }
+  handleEmailChange(event) {
+    // grabbing whatever the user is typing in the email form as they type, and
+    // saving it to state. (Controlled input).
+    console.log("emailchange", event.target.value);
+    this.setState({ email: event.target.value });
+  }
 
-  // Handler for "Next" button on IDfirst form (ModalLogin).
-  handleSubmit() {
+  // Handler for "Next" and "Recover Username" buttons.
+  handleSubmit(tab) {
+    let identifier = '';
+    let flowResponse = {};
+    console.log("handlesubmittab:", tab);
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
-      const flowId = params.get('flowId');
+      const flowId = params.get('flowId'); /* TODO will we ever have something other than a flowId to handle? */
+      
+      console.log("handlesubmit flowid", flowId);
+      
+      identifier = tab == '2' ? this.state.userName : this.state.email; //TODO if not 2 we assume 5. Will there ever be other tab IDs.
+      flowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
+      this.PingAuthN.handleFlowStatus(flowResponse, identifier);
 
-      this.PingAuthN.authnAPI("GET", flowId)
+      /* this.PingAuthN.authnAPI("GET", flowId)
         .then(response => response.json())
-        .then(jsonResult => this.PingAuthN.handleFlowStatus(jsonResult, this.state.userName))
-        .catch(error => console.error('HANDLESUBMIT ERROR', error));
-    }
+        .then(jsonResult => this.PingAuthN.handleFlowStatus(jsonResult, identifier))
+        .catch(error => console.error('HANDLESUBMIT ERROR', error)); */
+    } /* TODO what do we do if they submit with no querystring? Is that even possible?*/
   }
   // END PING INTEGRATIONS
 
@@ -109,10 +139,10 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button> {/* PING INTEGRATION see onClick function. */}
                   </div>
                   <div>
-                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('4'); }}>{data.form.buttons.reset}</Button>
+                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('4'); }}>{data.form.buttons.reset}</Button> {/* PING INTEGRATION: see onclick function. */}
                   </div>
                 </TabPane>
-                <TabPane tabId="2">
+                <TabPane tabId="2">{/* PING INTEGRATION: we dont use tab 2. This is handled by PF. */}
                   <h4>{data.titles.login_method}</h4>
                   <FormGroup className={this.state.loginMethodFormGroupClass}>
                     <div>
@@ -128,7 +158,7 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="3">
+                <TabPane tabId="3">{/* PING INTEGRATION: we dont use tab 3. This is handled by PF. */}
                   <div className="mobile-loading" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)` }}>
                     <div className="spinner">
                       <FontAwesomeIcon icon={faCircleNotch} size="3x" className="fa-spin" />
@@ -143,10 +173,10 @@ class ModalLogin extends React.Component {
                   <h4>{data.form.buttons.recover_username}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="email">{data.form.fields.email.label}</Label>
-                    <Input type="text" name="email" id="email" placeholder={data.form.fields.email.placeholder} />
+                    <Input onChange={this.handleEmailChange.bind(this)} type="text" name="email" id="email" placeholder={data.form.fields.email.placeholder} />
                   </FormGroup>
                   <div className="mb-3">
-                    <Button type="button" color="primary" onClick={() => { this.toggleTab('5'); }}>{data.form.buttons.recover_username}</Button>
+                    <Button type="button" color="primary" onClick={() => { this.toggleTab('5'); }}>{data.form.buttons.recover_username}</Button> {/* PING INTEGRATION: See onClick function. */}
                   </div>
                 </TabPane>
                 <TabPane tabId="5">

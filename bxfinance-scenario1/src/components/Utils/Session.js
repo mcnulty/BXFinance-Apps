@@ -40,7 +40,8 @@ export default class Session {
             return true;
         } catch (error) {
             // Fail with the utmost grace and leisure
-            return error;
+            console.error("setAuthenticateduserItem Error:", error); /* TODO this should be removed for prod. */
+            return error; /* TODO risk of throwing this error is minimal. Do we handle errors in app in v1??? */
         }
     }
 

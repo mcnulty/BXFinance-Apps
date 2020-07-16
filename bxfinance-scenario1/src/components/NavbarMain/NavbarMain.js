@@ -57,34 +57,54 @@ class NavbarMain extends React.Component {
       isOpen: !this.state.isOpen
     });
   }
-  componentDidMount () {
+  componentDidMount() {
     // BEGIN PING INTEGRATION
     // Check for and create a query string params object
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
-      // Coming back from authN API so pop the login modal dialog
+      //const authID = params.get("flowId") ? params.get("flowId") : params.get("REF");
+
+      // Coming back from authN API so grab the flowId.
       if (params.get("flowId")) {
-        this.refs.modalLogin.toggle();
-      }
-      // Coming back as authenticated user from Agentless IK.
+        // call authn api to get status. 
+        this.PingAuthN.authnAPI("GET", params.get("flowId"))
+          .then(response => response.json())
+          .then(jsonResult => {
+            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult));
+            if (jsonResult.status == "IDENTIFIER_REQUIRED") {
+              console.log("STATUS:", jsonResult.status)
+              //pop the modal. Defaults it ID first.
+              this.refs.modalLogin.toggle();
+            }
+            else if (jsonResult.status == "ACCOUNT_RECOVERY_USERNAME_REQUIRED") {
+              console.log("STATUS:", jsonResult.status)
+              this.refs.modalLogin.toggle('4');
+            }
+          })
+          .catch(error => console.error('HANDLESUBMIT ERROR', error));
+        //if status is identifier_required
+        //this.refs.modalLogin.toggle();
+
+      } // Coming back as authenticated user from Agentless IK.
       else if (params.get("REF")) {
         const REF = params.get("REF");
         const targetApp = decodeURIComponent(params.get("TargetResource"));
 
         this.PingAuthN.pickUpAPI(REF)
-        .then(response => response.json())
-        .then((jsonData) => {
-          this.Session.setAuthenticatedUserItem("email", jsonData.Email);
-          this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
-          this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
-          this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
-          this.Session.setAuthenticatedUserItem("uid", jsonData.uid);
-          this.Session.setAuthenticatedUserItem("pfSessionId", jsonData.sessionid);
+          .then(response => response.json())
+          .then((jsonData) => {
+            this.Session.setAuthenticatedUserItem("email", jsonData.Email);
+            this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
+            this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
+            this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
+            this.Session.setAuthenticatedUserItem("uid", jsonData.uid);
+            this.Session.setAuthenticatedUserItem("pfSessionId", jsonData.sessionid);
 
-        })
-        .catch(error => console.error("Pickup Error:", error));
+          })
+          .catch(error => console.error("Pickup Error:", error));
 
         // Send them to the target app
+        // TODO can we do this SPA style with history.push?
         window.location.href = targetApp;
       }
     }
@@ -115,7 +135,7 @@ class NavbarMain extends React.Component {
                   <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
                 </NavItem>
                 <NavItem className="logout d-none">
-                  <Link to="/" onClick={()=>this.Session.killAuthenticatedUser()} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
+                  <Link to="/" onClick={() => this.Session.killAuthenticatedUser()} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
                 </NavItem>
                 <NavItem className="register">
                   {/* PING INTEGRATION: added env var and link to PF LIP reg form. */}
@@ -128,7 +148,7 @@ class NavbarMain extends React.Component {
         <Navbar color="dark" dark expand="md" className="navbar-desktop">
           <Container>
             <Nav className="mr-auto navbar-nav-main" navbar>
-              { this.props && this.props.data && this.props.data.menus && this.props.data.menus.primary ? (
+              {this.props && this.props.data && this.props.data.menus && this.props.data.menus.primary ? (
                 this.props.data.menus.primary.map((item, i) => {
                   return (
                     <NavItem key={i}>
@@ -137,14 +157,14 @@ class NavbarMain extends React.Component {
                   );
                 })
               ) : (
-                data.menus.primary.map((item, i) => {
-                  return (
-                    <NavItem key={i}>
-                      <NavLink to={item.url} activeClassName="active" tag={RRNavLink}>{item.title}</NavLink>
-                    </NavItem>
-                  );
-                })
-              )}
+                  data.menus.primary.map((item, i) => {
+                    return (
+                      <NavItem key={i}>
+                        <NavLink to={item.url} activeClassName="active" tag={RRNavLink}>{item.title}</NavLink>
+                      </NavItem>
+                    );
+                  })
+                )}
             </Nav>
           </Container>
         </Navbar>
@@ -162,7 +182,7 @@ class NavbarMain extends React.Component {
           </div>
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="navbar-nav-main navbar-light bg-light" navbar>
-              { this.props && this.props.data && this.props.data.menus && this.props.data.menus.primary ? (
+              {this.props && this.props.data && this.props.data.menus && this.props.data.menus.primary ? (
                 this.props.data.menus.primary.map((item, i) => {
                   return (
                     <NavItem key={i}>
@@ -171,14 +191,14 @@ class NavbarMain extends React.Component {
                   );
                 })
               ) : (
-                data.menus.primary.map((item, i) => {
-                  return (
-                    <NavItem key={i}>
-                      <NavLink to={item.url} activeClassName="active" exact tag={RRNavLink}>{item.title}</NavLink>
-                    </NavItem>
-                  );
-                })
-              )}
+                  data.menus.primary.map((item, i) => {
+                    return (
+                      <NavItem key={i}>
+                        <NavLink to={item.url} activeClassName="active" exact tag={RRNavLink}>{item.title}</NavLink>
+                      </NavItem>
+                    );
+                  })
+                )}
             </Nav>
             <Nav className="navbar-nav-utility" navbar>
               <NavItem>

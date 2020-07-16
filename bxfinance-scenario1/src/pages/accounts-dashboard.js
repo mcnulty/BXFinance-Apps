@@ -36,26 +36,34 @@ class AccountsDashboard extends React.Component {
   /* BEGIN PING INTEGRATION: */
   componentDidMount() {
     let acctIDsArr = [];
+    let authCode = '';
+    let token = '';
 
     this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid"))
     .then(response => response.json())
     .then(jsonData => {
       acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
+      console.log("accts:", acctIDsArr);
       if (acctIDsArr.length) {
+        console.log("TEST:","we see accts arr.");
         //Store their account IDs in their browser session. (as a string).
         this.Session.setAuthenticatedUserItem("accounts", acctIDsArr.join());
-        
 
       } else {
-        // provision accts and update array
+        console.log("TEST:", "we dont see accts arr.");
+        authCode = this.PingOAuth.getAuthCode(this.Session.getAuthenticatedUserItem("uid"));        
+        this.PingOAuth.getToken(authCode);
+        /* .then(response => response.json())
+        .then(jsonData => console.info("jsonData:", JSON.stringify(jsonData))) */
+        //this.Session.setAuthenticatedUserItem("accounts", acctIDsArr.join());
       }
-    })
+    });
       //.then(jsonData => console.log("test:", this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs")))
     //.then(jsonData => console.log("test:", JSON.stringify(jsonData)))
     /* .then(jsonData => {
       tmpArr = this.JSONSearch.getValues(jsonData, "bxFinanceUserAccountIDs");
       console.info("Search Results:", tmpArr);
-    }) */;
+    }) */
   }
   /* END PING INTEGRATION: */
   

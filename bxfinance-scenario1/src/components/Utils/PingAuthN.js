@@ -26,7 +26,8 @@ export default class PingAuthN {
         let headers = new Headers();
         headers.append('Accept', 'application/json');
         headers.append('X-XSRF-Header', 'PingFederate');
-
+        console.log("authnApi flowid", flowId);
+        // TODO this look syntactically stupid. Review/refactor.
         let tmp = contentType !== undefined && headers.append('Content-Type', contentType);
 
         const requestOptions = {
@@ -64,19 +65,35 @@ export default class PingAuthN {
     /* 
     Handler for different authN API flow status
     @param flowResponse the response object in JSON format
-    @param userName the userName of the authenticating user
+    @param identifier the userName or email of the authenticating user
     */
-    handleFlowStatus(flowResponse, userName) {
+    handleFlowStatus(flowResponse, identifier) {
+        console.log("flowresponse:", flowResponse);
+        console.log("identifier",identifier);
+        let payload = '{}';
         switch (flowResponse.status) {
             case "IDENTIFIER_REQUIRED":
-                const payload = '{\n  \"identifier\": \"' + userName + '\"\n}';
+                console.log("IN IDENTIFIER");
+                payload = '{\n  \"identifier\": \"' + identifier + '\"\n}';
                 this.authnAPI("POST", flowResponse.id, "application/vnd.pingidentity.submitIdentifier+json", payload)
                     .then(response => response.json())
                     .then(data => this.handleFlowStatus(data))
                     .catch(error => console.error("HANDLEFLOWSTATUS ERROR", error));
                 break;
             case "RESUME":
+                console.log("IN RESUME");
+                console.log("resumeUrl", flowResponse.resumeUrl);
+                // window.location.href = flowResponse.resumeUrl;
                 window.location.href = flowResponse.resumeUrl;
+                break;
+            case "ACCOUNT_RECOVERY_USERNAME_REQUIRED":
+                console.log("IN RECOVERY");
+                payload = '{\n  \"username\": \"' + identifier + '\"\n}';
+                console.log("payload",payload);
+                this.authnAPI("POST", flowResponse.id, "application/vnd.pingidentity.checkAccountRecoveryUsername+json", payload)
+                    .then(response => response.json())
+                    .then(data => this.handleFlowStatus(data))
+                    .catch(error => console.error("HANDLEFLOWSTATUS ERROR", error));
                 break;
             default:
                 console.warn("WTF", "handleFlowStatus() defaulted with flowId = " + flowResponse.id);
