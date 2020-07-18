@@ -1,4 +1,5 @@
 {
+	"pfPwdChangeURI": "/ext/pwdchange/Identify?AdapterId=HTMLFormWithLIP",
 	"pfAcctRecoveryURI": "/ext/pwdreset/Identify?AdapterId=HTMLFormWithLIP",
 	"titles": {
 		"welcome": "Welcome back",

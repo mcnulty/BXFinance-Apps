@@ -67,7 +67,7 @@ class ModalLogin extends React.Component {
     if (tab == '2' || tab == '5') {
       this.handleSubmit(tab);
     } else if (tab == '4') {
-      window.location.href = process.env.REACT_APP_HOST + data.pfAcctRecoveryURI;
+      window.location.href = process.env.REACT_APP_HOST + data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API is fixed, this ideally should be switched to a fetch(). No redirects for true SPA. TTM syndrome */
     } else {
       /* END PING INTEGRATION */
       this.setState({
@@ -126,7 +126,7 @@ class ModalLogin extends React.Component {
           <ModalBody>
             <form>
               <TabContent activeTab={this.state.activeTab}>
-                <TabPane tabId="1">
+                <TabPane tabId="1">{/* Identifier first */}
                   <h4>{data.titles.welcome}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
@@ -142,7 +142,7 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('4'); }}>{data.form.buttons.reset}</Button> {/* PING INTEGRATION: see onclick function. */}
                   </div>
                 </TabPane>
-                <TabPane tabId="2">{/* PING INTEGRATION: we dont use tab 2. This is handled by PF. */}
+                <TabPane tabId="2">{/* Device/login selection. We dont use tab 2. This is handled by PF. */}
                   <h4>{data.titles.login_method}</h4>
                   <FormGroup className={this.state.loginMethodFormGroupClass}>
                     <div>
@@ -158,7 +158,7 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="3">{/* PING INTEGRATION: we dont use tab 3. This is handled by PF. */}
+                <TabPane tabId="3">{/* MFA sent, check phone msg. We dont use tab 3. This is handled by PF. */}
                   <div className="mobile-loading" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)` }}>
                     <div className="spinner">
                       <FontAwesomeIcon icon={faCircleNotch} size="3x" className="fa-spin" />
@@ -169,7 +169,7 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="4">
+                <TabPane tabId="4">{/* Recover userName. */}
                   <h4>{data.form.buttons.recover_username}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="email">{data.form.fields.email.label}</Label>
@@ -179,7 +179,7 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('5'); }}>{data.form.buttons.recover_username}</Button> {/* PING INTEGRATION: See onClick function. */}
                   </div>
                 </TabPane>
-                <TabPane tabId="5">
+                <TabPane tabId="5">{/* TODO Do we need this? Recover username success. Are we not just sending back to /app and pop modal? */}
                   <h4>{data.titles.recover_username_success}</h4>
                   <div className="mb-3 text-center">
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('1'); }}>{data.form.buttons.login}</Button>

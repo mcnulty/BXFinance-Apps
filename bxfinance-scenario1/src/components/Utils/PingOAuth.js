@@ -8,7 +8,12 @@ OAuth-related API endpoints.
 
 */
 
+import Session from './Session';
+
 export default class PingOAuth {
+    constructor() {
+        this.Session = new Session();
+    }
 
     // Didn't abstract these since they shouldn't ever change.
     pfAuthZAPIURI = "/as/authorization.oauth2?";
@@ -16,8 +21,8 @@ export default class PingOAuth {
 
     /* 
     Get AuthZ code from AS.
-    We defaulted all params except for uid and password, 
-    which are user specifc. As a demo site we only have 1
+    We defaulted all params except for uid, 
+    which is user specifc. As a demo site we only have 1
     auth code client. But if we add more in the future, this
     will already support that.
 
@@ -29,13 +34,11 @@ export default class PingOAuth {
     @param
     @return string
     */
-    getAuthCode(uid, swaprods="2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST+"/app/banking", scopes = "") {
+    async getAuthCode(uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = "") {
         //swaprods... get it?
-        console.log("TEST:","getting auth code")
-        let authCode = '0';
+        console.log("TEST:", "getting auth code")
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
-        //myHeaders.append();
 
         const urlEncodedBody = new URLSearchParams();
         urlEncodedBody.append("pf.username", uid);
@@ -49,19 +52,12 @@ export default class PingOAuth {
         };
 
         const url = process.env.REACT_APP_HOST + this.pfAuthZAPIURI + "response_type=" + responseType + "&client_id=" + client + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
-        return fetch(url, requestOptions)
-            .then(response => {
-                authCode = this.getCodeFromResponse(response);
-            })
-            .catch(error => console.error(error));
-
+        const response = await fetch(url, requestOptions);
+        const authCode = response.url.substring(response.url.search("=") + 1);
+        console.log("authcode extracted:", authCode);
+        //console.log("getauthcoderesponse:", response);
+        //return await fetch(url, requestOptions);;
         return authCode;
-    }
-    /* stoopid */
-    getCodeFromResponse(data) {
-        let code = data.url.substring(data.url.search("=") + 1);
-        console.log("Real authcode:" , authCode);
-        return code;
     }
 
     /* 
@@ -77,23 +73,37 @@ export default class PingOAuth {
     @return string base64 encoded
     */
     // TODO this could be refactored to be the only public method. The app never needs the authCode. So getToken could call getAuthCode, then swap for token.    
-    getToken(code, grantType = "authorization_code", redirectURI = process.env.REACT_APP_HOST + "/app/banking") {
-        console.log("TEST:", "getting token")
+    //async getToken(code, grantType = "authorization_code", redirectURI = process.env.REACT_APP_HOST + "/app/banking") {
+    async getToken(uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = "") {
+        let grantType = "authorization_code"; //Defaulting to auth code for v1. If it changes in a later version this should be a defaulted param in the function.
+        let response = {};
+        //let authCode = '0';
 
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
-        myHeaders.append("Authorization", "Basic UGluZ1Rva2VuOjJGZWRlcmF0ZU0wcmU=");
+        if (responseType == "code") {
+            console.log("in gettoken responseType code ")
 
-        const requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            redirect: 'manual'
-        };
+            const authCode = await this.getAuthCode(this.Session.getAuthenticatedUserItem("uid"));
+            console.log("getAuthCode response:", authCode);
 
-        const url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType + "&redirect_uri=" + redirectURI + "&code=" + code;
-        fetch(url, requestOptions)
-            .then(response => response.text())
-            .then(result => console.log("Tokenresult:", result))
-            .catch(error => console.log('error', error));
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
+            myHeaders.append("Authorization", "Basic cGFfd2FtOjJGZWRlcmF0ZU0wcmU=");
+            const requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
+            const url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType + "&redirect_uri=" + redirectURI + "&code=" + authCode;
+            const response = await fetch(url, requestOptions);
+            const jsonData = await response.json();
+            const token = await jsonData.access_token;
+            console.log("token:", token);
+
+            return token;
+        } else {
+            //Assuming response_type=token (implicit) here based on our current PF configs. That assumptoin could change in future versions.
+            //TODO implement implicit call here when needed. Not needed in v1 release. So throw error for now.
+            throw new Error("Unexpected response_type exception in PingOAuth.getToken.");
+        }
     }
 }

@@ -36,8 +36,33 @@ export default class PingData {
         };
         const url = process.env.REACT_APP_HOST + this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
         return fetch(url, requestOptions);
-        /*  .then(response => response.text())
-         .then(result => console.log(result))
-         .catch(error => console.log('error', error)); */
     }
+
+    /* 
+    Update user record with bank accounts.
+
+    @param 
+    @return boolean to state success
+    */
+   updateUserEntry() {
+       var myHeaders = new Headers();
+       myHeaders.append("Content-Type", "application/json");
+       myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
+       myHeaders.append("Cookie", "PF=YdzsRlxXm67qsRriWenYMf");
+
+       var raw = JSON.stringify({ "modifications": [{ "attributeName": "bxFinanceUserAccountIDs", "modificationType": "set", "values": [{ "ids": ["10", "11", "12"] }] }] });
+
+       var requestOptions = {
+           method: 'PATCH',
+           headers: myHeaders,
+           body: raw,
+           redirect: 'follow'
+       };
+
+       fetch("https://demo.bxfinance.xyz/directory/v1/uid=irenaneski,ou=People,dc=bxfinance.xyz", requestOptions)
+           .then(response => response.text())
+           .then(result => console.log(result))
+           .catch(error => console.log('error', error));
+
+   }
 }

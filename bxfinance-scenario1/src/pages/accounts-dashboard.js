@@ -36,10 +36,10 @@ class AccountsDashboard extends React.Component {
   /* BEGIN PING INTEGRATION: */
   componentDidMount() {
     let acctIDsArr = [];
-    let authCode = '';
+    //let authCode = '';
     let token = '';
 
-    this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid"))
+    this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid")) //TODO move promise chaining into component. Shouldn't deal with that here.
     .then(response => response.json())
     .then(jsonData => {
       acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
@@ -48,22 +48,18 @@ class AccountsDashboard extends React.Component {
         console.log("TEST:","we see accts arr.");
         //Store their account IDs in their browser session. (as a string).
         this.Session.setAuthenticatedUserItem("accounts", acctIDsArr.join());
-
+        //callOpenBanking API to get account balances.
+        //this.OpenBanking.getAccountBalances(token);
       } else {
         console.log("TEST:", "we dont see accts arr.");
-        authCode = this.PingOAuth.getAuthCode(this.Session.getAuthenticatedUserItem("uid"));        
-        this.PingOAuth.getToken(authCode);
-        /* .then(response => response.json())
-        .then(jsonData => console.info("jsonData:", JSON.stringify(jsonData))) */
-        //this.Session.setAuthenticatedUserItem("accounts", acctIDsArr.join());
+        this.PingOAuth.getToken(this.Session.getAuthenticatedUserItem("uid"))
+        .then(token => {//this is new since I got getToken working. Was just console.log(token):
+          this.OpenBanking.provisionAccounts(token);
+        });
       }
+    }).catch(e => {
+      throw new Error("GetUserEntry Exception: " + e);
     });
-      //.then(jsonData => console.log("test:", this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs")))
-    //.then(jsonData => console.log("test:", JSON.stringify(jsonData)))
-    /* .then(jsonData => {
-      tmpArr = this.JSONSearch.getValues(jsonData, "bxFinanceUserAccountIDs");
-      console.info("Search Results:", tmpArr);
-    }) */
   }
   /* END PING INTEGRATION: */
   
