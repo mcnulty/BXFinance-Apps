@@ -50,7 +50,8 @@ export default class PingOAuth {
             body: urlEncodedBody,
             redirect: 'follow'
         };
-
+        // if async process already started, await wont have any effect.
+        // add try catch around fetch calls
         const url = process.env.REACT_APP_HOST + this.pfAuthZAPIURI + "response_type=" + responseType + "&client_id=" + client + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
         const response = await fetch(url, requestOptions);
         const authCode = response.url.substring(response.url.search("=") + 1);

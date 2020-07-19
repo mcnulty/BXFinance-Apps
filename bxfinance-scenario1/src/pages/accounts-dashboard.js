@@ -53,8 +53,9 @@ class AccountsDashboard extends React.Component {
       } else {
         console.log("TEST:", "we dont see accts arr.");
         this.PingOAuth.getToken(this.Session.getAuthenticatedUserItem("uid"))
-        .then(token => {//this is new since I got getToken working. Was just console.log(token):
+        .then(token => {//need a catch() for this .then():
           this.OpenBanking.provisionAccounts(token);
+          //TODO dont want openbanking to return accts. More promise chaos. On success of provisionAccounts(), call getUserEntry() again and update UI.
         });
       }
     }).catch(e => {

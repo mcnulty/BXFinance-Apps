@@ -9,12 +9,22 @@ I like to call it the OpenBabbitt API.
 @see https://github.com/babbtx/mock-simple-aspsp
 */
 
+import JSONSearch from './JSONSearch';
+import PingData from './PingData';
+
 export default class OpenBanking {
-    // Didn't abstract these since they shouldn't ever change.
-    mockOBhost = "https://demo-openbanking-api-server.herokuapp.com/OpenBanking";
-    mockOBAPIver = "/v2";
-    mockOBbalURI = "/balances";
-    mockOBacctsURI = "/accounts";
+    
+    constructor() {
+        // Didn't abstract these since they shouldn't ever change.
+        this.mockOBConsenthost = process.env.REACT_APP_HOST + "/OpenBanking";
+        this.mockOBhost = "https://demo-openbanking-api-server.herokuapp.com/OpenBanking";
+        this.mockOBAPIver = "/v2";
+        this.mockOBbalURI = "/balances";
+        this.mockOBacctsURI = "/accounts";
+        this.JSONSearch = new JSONSearch();
+        this.PingData = new PingData();
+    }
+    
 
     /* 
       Provision Banking accounts for user.
@@ -22,7 +32,7 @@ export default class OpenBanking {
       @response object
       */
     provisionAccounts(token) {
-        //console.log("provisionAccts token:", token);
+        let acctIdsArr = [];
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
 
@@ -31,10 +41,15 @@ export default class OpenBanking {
             headers: myHeaders,
             redirect: 'follow'
         };
-
-        fetch("https://demo-openbanking-api-server.herokuapp.com/OpenBanking/v2/accounts", requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
+        const url = this.mockOBhost + this.mockOBAPIver + this.mockOBacctsURI;
+        fetch(url , requestOptions)
+            .then(response => response.json())
+            .then(jsonData => {
+                console.log("jsonData:", jsonData);
+                acctIdsArr = this.JSONSearch.findValues(jsonData, "AccountId");
+                console.log("acctIdsArr:", acctIdsArr);
+                this.PingData.updateUserEntry(acctIdsArr);
+            })
             .catch(error => console.log('error', error));
             //TODO 
     }
@@ -53,8 +68,8 @@ export default class OpenBanking {
             headers: myHeaders,
             redirect: 'follow'
         };
-
-        fetch("https://demo-openbanking-api-server.herokuapp.com/OpenBanking/v2/balances/", requestOptions)
+        const url = this.mockOBConsenthost + this.mockOBAPIver + this.mockOBbalURI;
+        fetch(url, requestOptions)
             .then(response => response.text())
             .then(result => console.log(result))
             .catch(error => console.log('error', error));

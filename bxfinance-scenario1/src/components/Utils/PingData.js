@@ -41,16 +41,22 @@ export default class PingData {
     /* 
     Update user record with bank accounts.
 
-    @param 
+    @param acctIds an array of account IDs to add to the user entry.
     @return boolean to state success
     */
-   updateUserEntry() {
+   updateUserEntry(acctIds) {
        var myHeaders = new Headers();
        myHeaders.append("Content-Type", "application/json");
        myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
-       myHeaders.append("Cookie", "PF=YdzsRlxXm67qsRriWenYMf");
+       //myHeaders.append("Cookie", "PF=YdzsRlxXm67qsRriWenYMf");
 
-       var raw = JSON.stringify({ "modifications": [{ "attributeName": "bxFinanceUserAccountIDs", "modificationType": "set", "values": [{ "ids": ["10", "11", "12"] }] }] });
+       console.log("acctIds", acctIds);
+       let updateObj = { "modifications": [{ "attributeName": "bxFinanceUserAccountIDs", "modificationType": "set", "values": [{ "ids": [] }] }] };
+       updateObj.modifications[0].values[0].ids = acctIds;
+       console.log("updateObj", updateObj);
+
+       var raw = JSON.stringify(updateObj);
+       console.log("raw", raw);
 
        var requestOptions = {
            method: 'PATCH',
@@ -59,10 +65,13 @@ export default class PingData {
            redirect: 'follow'
        };
 
+       //TODO add try catch here.
        fetch("https://demo.bxfinance.xyz/directory/v1/uid=irenaneski,ou=People,dc=bxfinance.xyz", requestOptions)
            .then(response => response.text())
            .then(result => console.log(result))
            .catch(error => console.log('error', error));
+
+        return true;
 
    }
 }
