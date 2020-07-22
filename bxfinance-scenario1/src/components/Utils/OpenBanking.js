@@ -23,15 +23,16 @@ export default class OpenBanking {
         this.mockOBacctsURI = "/accounts";
         this.JSONSearch = new JSONSearch();
         this.PingData = new PingData();
+        this.xfrMoneyURI = "/transferMoney?amount=";
     }
     
 
     /* 
-      Provision Banking accounts for user.
+      Provision Banking Accounts
       @param token the access token for the authenticated user.
       @response object
       */
-    provisionAccounts(token) {
+    provisionAccounts(token, uid) {
         let acctIdsArr = [];
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
@@ -45,17 +46,18 @@ export default class OpenBanking {
         fetch(url , requestOptions)
             .then(response => response.json())
             .then(jsonData => {
-                console.log("jsonData:", jsonData);
+                // console.log("jsonData:", jsonData);
                 acctIdsArr = this.JSONSearch.findValues(jsonData, "AccountId");
-                console.log("acctIdsArr:", acctIdsArr);
-                this.PingData.updateUserEntry(acctIdsArr);
+                // console.log("acctIdsArr:", acctIdsArr);
+                this.PingData.updateUserEntry(acctIdsArr, uid);
             })
             .catch(error => console.log('error', error));
-            //TODO 
+            //TODO try catch error handling
+            return true;
     }
 
     /* 
-      Get Account Balances for user.
+      Get Account Balances
       @param token the access token for the authenticated user.
       @return response object
       */
@@ -69,9 +71,34 @@ export default class OpenBanking {
             redirect: 'follow'
         };
         const url = this.mockOBConsenthost + this.mockOBAPIver + this.mockOBbalURI;
-        fetch(url, requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
+        return fetch(url, requestOptions);
+        /* const response = fetch(url, requestOptions);
+        const jsonData = response.json();
+        console.log("accounts json", JSON.stringify(jsonData.Data.Balance));
+        return jsonData.Data.Balance; */
     }
+
+    /* 
+    Transfer Money
+    @param amount the dollar amount the user wants to transfer
+    @param token the access token from PF for the authenticated user
+    @return boolean stating success
+    */
+    transferMoney(amount, token) {
+       console.log("transferMoney", arguments);
+
+       let myHeaders = new Headers();
+       myHeaders.append("Authorization", "Bearer " + token);
+
+       const requestOptions = {
+           method: 'GET',
+           headers: myHeaders,
+           redirect: 'follow'
+       };
+       const url = process.env.REACT_APP_HOST + this.xfrMoneyURI + amount;
+       return fetch(url, requestOptions);
+           /* .then(response => response.text())
+           .then(result => console.log("XFR Response",result))
+           .catch(error => console.log('error', error)); */
+   }
 }

@@ -194,8 +194,8 @@ section.navbar-main {
     }
   }
 }
-
-.accounts {
+/* TODO hide this to take back control of the sign in out links. */
+/* .accounts {
   section.navbar-main {
     .logout {
       display: flex !important;
@@ -212,4 +212,4 @@ section.navbar-main {
       display: none;
     }
   }
-}
+} */

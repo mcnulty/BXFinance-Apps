@@ -39,34 +39,36 @@ export default class PingData {
     }
 
     /* 
-    Update user record with bank accounts.
+    Update user entry with bank accounts.
 
     @param acctIds an array of account IDs to add to the user entry.
     @return boolean to state success
     */
-   updateUserEntry(acctIds) {
-       var myHeaders = new Headers();
+   updateUserEntry(acctIds, uid) {
+       const userRDN = 'uid=' + uid;
+       const myHeaders = new Headers();
        myHeaders.append("Content-Type", "application/json");
        myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
        //myHeaders.append("Cookie", "PF=YdzsRlxXm67qsRriWenYMf");
 
-       console.log("acctIds", acctIds);
+    //    console.log("acctIds", acctIds);
        let updateObj = { "modifications": [{ "attributeName": "bxFinanceUserAccountIDs", "modificationType": "set", "values": [{ "ids": [] }] }] };
        updateObj.modifications[0].values[0].ids = acctIds;
-       console.log("updateObj", updateObj);
+    //    console.log("updateObj", updateObj);
 
-       var raw = JSON.stringify(updateObj);
-       console.log("raw", raw);
+       const raw = JSON.stringify(updateObj);
+    //    console.log("raw", raw);
 
-       var requestOptions = {
+       const requestOptions = {
            method: 'PATCH',
            headers: myHeaders,
            body: raw,
            redirect: 'follow'
        };
 
-       //TODO add try catch here.
-       fetch("https://demo.bxfinance.xyz/directory/v1/uid=irenaneski,ou=People,dc=bxfinance.xyz", requestOptions)
+       //TODO add try catch error handling here.
+       const url = process.env.REACT_APP_HOST + this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
+       fetch(url, requestOptions)
            .then(response => response.text())
            .then(result => console.log(result))
            .catch(error => console.log('error', error));

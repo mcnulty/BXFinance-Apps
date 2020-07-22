@@ -57,6 +57,18 @@ class NavbarMain extends React.Component {
       isOpen: !this.state.isOpen
     });
   }
+  /* PING INTEGRATION: SLO support when signing out */
+  logEmOut() {
+    this.Session.killAuthenticatedUser(); //Kill the local app session.
+    let rootDiv = document.getElementById("root"); //Grab the root div for the app
+    let logoutForm = document.createElement('form'); // Create a new form element
+    logoutForm.setAttribute("action", "/sp/startSLO.ping"); // Add the action attribute we want to POST to
+    logoutForm.setAttribute("id", "logoutForm"); // Add an Id Attribute
+    logoutForm.setAttribute("method", "post"); // Add the method attribute
+    rootDiv.appendChild(logoutForm); //Add the form to the DOM
+    document.forms["logoutForm"].submit(); //Submit the form, obviously.
+  }
+  
   componentDidMount() {
     // BEGIN PING INTEGRATION
     // Check for and create a query string params object
@@ -131,14 +143,18 @@ class NavbarMain extends React.Component {
                 <NavItem>
                   <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} /></NavLink>
                 </NavItem>
+                {/* BEGIN PING INTEGRATION: added conditional rendering logic for Sign In/Out links. */}
+                {/* TODO might need to change this to check state instead. Getting inconsistent results. */}
+                {this.Session.getAuthenticatedUserItem("subject") == null &&
                 <NavItem className="login">
                   <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
-                </NavItem>
-                <NavItem className="logout d-none">
-                  <Link to="/" onClick={() => this.Session.killAuthenticatedUser()} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
-                </NavItem>
+                </NavItem>}
+                {this.Session.getAuthenticatedUserItem("subject") !== null &&
+                <NavItem className="logout">
+                  <Link to="/" onClick={this.logEmOut.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
+                </NavItem> }
                 <NavItem className="register">
-                  {/* PING INTEGRATION: added env var and link to PF LIP reg form. */}
+                  {/* END PING INTEGRATION */}
                   <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
                 </NavItem>
               </Nav>

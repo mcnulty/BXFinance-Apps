@@ -36,9 +36,10 @@ export default class PingOAuth {
     */
     async getAuthCode(uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = "") {
         //swaprods... get it?
-        console.log("TEST:", "getting auth code")
+        //console.log("TEST:", "getting auth code")
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
+        myHeaders.append("Authorization", "Basic cGFfd2FtOjJGZWRlcmF0ZU0wcmU=");
 
         const urlEncodedBody = new URLSearchParams();
         urlEncodedBody.append("pf.username", uid);
@@ -54,8 +55,9 @@ export default class PingOAuth {
         // add try catch around fetch calls
         const url = process.env.REACT_APP_HOST + this.pfAuthZAPIURI + "response_type=" + responseType + "&client_id=" + client + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
         const response = await fetch(url, requestOptions);
+        // console.log("response", response);
         const authCode = response.url.substring(response.url.search("=") + 1);
-        console.log("authcode extracted:", authCode);
+        // console.log("authcode extracted:", authCode);
         //console.log("getauthcoderesponse:", response);
         //return await fetch(url, requestOptions);;
         return authCode;
@@ -81,10 +83,10 @@ export default class PingOAuth {
         //let authCode = '0';
 
         if (responseType == "code") {
-            console.log("in gettoken responseType code ")
+            // console.log("in gettoken")
 
             const authCode = await this.getAuthCode(this.Session.getAuthenticatedUserItem("uid"));
-            console.log("getAuthCode response:", authCode);
+            // console.log("getAuthCode response:", authCode);
 
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
@@ -98,7 +100,7 @@ export default class PingOAuth {
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
-            console.log("token:", token);
+            // console.log("token:", token);
 
             return token;
         } else {

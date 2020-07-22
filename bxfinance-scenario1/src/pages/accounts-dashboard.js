@@ -28,44 +28,73 @@ class AccountsDashboard extends React.Component {
     this.Session = new Session();
     this.PingData = new PingData();
     this.JSONSearch = new JSONSearch();
-    this.PingOAuth = new PingOAuth(); 
+    this.PingOAuth = new PingOAuth();
     this.OpenBanking = new OpenBanking();
+    this.state = {
+      myAccounts: []
+    }
     /* END PING INTEGRATION: */
   }
 
   /* BEGIN PING INTEGRATION: */
   componentDidMount() {
     let acctIDsArr = [];
-    //let authCode = '';
-    let token = '';
+    let myAccounts = [];
 
     this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid")) //TODO move promise chaining into component. Shouldn't deal with that here.
-    .then(response => response.json())
-    .then(jsonData => {
-      acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
-      console.log("accts:", acctIDsArr);
-      if (acctIDsArr.length) {
-        console.log("TEST:","we see accts arr.");
-        //Store their account IDs in their browser session. (as a string).
-        this.Session.setAuthenticatedUserItem("accounts", acctIDsArr.join());
-        //callOpenBanking API to get account balances.
-        //this.OpenBanking.getAccountBalances(token);
-      } else {
-        console.log("TEST:", "we dont see accts arr.");
-        this.PingOAuth.getToken(this.Session.getAuthenticatedUserItem("uid"))
-        .then(token => {//need a catch() for this .then():
-          this.OpenBanking.provisionAccounts(token);
-          //TODO dont want openbanking to return accts. More promise chaos. On success of provisionAccounts(), call getUserEntry() again and update UI.
-        });
-      }
-    }).catch(e => {
-      throw new Error("GetUserEntry Exception: " + e);
-    });
+      .then(response => response.json())
+      .then(jsonData => {
+        acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
+        // console.log("accts:", acctIDsArr);
+        if (acctIDsArr.length) {
+          console.log("TEST:", "we see accts array.");
+          this.PingOAuth.getToken(this.Session.getAuthenticatedUserItem("uid"))
+            .then(token => {
+              this.Session.setAuthenticatedUserItem("at", token);
+              this.OpenBanking.getAccountBalances(token)
+                .then(response => response.json())
+                .then(jsonData => {
+                  this.setState({ myAccounts: jsonData.Data.Balance });
+                  // console.log("accts response", JSON.stringify(jsonData));
+                  // console.log("this.myAccount", this.state.myAccounts);
+                  //console.log("myAccounts 0", this.state.myAccounts[0].Amount.Amount);
+                })
+                .catch(e => {
+                  console.error("GetAccountBalances Exception", e)
+                });
+            })
+            .catch(e => {
+              console.error("GetToken Exception", e);
+            });
+        } else {
+          console.log("TEST:", "we dont see accts arr.");
+          this.PingOAuth.getToken(this.Session.getAuthenticatedUserItem("uid"))
+            .then(token => {//need a catch() for this .then():
+              this.Session.setAuthenticatedUserItem("at", token);
+              this.OpenBanking.provisionAccounts(token, this.Session.getAuthenticatedUserItem("uid"));
+              this.OpenBanking.getAccountBalances(token)
+                .then(response => response.json())
+                .then(jsonData => {
+                  this.setState({ myAccounts: jsonData.Data.Balance });
+                  // console.log("this.myAccount", this.state.myAccounts);
+                })
+                .catch(e => {
+                  console.error("GetAccountBalances Exception", e)
+                });
+            })
+            .catch(e => {
+              console.error("GetToken Exception", e);
+            });
+        }
+      }).catch(e => {
+        console.error("GetUserEntry Exception", e);
+      });
   }
   /* END PING INTEGRATION: */
-  
+
   render() {
-    return(
+
+    return (
       <div className="accounts accounts-dashboard">
         <NavbarMain />
         <WelcomeBar firstName={this.Session.getAuthenticatedUserItem('firstName')} /> {/* PING INTEGRATION: added passing of firstName prop. */}
@@ -77,7 +106,7 @@ class AccountsDashboard extends React.Component {
                   return (
                     <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} />
                   );
-                })      
+                })
               }
               <CardRewards />
             </div>
@@ -89,9 +118,9 @@ class AccountsDashboard extends React.Component {
               {
                 Object.keys(data.balances).map(key => {
                   return (
-                    <AccountsBalance key={data.balances[key].title} balance={data.balances[key]} />
+                    <AccountsBalance key={data.balances[key].title} balance={data.balances[key]} myAccounts={this.state.myAccounts} />
                   );
-                })      
+                })
               }
             </div>
           </div>

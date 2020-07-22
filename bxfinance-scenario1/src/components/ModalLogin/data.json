@@ -29,7 +29,7 @@
 		},
 		"buttons": {
 			"next": "Next",
-			"reset": "Forgot your username?",
+			"reset": "Forgot your username or password?",
 			"login": "Sign In",
 			"help": "Need help signing in?",
 			"recover_username": "Recover Username"

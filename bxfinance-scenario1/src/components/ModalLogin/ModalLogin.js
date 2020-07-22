@@ -90,7 +90,6 @@ class ModalLogin extends React.Component {
   handleEmailChange(event) {
     // grabbing whatever the user is typing in the email form as they type, and
     // saving it to state. (Controlled input).
-    console.log("emailchange", event.target.value);
     this.setState({ email: event.target.value });
   }
 
