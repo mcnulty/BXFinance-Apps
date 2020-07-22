@@ -16,6 +16,9 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 
+// Components
+import FormPassword from '../../components/FormPassword';
+
 // Styles
 import "./ModalLogin.scss";
 
@@ -131,6 +134,7 @@ class ModalLogin extends React.Component {
                     <Label for="username">{data.form.fields.username.label}</Label>
                     <Input onChange={this.handleIDChange.bind(this)} type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} /> {/* PING INTEGRATION added onChange. */}
                   </FormGroup>
+                  <FormPassword name="password" label={data.form.fields.password.label} placeholder={data.form.fields.password.placeholder} />
                   <FormGroup className="form-group-light">
                     <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
                   </FormGroup>
@@ -139,6 +143,9 @@ class ModalLogin extends React.Component {
                   </div>
                   <div>
                     <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('4'); }}>{data.form.buttons.reset}</Button> {/* PING INTEGRATION: see onclick function. */}
+                  </div>
+                  <div>
+                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('5'); }}>{data.form.buttons.reset_password}</Button>
                   </div>
                 </TabPane>
                 <TabPane tabId="2">{/* Device/login selection. We dont use tab 2. This is handled by PF. */}
@@ -175,10 +182,27 @@ class ModalLogin extends React.Component {
                     <Input onChange={this.handleEmailChange.bind(this)} type="text" name="email" id="email" placeholder={data.form.fields.email.placeholder} />
                   </FormGroup>
                   <div className="mb-3">
+<<<<<<< HEAD
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('5'); }}>{data.form.buttons.recover_username}</Button> {/* PING INTEGRATION: See onClick function. */}
                   </div>
                 </TabPane>
                 <TabPane tabId="5">{/* TODO Do we need this? Recover username success. Are we not just sending back to /app and pop modal? */}
+=======
+                    <Button type="button" color="primary" onClick={() => { this.toggleTab('6'); }}>{data.form.buttons.recover_username}</Button>
+                  </div>
+                </TabPane>
+                <TabPane tabId="5">
+                  <h4>{data.form.buttons.recover_password}</h4>
+                  <FormGroup className="form-group-light">
+                    <Label for="email">{data.form.fields.email.label}</Label>
+                    <Input type="text" name="email" id="email" placeholder={data.form.fields.email.placeholder} />
+                  </FormGroup>
+                  <div className="mb-3">
+                    <Button type="button" color="primary" onClick={() => { this.toggleTab('6'); }}>{data.form.buttons.recover_password}</Button>
+                  </div>
+                </TabPane>
+                <TabPane tabId="6">
+>>>>>>> master
                   <h4>{data.titles.recover_username_success}</h4>
                   <div className="mb-3 text-center">
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('1'); }}>{data.form.buttons.login}</Button>

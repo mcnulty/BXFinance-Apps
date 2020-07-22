@@ -16,6 +16,10 @@
 				"label": "Username",
 				"placeholder": ""
 			},
+			"password": {
+				"label": "Password",
+				"placeholder": ""
+			},
 			"remember": {
 				"label": "Remember Me"
 			},
@@ -29,10 +33,16 @@
 		},
 		"buttons": {
 			"next": "Next",
+<<<<<<< HEAD
 			"reset": "Forgot your username or password?",
+=======
+			"reset": "Forgot your username?",
+			"reset_password": "Forgot your password?",
+>>>>>>> master
 			"login": "Sign In",
 			"help": "Need help signing in?",
-			"recover_username": "Recover Username"
+			"recover_username": "Recover Username",
+			"recover_password": "Recover Password"
 		}
 	},
 	"mobile": {
