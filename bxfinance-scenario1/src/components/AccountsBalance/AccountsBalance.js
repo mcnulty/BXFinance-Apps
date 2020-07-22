@@ -30,7 +30,8 @@ const AccountsBalance = (props) => {
                 return (
                   <tr>
                     <td><a href={props.balance.accounts[key].href}>{props.balance.accounts[key].account}</a></td>
-                    <td>{props.balance.accounts[key].balance}</td>
+                    {/* <td>{props.balance.accounts[key].balance} PING INTEGRATION: replaced this with below line.  */}
+                    <td>{props.myAccounts.length > 0 && props.myAccounts[key].Amount.Amount}</td>
                   </tr>
                 );
               })      

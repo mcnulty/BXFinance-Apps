@@ -6,12 +6,13 @@ import { Container, Row, Col } from 'reactstrap';
 import "./WelcomeBar.scss";
 
 const WelcomeBar = (props) => {
+  
   return (
     <div className="welcome-bar">
       <Container>
         <Row>
           <Col lg="12">
-            <p>Welcome, Jane</p>
+            <p>Welcome{props.firstName && ", "+props.firstName}</p> {/* PING INTEGRATION: added use of props. */}
           </Col>
         </Row>
       </Container>

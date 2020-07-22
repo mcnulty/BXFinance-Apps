@@ -1,4 +1,6 @@
 {
+	"pfPwdChangeURI": "/ext/pwdchange/Identify?AdapterId=HTMLFormWithLIP",
+	"pfAcctRecoveryURI": "/ext/pwdreset/Identify?AdapterId=HTMLFormWithLIP",
 	"titles": {
 		"welcome": "Welcome back",
 		"login_method": "How would you like to sign in?",
@@ -14,10 +16,6 @@
 				"label": "Username",
 				"placeholder": ""
 			},
-			"password": {
-				"label": "Password",
-				"placeholder": ""
-			},
 			"remember": {
 				"label": "Remember Me"
 			},
@@ -31,12 +29,10 @@
 		},
 		"buttons": {
 			"next": "Next",
-			"reset": "Forgot your username?",
-			"reset_password": "Forgot your password?",
+			"reset": "Forgot your username or password?",
 			"login": "Sign In",
 			"help": "Need help signing in?",
-			"recover_username": "Recover Username",
-			"recover_password": "Recover Password"
+			"recover_username": "Recover Username"
 		}
 	},
 	"mobile": {
