@@ -12,7 +12,7 @@ export default class PingAuthN {
     // Didn't abstract these since they shouldn't ever change.
     pfAuthnAPIURI = "/pf-ws/authn/flows/";
     pfPickupURI = "/ext/ref/pickup?REF=";
-    pfSPRefIdAdapterInstanceId = "BXFSPRefID"; /* If we ever end up with more adapters, might make sense to abstract the IDs. */
+    //TODO remove if stable. pfSPRefIdAdapterInstanceId = "BXFSPRefID";
 
     /* 
     AuthN API endpoint
@@ -45,10 +45,10 @@ export default class PingAuthN {
     @param REF the ref Id returned with the authenticated user
     @return response object
      */
-    pickUpAPI(REF) {
+    pickUpAPI(REF, adapter) {
         const refId = REF;
         const myHeaders = new Headers();
-        myHeaders.append("ping.instanceid", this.pfSPRefIdAdapterInstanceId);
+        myHeaders.append("ping.instanceid", adapter);
         myHeaders.append("Authorization", "Basic cmVhY3QtdXNlcjoyRmVkZXJhdGVNMHJl"); /* TODO this should be obfuscated somehow. */
 
         const requestOptions = {

@@ -20,7 +20,7 @@ export default class PingOAuth {
     pfTokenAPIURI = "/as/token.oauth2?";
 
     /* 
-    Get AuthZ code from AS.
+    Get AuthZ Code
     We defaulted all params except for uid, 
     which is user specifc. As a demo site we only have 1
     auth code client. But if we add more in the future, this
@@ -34,7 +34,7 @@ export default class PingOAuth {
     @param
     @return string
     */
-    async getAuthCode(uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = "") {
+    async getAuthCode({uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         //swaprods... get it?
         //console.log("TEST:", "getting auth code")
         const myHeaders = new Headers();
@@ -64,7 +64,7 @@ export default class PingOAuth {
     }
 
     /* 
-    Get Token from AS.
+    Get Token
     We defaulted all params except for code,
     which is code flow specifc. As a demo site we only have 1
     auth code client. But if we add more in the future, this
@@ -75,18 +75,13 @@ export default class PingOAuth {
     @param
     @return string base64 encoded
     */
-    // TODO this could be refactored to be the only public method. The app never needs the authCode. So getToken could call getAuthCode, then swap for token.    
-    //async getToken(code, grantType = "authorization_code", redirectURI = process.env.REACT_APP_HOST + "/app/banking") {
-    async getToken(uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = "") {
+    async getToken({uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         let grantType = "authorization_code"; //Defaulting to auth code for v1. If it changes in a later version this should be a defaulted param in the function.
         let response = {};
         //let authCode = '0';
 
         if (responseType == "code") {
-            // console.log("in gettoken")
-
-            const authCode = await this.getAuthCode(this.Session.getAuthenticatedUserItem("uid"));
-            // console.log("getAuthCode response:", authCode);
+            const authCode = await this.getAuthCode({uid:this.Session.getAuthenticatedUserItem("uid"), scopes:scopes});
 
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
@@ -96,11 +91,11 @@ export default class PingOAuth {
                 headers: myHeaders,
                 redirect: 'follow'
             };
-            const url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType + "&redirect_uri=" + redirectURI + "&code=" + authCode;
+            let url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType + "&redirect_uri=" + redirectURI + "&code=" + authCode;
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
-            // console.log("token:", token);
+            console.log("TOKEN", token);
 
             return token;
         } else {

@@ -39,25 +39,23 @@ class AccountsDashboard extends React.Component {
   /* BEGIN PING INTEGRATION: */
   componentDidMount() {
     let acctIDsArr = [];
-    let myAccounts = [];
+    let acctIDsArrSimple = [];
 
     this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid")) //TODO move promise chaining into component. Shouldn't deal with that here.
       .then(response => response.json())
       .then(jsonData => {
         acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
-        // console.log("accts:", acctIDsArr);
+        acctIDsArrSimple = this.JSONSearch.findValues(acctIDsArr, "ids");
+        this.Session.setAuthenticatedUserItem("accts", acctIDsArrSimple[0]);
         if (acctIDsArr.length) {
           console.log("TEST:", "we see accts array.");
           this.PingOAuth.getToken(this.Session.getAuthenticatedUserItem("uid"))
             .then(token => {
-              this.Session.setAuthenticatedUserItem("at", token);
+              this.Session.setAuthenticatedUserItem("AT", token);
               this.OpenBanking.getAccountBalances(token)
                 .then(response => response.json())
                 .then(jsonData => {
                   this.setState({ myAccounts: jsonData.Data.Balance });
-                  // console.log("accts response", JSON.stringify(jsonData));
-                  // console.log("this.myAccount", this.state.myAccounts);
-                  //console.log("myAccounts 0", this.state.myAccounts[0].Amount.Amount);
                 })
                 .catch(e => {
                   console.error("GetAccountBalances Exception", e)
@@ -76,7 +74,8 @@ class AccountsDashboard extends React.Component {
                 .then(response => response.json())
                 .then(jsonData => {
                   this.setState({ myAccounts: jsonData.Data.Balance });
-                  // console.log("this.myAccount", this.state.myAccounts);
+                  acctIDsArr = this.JSONSearch.findValues(jsonData.Data.Balance, "AccountId");
+                  this.Session.setAuthenticatedUserItem("accts", acctIDsArr);
                 })
                 .catch(e => {
                   console.error("GetAccountBalances Exception", e)

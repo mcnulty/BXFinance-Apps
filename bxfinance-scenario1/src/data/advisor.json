@@ -24,7 +24,7 @@
 			}
 		]
 	},
-	"welcome_bar": "Welcome, Amy",
+	"welcome_bar": "Welcome, ",
 	"subnav": [
 		{
 			"title": "Active Campaigns",
@@ -60,7 +60,7 @@
 	"profile": {
 		"advisor": {
 			"title": "Your Profile",
-			"content": "<strong>Amy Davis</strong> <br> AWA Wealth Advisor <br> Roebuck, IL  60610 <br> Phone: 847.489.2213 <br> amy.davis@AWA.com <br> awa.com/amy.davis",
+			"content": "<br> AWA Wealth Advisor <br> Roebuck, IL  60610 <br> Phone: 847.489.2213 <br> amy.davis@AWA.com <br> awa.com/amy.davis",
 			"button": "Make Changes"
 		}
 	},
