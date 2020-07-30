@@ -69,7 +69,7 @@ export default class PingData {
             redirect: 'follow'
         };
 
-        //TODO add try catch error handling here.
+        //TODO add try catch error handling here. And stop the .then() logging. Remove or return the response.
         const url = process.env.REACT_APP_HOST + this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
         fetch(url, requestOptions)
             .then(response => response.text())
