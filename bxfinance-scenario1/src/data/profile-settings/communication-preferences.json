@@ -73,15 +73,15 @@
       "communication_types": [
         {
           "name": "sms",
-          "label": "SMS/Text Messages (555.239.9685)"
+          "label": "SMS/Text Messages "
         },
         {
           "name": "email",
-          "label": "Email (janelakesmith@gmail.com)"
+          "label": "Email "
         },
         {
           "name": "mail",
-          "label": "Mail (1278 Sutherland Dr. Roebuck, IL 60610)"
+          "label": "Mail "
         }
       ],
       "btn_cancel": "Cancel",

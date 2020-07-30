@@ -22,9 +22,11 @@ export default class Session {
     }
 
     /* 
+    Set Authenticated User Item
     Sets an item in the current origin's sessions storage.
 
     @param key the item name to set in storage
+    @param value the string value of the key
     @return boolean
     @throws storageFullException Particularly, in Mobile Safari 
                                 (since iOS 5) it always throws when 
@@ -46,6 +48,7 @@ export default class Session {
     }
 
     /* 
+    Remove Authenticated User Item
     Removes an item from the current origin's session storage.
 
     @param key the item name in storage to remove 
@@ -57,8 +60,9 @@ export default class Session {
     }
 
     /* 
+    Kill Authenticated User
     Clears out everything in the current origin's sessions storage.
-
+    
     @return true
      */
     killAuthenticatedUser() {
