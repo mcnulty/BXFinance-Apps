@@ -59,16 +59,18 @@ class NavbarMain extends React.Component {
   }
   /* PING INTEGRATION: SLO support when signing out */
   logEmOut() {
-    this.Session.killAuthenticatedUser(); //Kill the local app session.
-    let rootDiv = document.getElementById("root"); //Grab the root div for the app
+    const success = this.Session.killAuthenticatedUser(); //Kill the local app session.
+    //TODO This needs to be put back once SLO is debugged. for now just sending to the home page
+    /* let rootDiv = document.getElementById("root"); //Grab the root div for the app
     let logoutForm = document.createElement('form'); // Create a new form element
     logoutForm.setAttribute("action", "/sp/startSLO.ping"); // Add the action attribute we want to POST to
     logoutForm.setAttribute("id", "logoutForm"); // Add an Id Attribute
     logoutForm.setAttribute("method", "post"); // Add the method attribute
     rootDiv.appendChild(logoutForm); //Add the form to the DOM
-    document.forms["logoutForm"].submit(); //Submit the form, obviously.
+    document.forms["logoutForm"].submit(); //Submit the form, obviously. */
+    window.location.href = process.env.REACT_APP_HOST + "/app"; //TODO remove this once SLO is fixed.
   }
-  
+
   componentDidMount() {
     // BEGIN PING INTEGRATION
     // Check for and create a query string params object
@@ -82,6 +84,7 @@ class NavbarMain extends React.Component {
         this.PingAuthN.authnAPI("GET", params.get("flowId"))
           .then(response => response.json())
           .then(jsonResult => {
+            console.log("TEST", "Got flowId");
             let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult));
             if (jsonResult.status == "IDENTIFIER_REQUIRED") {
               console.log("STATUS:", jsonResult.status)
@@ -99,18 +102,31 @@ class NavbarMain extends React.Component {
 
       } // Coming back as authenticated user from Agentless IK.
       else if (params.get("REF")) {
+        console.log("TEST", "Got REF");
         const REF = params.get("REF");
         const targetApp = decodeURIComponent(params.get("TargetResource"));
 
         this.PingAuthN.pickUpAPI(REF)
           .then(response => response.json())
           .then((jsonData) => {
+            console.log("jsonData", JSON.stringify(jsonData));
+            //console.log("RESUMEPATH", jsonData.resumePath);
+            if (jsonData.resumePath) { // Means we are in a SLO request. AIK doesnt use resumePaths.
+              console.log("TEST", "In SLO");
+              window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath;
+            }
             this.Session.setAuthenticatedUserItem("email", jsonData.Email);
             this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
             this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
             this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
             this.Session.setAuthenticatedUserItem("uid", jsonData.uid);
             this.Session.setAuthenticatedUserItem("pfSessionId", jsonData.sessionid);
+            this.Session.setAuthenticatedUserItem("street", jsonData.street);
+            this.Session.setAuthenticatedUserItem("mobile", jsonData.mobile);
+            this.Session.setAuthenticatedUserItem("city", jsonData.city);
+            this.Session.setAuthenticatedUserItem("zipcode", jsonData.postalCode);
+            const fullAddress = jsonData.street + ", " + jsonData.city + ", " + jsonData.postalCode;
+            this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
 
           })
           .catch(error => console.error("Pickup Error:", error));
@@ -145,18 +161,19 @@ class NavbarMain extends React.Component {
                 </NavItem>
                 {/* BEGIN PING INTEGRATION: added conditional rendering logic for Sign In/Out links. */}
                 {/* TODO might need to change this to check state instead. Getting inconsistent results. */}
-                {this.Session.getAuthenticatedUserItem("subject") == null &&
-                <NavItem className="login">
-                  <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
-                </NavItem>}
-                {this.Session.getAuthenticatedUserItem("subject") !== null &&
-                <NavItem className="logout">
-                  <Link to="/" onClick={this.logEmOut.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
-                </NavItem> }
-                <NavItem className="register">
-                  {/* END PING INTEGRATION */}
-                  <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
-                </NavItem>
+                {!(this.Session.getAuthenticatedUserItem("subject")) &&
+                  <NavItem className="login">
+                    <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
+                  </NavItem>}
+                {(this.Session.getAuthenticatedUserItem("subject")) &&
+                  <NavItem className="logout">
+                    <Link to="/" onClick={this.logEmOut.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
+                  </NavItem>}
+                {!(this.Session.getAuthenticatedUserItem("subject")) &&
+                  <NavItem className="register">
+                    <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
+                  </NavItem>}
+                {/* END PING INTEGRATION */}
               </Nav>
             </Collapse>
           </Container>
