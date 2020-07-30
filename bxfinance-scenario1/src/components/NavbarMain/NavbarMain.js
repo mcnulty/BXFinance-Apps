@@ -105,29 +105,37 @@ class NavbarMain extends React.Component {
         console.log("TEST", "Got REF");
         const REF = params.get("REF");
         const targetApp = decodeURIComponent(params.get("TargetResource"));
+        const adapter = targetApp.includes("/banking") ? "BXFSPRefID" : "AdvisorSPRefID";
 
-        this.PingAuthN.pickUpAPI(REF)
+        this.PingAuthN.pickUpAPI(REF, adapter)
           .then(response => response.json())
           .then((jsonData) => {
             console.log("jsonData", JSON.stringify(jsonData));
-            //console.log("RESUMEPATH", jsonData.resumePath);
-            if (jsonData.resumePath) { // Means we are in a SLO request. AIK doesnt use resumePaths.
+            if (jsonData.resumePath) { // Means we are in a SLO request. AIK doesnt use resumePath.
               console.log("TEST", "In SLO");
               window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath;
             }
-            this.Session.setAuthenticatedUserItem("email", jsonData.Email);
-            this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
-            this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
-            this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
-            this.Session.setAuthenticatedUserItem("uid", jsonData.uid);
-            this.Session.setAuthenticatedUserItem("pfSessionId", jsonData.sessionid);
-            this.Session.setAuthenticatedUserItem("street", jsonData.street);
-            this.Session.setAuthenticatedUserItem("mobile", jsonData.mobile);
-            this.Session.setAuthenticatedUserItem("city", jsonData.city);
-            this.Session.setAuthenticatedUserItem("zipcode", jsonData.postalCode);
-            const fullAddress = jsonData.street + ", " + jsonData.city + ", " + jsonData.postalCode;
-            this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
-
+            if (targetApp.includes("/advisor")) {
+              this.Session.setAuthenticatedUserItem("email", jsonData.Email);
+              this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
+              this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
+              this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
+              this.Session.setAuthenticatedUserItem("uid", jsonData.uid);
+              this.Session.setAuthenticatedUserItem("bxFinanceUserType", jsonData.bxFinanceUserType);
+            } else { //banking customer
+              this.Session.setAuthenticatedUserItem("email", jsonData.Email);
+              this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
+              this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
+              this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
+              this.Session.setAuthenticatedUserItem("uid", jsonData.uid);
+              this.Session.setAuthenticatedUserItem("pfSessionId", jsonData.sessionid);
+              this.Session.setAuthenticatedUserItem("street", jsonData.street);
+              this.Session.setAuthenticatedUserItem("mobile", jsonData.mobile);
+              this.Session.setAuthenticatedUserItem("city", jsonData.city);
+              this.Session.setAuthenticatedUserItem("zipcode", jsonData.postalCode);
+              const fullAddress = jsonData.street + ", " + jsonData.city + ", " + jsonData.postalCode;
+              this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
+            }
           })
           .catch(error => console.error("Pickup Error:", error));
 

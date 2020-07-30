@@ -19,6 +19,7 @@ import { faLinkedinIn, faFacebookF, faTwitter, faInstagram } from '@fortawesome/
 import NavbarMain from '../../components/NavbarMain';
 import FooterMain from '../../components/FooterMain';
 import AccountsSubnav from '../../components/AccountsSubnav';
+import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/advisor.json';
@@ -102,6 +103,10 @@ const SearchAutocomplete = () => {
 
 // AdvisorClient Page
 class AdvisorClient extends React.Component {
+  constructor() {
+    super();
+    this.Session = new Session(); /* PING INTEGRATION: */
+  }
   render() {
     return (
       <div className="accounts advisor">
@@ -110,7 +115,7 @@ class AdvisorClient extends React.Component {
           <Container>
             <Row>
               <Col lg="12">
-                <p>{data.welcome_bar}</p>
+                <p>{data.welcome_bar}{this.Session.getAuthenticatedUserItem("firstName")}</p>
               </Col>
             </Row>
           </Container>
@@ -127,7 +132,9 @@ class AdvisorClient extends React.Component {
                         <Media object src={process.env.PUBLIC_URL + "/images/anywealthadvisor-photo.png"} alt="Generic placeholder image" />
                       </Media>
                       <Media body>
-                        <p dangerouslySetInnerHTML={{__html: data.profile.advisor.content}}></p>
+                        {/* PING INTEGRATION */}
+                        <strong>{this.Session.getAuthenticatedUserItem("firstName") + " " + this.Session.getAuthenticatedUserItem("lastName")}</strong>
+                        <span dangerouslySetInnerHTML={{ __html: data.profile.advisor.content }}></span>
                         <Button color="link">{data.profile.advisor.button}</Button>
                       </Media>
                     </Media>
@@ -139,9 +146,9 @@ class AdvisorClient extends React.Component {
                     {
                       Object.keys(data.alerts.messages).map(key => {
                         return (
-                          <p key={key} dangerouslySetInnerHTML={{__html: data.alerts.messages[key]}}></p>
+                          <p key={key} dangerouslySetInnerHTML={{ __html: data.alerts.messages[key] }}></p>
                         );
-                      })      
+                      })
                     }
                     <Button color="link">{data.alerts.button}</Button>
                   </CardBody>
@@ -165,7 +172,7 @@ class AdvisorClient extends React.Component {
                 </div>
                 <div>
                   <h5 className="mb-3">{data.clients_recent.title}</h5>
-                  <p dangerouslySetInnerHTML={{__html: data.clients_recent.content}}></p>
+                  <p dangerouslySetInnerHTML={{ __html: data.clients_recent.content }}></p>
                   <Button color="link">{data.clients_recent.button}</Button>
                 </div>
               </Col>
