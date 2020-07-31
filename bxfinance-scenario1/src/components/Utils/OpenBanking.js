@@ -16,6 +16,7 @@ export default class OpenBanking {
     
     constructor() {
         // Didn't abstract these since they shouldn't ever change.
+        //TODO move these out of the constructor. Not sure why I did this. Not necessary. Didn't do it anywhere else. That's what I get for working on a Saturday.
         this.mockOBConsenthost = process.env.REACT_APP_HOST + "/OpenBanking";
         this.mockOBhost = "https://demo-openbanking-api-server.herokuapp.com/OpenBanking";
         this.mockOBAPIver = "/v2";
@@ -86,6 +87,7 @@ export default class OpenBanking {
     */
     transferMoney(amount, token) {
        console.log("transferMoney", arguments);
+        console.log("token", token);
 
        let myHeaders = new Headers();
        myHeaders.append("Authorization", "Bearer " + token);

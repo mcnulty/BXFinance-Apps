@@ -93,7 +93,7 @@
 				"label": "Start Transfer"
       },
       "pending_transfer": {
-        "label": "Pending your aproval..."
+        "label": "Pending your approval..."
       },
       "start_new_transfer": {
         "label": "Start Another Transfer"

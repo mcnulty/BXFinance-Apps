@@ -19,6 +19,7 @@ import { faLinkedinIn, faFacebookF, faTwitter, faInstagram } from '@fortawesome/
 import NavbarMain from '../../components/NavbarMain';
 import FooterMain from '../../components/FooterMain';
 import AccountsSubnav from '../../components/AccountsSubnav';
+import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/advisor.json';
@@ -105,6 +106,11 @@ const SearchAutocomplete = () => {
 
 // Advisor Page
 class Advisor extends React.Component {
+  constructor() {
+    super();
+    this.Session = new Session(); /* PING INTEGRATION: */
+  }
+  
   render() {
     return (
       <div className="accounts advisor">
@@ -113,7 +119,7 @@ class Advisor extends React.Component {
           <Container>
             <Row>
               <Col lg="12">
-                <p>{data.welcome_bar}</p>
+                <p>{data.welcome_bar}{this.Session.getAuthenticatedUserItem("firstName")}</p>
               </Col>
             </Row>
           </Container>
@@ -130,7 +136,9 @@ class Advisor extends React.Component {
                         <Media object src={process.env.PUBLIC_URL + "/images/anywealthadvisor-photo.png"} alt="Generic placeholder image" />
                       </Media>
                       <Media body>
-                        <p dangerouslySetInnerHTML={{__html: data.profile.advisor.content}}></p>
+                        {/* PING INTEGRATION */}
+                        <strong>{this.Session.getAuthenticatedUserItem("firstName") + " " + this.Session.getAuthenticatedUserItem("lastName")}</strong>
+                        <span dangerouslySetInnerHTML={{ __html: data.profile.advisor.content }}></span>
                         <Button color="link">{data.profile.advisor.button}</Button>
                       </Media>
                     </Media>

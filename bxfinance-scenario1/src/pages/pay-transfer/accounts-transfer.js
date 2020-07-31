@@ -46,6 +46,7 @@ class AccountsTransfer extends React.Component {
     switch (status) {
       case "approved":
         // TODO need error handling and checking status of transfermoney response.
+        //TODO since using token from session, need ability to get new token if expired.
         this.OpenBanking.transferMoney(this.state.xfrAmount, this.Session.getAuthenticatedUserItem("at"))
           .then(response => response.json())
           .then(jsonData => {
@@ -177,7 +178,7 @@ class AccountsTransfer extends React.Component {
                     </div>
                     <div className="table-col">
                       <h3>Amount:</h3>
-                      <p>${this.state.xfrAmount}</p>{/* TODO this should be formatted as currency but only for display. */}
+                      <p>${this.state.xfrAmount}</p>
                     </div>
                   </div>
                   <div className="app-approval-banner">
