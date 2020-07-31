@@ -137,7 +137,7 @@ class PrivacySecurity extends React.Component {
                                   return (
                                   <FormGroup check>
                                     <Label className="custom-checkbox" check>
-                                      <Input type="checkbox" checked={partner3.permissions[index2].checked} /> {partner3.permissions[index2].label}
+                                      <Input type="checkbox" /> {partner3.permissions[index2].label}
                                       <span class="checkmark"><span></span></span>
                                     </Label>
                                   </FormGroup>
