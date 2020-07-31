@@ -190,7 +190,7 @@ class AccountsTransfer extends React.Component {
                   <Form>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <a href={process.env.PUBLIC_URL} class="text-info cancel">{data.form.buttons.cancel.label}</a>
+                        <a href={process.env.PUBLIC_URL} className="text-info cancel">{data.form.buttons.cancel.label}</a>
                         <Button color="primary" className="start-transfer" onClick={this.showStep3}>{data.form.buttons.pending_transfer.label}</Button>
                       </Col>
                     </Row>
