@@ -50,7 +50,7 @@ class NavbarMain extends React.Component {
       window.location.href = process.env.REACT_APP_HOST + data.startSSOURI /* TODO this ideally should be switched to a fetch(). No redirects for true SPA. TTM syndrome */
     }/* END PING INTEGRATION */
     //We're not triggering the login modal unless we come back with a flowId.
-    this.refs.modalLogin.toggle();
+    //this.refs.modalLogin.toggle();
   }
   toggle() {
     this.setState({
