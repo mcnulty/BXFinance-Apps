@@ -41,7 +41,7 @@ class AccountsDashboard extends React.Component {
     let acctIDsArr = [];
     let acctIDsArrSimple = [];
 
-    this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid")) //TODO move promise chaining into component. Shouldn't deal with that here.
+    this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid"))
       .then(response => response.json())
       .then(jsonData => {
         acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
@@ -49,9 +49,9 @@ class AccountsDashboard extends React.Component {
         this.Session.setAuthenticatedUserItem("accts", acctIDsArrSimple[0]);
         if (acctIDsArr.length) {
           console.log("TEST:", "we see accts array.");
-          this.PingOAuth.getToken(this.Session.getAuthenticatedUserItem("uid"))
+          this.PingOAuth.getToken({uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent'})
             .then(token => {
-              this.Session.setAuthenticatedUserItem("AT", token);
+              this.Session.setAuthenticatedUserItem("AT", token); //TODO need to re-use this token everywhere to avoid multiple getToken calls.
               this.OpenBanking.getAccountBalances(token)
                 .then(response => response.json())
                 .then(jsonData => {
@@ -66,8 +66,8 @@ class AccountsDashboard extends React.Component {
             });
         } else {
           console.log("TEST:", "we dont see accts arr.");
-          this.PingOAuth.getToken(this.Session.getAuthenticatedUserItem("uid"))
-            .then(token => {//need a catch() for this .then():
+          this.PingOAuth.getToken({uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent'})
+            .then(token => {
               this.Session.setAuthenticatedUserItem("at", token);
               this.OpenBanking.provisionAccounts(token, this.Session.getAuthenticatedUserItem("uid"));
               this.OpenBanking.getAccountBalances(token)

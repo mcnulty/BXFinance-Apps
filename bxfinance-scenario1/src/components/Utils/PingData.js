@@ -118,15 +118,14 @@ export default class PingData {
             consentObject.actor = uid;
             consentObject.data["share-balance"] = consent;
             consentObject.definition.id = definition;
-            raw = JSON.stringify(consentObject);
         } else { //share-comm-preferences
             consentObject = { "status": "accepted", "subject": "", "actor": "", "audience": "BXFinance", "definition": { "id": "", "version": "0.1", "locale": "en-us" }, "titleText": "Share Comms Preferences", "dataText": "Share Comms Preferences", "purposeText": "Share Comms Preferences", "data": {}, "consentContext": {} };
             consentObject.subject = uid;
             consentObject.actor = uid;
             consentObject.data = consent;
             consentObject.definition.id = definition;
-            raw = JSON.stringify(consentObject);
         }
+        raw = JSON.stringify(consentObject);
 
         const requestOptions = {
             method: 'POST',
@@ -145,14 +144,21 @@ export default class PingData {
     @param consentId the id of the user's existing consent record
     @return consent record in JSON format
     */
-    updateUserConsent(token, consent, consentId) {
+    updateUserConsent(token, consent, consentId, definition) {
         let myHeaders = new Headers();
+        let consentObject = { "data": {} };
+        let raw = "";
         myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
 
-        let consentObject = { "data": {} };
-        consentObject.data = consent;
-        const raw = JSON.stringify(consentObject);
+        if (definition == "share-account-balances") {
+            consentObject = { "data": { "share-balance": [] } };
+            consentObject.data["share-balance"] = consent;
+        } else { //share-comm-preferences
+            consentObject = { "data": {} };
+            consentObject.data = consent;
+        }
+        raw = JSON.stringify(consentObject);
 
         const requestOptions = {
             method: 'PATCH',
