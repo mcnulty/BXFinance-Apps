@@ -92,6 +92,28 @@
 			"button": "Learn More"
 		}
 	},
+	"client_detail": {
+		"side": {
+			"content": "<strong>Smith, Jane</strong> <br> 4700 Red River St. <br> Roebuck, IL 60434 <br> Home: 617.525.4435 <br> Mobile: 614.787.2278 <br> <a href=\"#\">See Notes</a> | <a href=\"#\">Modify Records</a>",
+			"button": "Message Client"
+		},
+		"content": {
+			"title": "Linked Account Balances",
+			"accounts": [
+				{
+					"account": "BXFinance Savings (Account 1)",
+					"amount": "$1567.82"
+				},
+				{
+					"account": "BXFinance Savings (Account 2)",
+					"amount": "$38034.22"
+				}
+			],
+			"links": "<a href=\"#\">Add an Account</a> | <a href=\"#\">Modify Account Nicknames</a>",
+			"portfolio_overview": "Porfolio Overview",
+			"portfolio_view": "View Portfolio"
+		}
+	},
 	"clients_recent": {
 		"title": "Recent Clients",
 		"content": "04/24/2020 | Initial Contact | <a href=\"#\">Notes</a> <br> 05/23/2020 | Linked Accounts | <a href=\"#\">Notes</a> <br> 06/03/2020 | Consult Call | <a href=\"#\">Notes</a>",
