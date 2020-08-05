@@ -75,6 +75,7 @@ export default class PingOAuth {
     @param
     @return string base64 encoded
     */
+   //TODO might need to change syntax for destructuring here. See "named and optional arguments" https://medium.com/dailyjs/named-and-optional-arguments-in-javascript-using-es6-destructuring-292a683d5b4e
     async getToken({uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         let grantType = "authorization_code"; //Defaulting to auth code for v1. If it changes in a later version this should be a defaulted param in the function.
         let response = {};
