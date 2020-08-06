@@ -67,6 +67,7 @@
   "dropdown": "Things I Can Do",
   "sections": [
     {
+      "pfProfileMgmtURI": "/pf/idprofile.ping?LocalIdentityProfileID=defaultIdentityProfile",
       "title": "Personal Details",
       "description": "Make changes to your name, address, phone number and other details of your account.",
       "white": true,
