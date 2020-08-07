@@ -17,8 +17,6 @@ import ModalRegisterConfirm from '../ModalRegisterConfirm';
 import ModalLogin from '../ModalLogin';
 import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
 import Session from '../Utils/Session'; /* PING INTEGRATION */
-
-// Styles
 import './NavbarMain.scss';
 
 // Data
@@ -47,19 +45,20 @@ class NavbarMain extends React.Component {
   triggerModalLogin() {
     /* BEGIN PING INTEGRATION */
     if (!window.location.search) {
-      window.location.href = process.env.REACT_APP_HOST + data.startSSOURI /* TODO this ideally should be switched to a fetch(). No redirects for true SPA. TTM syndrome */
+      window.location.href = process.env.REACT_APP_HOST + data.startSSOURI;
     }/* END PING INTEGRATION */
-    //We're not triggering the login modal unless we come back with a flowId.
-    //this.refs.modalLogin.toggle();
+    else { 
+      this.refs.modalLogin.toggle(); //This is left here just in case the user closes the modal and clicks "sign in" after we already have a flowId in the URL.
+    }
   }
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen
     });
   }
-  /* PING INTEGRATION: SLO support when signing out */
-  logEmOut() {
-    const success = this.Session.killAuthenticatedUser(); //Kill the local app session.
+  /* BEGIN PING INTEGRATION */
+  startSLO() {
+    const success = this.Session.clearUserAppSession();
     //TODO This needs to be put back once SLO is debugged. for now just sending to the home page
     /* let rootDiv = document.getElementById("root"); //Grab the root div for the app
     let logoutForm = document.createElement('form'); // Create a new form element
@@ -71,35 +70,39 @@ class NavbarMain extends React.Component {
     window.location.href = process.env.REACT_APP_HOST + "/app"; //TODO remove this once SLO is fixed.
   }
 
+  /* END PING INTEGRATION: */
+
   componentDidMount() {
     // BEGIN PING INTEGRATION
-    // Check for and create a query string params object
+    // Begin app Session timeout setup.
+
+    // End app Session timeout setup.
+
+    // Check for a querystring; Will be fowId or REF.
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
-      //const authID = params.get("flowId") ? params.get("flowId") : params.get("REF");
 
-      // Coming back from authN API so grab the flowId.
+      // Coming back from authN API or Agentless adapter.
       if (params.get("flowId")) {
-        // call authn api to get status. 
-        this.PingAuthN.authnAPI("GET", params.get("flowId"))
+        this.PingAuthN.handleAuthNflow({ flowId: params.get("flowId") })
           .then(response => response.json())
           .then(jsonResult => {
             console.log("TEST", "Got flowId");
-            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult));
+            console.log("STATUS:", jsonResult.status);
+            console.log("RESULTS:", JSON.stringify(jsonResult));
+            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO do we still need this?
             if (jsonResult.status == "IDENTIFIER_REQUIRED") {
-              console.log("STATUS:", jsonResult.status)
-              //pop the modal. Defaults it ID first.
+              //pop the ID first modal. 
               this.refs.modalLogin.toggle();
             }
-            else if (jsonResult.status == "ACCOUNT_RECOVERY_USERNAME_REQUIRED") {
+            else if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
+              //TODO I dont think this needs to be here. we will never hit this here. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
               console.log("STATUS:", jsonResult.status)
-              this.refs.modalLogin.toggle('4');
+              //pop the username/password modal.
+              this.refs.modalLoginPassword.toggle();
             }
           })
           .catch(error => console.error('HANDLESUBMIT ERROR', error));
-        //if status is identifier_required
-        //this.refs.modalLogin.toggle();
-
       } // Coming back as authenticated user from Agentless IK.
       else if (params.get("REF")) {
         console.log("TEST", "Got REF");
@@ -115,7 +118,7 @@ class NavbarMain extends React.Component {
               console.log("TEST", "In SLO");
               window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath;
             }
-            if (targetApp.includes("/advisor")) {
+            if (targetApp.includes("/advisor")) {//TODO I think we can re-use this for AnyMarketing.
               this.Session.setAuthenticatedUserItem("email", jsonData.Email);
               this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
               this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
@@ -175,7 +178,7 @@ class NavbarMain extends React.Component {
                   </NavItem>}
                 {(this.Session.getAuthenticatedUserItem("subject")) &&
                   <NavItem className="logout">
-                    <Link to="/" onClick={this.logEmOut.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
+                  <Link to="/" onClick={this.startSLO.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
                   </NavItem>}
                 {!(this.Session.getAuthenticatedUserItem("subject")) &&
                   <NavItem className="register">

@@ -18,6 +18,9 @@ import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 
 // Components
 import FormPassword from '../../components/FormPassword';
+import PingAuthN from '../Utils/PingAuthN' /* PING INTEGRATION */
+import Session from '../Utils/Session' /* PING INTEGRATION: */
+ 
 
 // Styles
 import "./ModalLoginPassword.scss";
@@ -32,8 +35,12 @@ class ModalLoginPassword extends React.Component {
       isOpen: false,
       activeTab: '1',
       loginMethodUnset: true,
-      loginMethodFormGroupClass: ''
+      loginMethodFormGroupClass: '',
+      userName: "",                   /* PING INTEGRATION: */
+      swaprods: ""                    /* PING INTEGRATION: */
     };
+    this.PingAuthN = new PingAuthN(); /* PING INTEGRATION: */
+    this.Session = new Session();     /* PING INTEGRATION: */
   }
   onClosed() {
     this.setState({
@@ -42,15 +49,32 @@ class ModalLoginPassword extends React.Component {
       loginMethodFormGroupClass: ''
     });
   }
-  toggle() {
+  toggle(userName) {
     this.setState({
-      isOpen: !this.state.isOpen
+      isOpen: !this.state.isOpen,
+      userName: userName
     });
   }
   toggleTab(tab) {
-    this.setState({
-      activeTab: tab
-    });
+    /* BEGIN PING INTEGRATION: 
+    tab 2 modal is device selection 
+    which we don't use so we don't change state. Only call our handler. 
+    Tab 4 is forgot username, so send them to PF endpoint. */
+    console.log("TOGGLING TAB");
+    console.log("STATE", this.state);
+
+    if (tab == '2') {
+      this.handleSubmit(tab);
+    } else if (tab == '4') {
+      window.location.href = process.env.REACT_APP_HOST + data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+    } else if (tab == '5') {
+      window.location.href = process.env.REACT_APP_HOST + data.pfPwdChangeURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+    } else {
+      /* END PING INTEGRATION */
+      this.setState({ // TODO I dont think we need this anymore.
+        activeTab: tab
+      });
+    }
   }
   setLoginMethod() {
     this.setState({
@@ -58,6 +82,41 @@ class ModalLoginPassword extends React.Component {
       loginMethodFormGroupClass: 'form-group-light'
     });
   }
+updatesession() {
+  console.log("TEST");
+}
+  /* BEGIN PING INTEGRATION: */
+  // This is used as a callback function to the child component FormPassword.
+  handlePswdChange(event) {
+    this.setState({ swaprods: event.target.value }, () => {
+      console.log("User Input", this.state.swaprods);
+    });
+  }
+  handleSubmit(tab) {
+    console.log("HANDLING SUBMIT");
+    console.log("STATE", this.state);
+    const pswd = tab == '2' ? this.state.swaprods : "WTF?"; //TODO Do we care about the tab param here? Keep?
+    const flowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
+
+    if (pswd) {
+      console.log("pswd", pswd);
+      this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, swaprods: this.state.swaprods })
+        .then(response => response.json())
+        .then(jsonResults => {
+          console.log("jsonResults", jsonResults);
+          if (jsonResults.status == "RESUME") {
+            this.PingAuthN.handleAuthNflow({flowResponse: jsonResults});
+          } else {
+            throw "Flow Status Exception: Unexpected status."; //TODO This is probably a corner case, but how do we handle the UI in this error?
+          }
+        })
+        .catch(e => {
+          console.error("HANDLEAUTHNFLOW Exception:", e);
+        });
+    } 
+  }
+  /* END PING INTEGRATION: */
+
   render() {
     const closeBtn = <div />;
     return (
@@ -71,14 +130,18 @@ class ModalLoginPassword extends React.Component {
                   <h4>{data.titles.welcome}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
-                    <Input type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} />
+                    <Input type="text" name="username" id="username" value={this.state.userName} placeholder={data.form.fields.username.placeholder} />
                   </FormGroup>
-                  <FormPassword name="password" label={data.form.fields.password.label} placeholder={data.form.fields.password.placeholder} />
+                  <FormGroup className="form-group-light">
+                    <Label for="password">{data.form.fields.password.label}</Label>
+                    <Input type="password" onChange={this.handlePswdChange.bind(this)} name="password" id="password" placeholder={data.form.fields.password.placeholder} />
+                  </FormGroup>
+                  {/* <FormPassword setPassword={this.handlePswdChange} name="password" label={data.form.fields.password.label} placeholder={data.form.fields.password.placeholder} /> */}
                   <FormGroup className="form-group-light">
                     <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
                   </FormGroup>
                   <div className="mb-3">
-                    <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button>
+                    <Button type="button" color="primary" onClick={() => { this.toggleTab('2') }}>{data.form.buttons.next}</Button>
                   </div>
                   <div>
                     <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('4'); }}>{data.form.buttons.reset}</Button>
