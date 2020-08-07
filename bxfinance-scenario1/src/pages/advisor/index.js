@@ -164,7 +164,7 @@ class Advisor extends React.Component {
                     <Col lg="4">
                       <h5 className="mb-4">
                         {data.clients.title}
-                        <div class="form-inline float-right">
+                        <div className="form-inline float-right">
                           <select className="form-control form-control-select">
                             <option>Filters</option>
                           </select>
