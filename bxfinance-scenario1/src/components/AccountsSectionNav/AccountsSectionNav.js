@@ -15,7 +15,10 @@ const AccountsSectionNav = (props) => {
         <h4>{props.data.title}</h4>
         <p>{props.data.description}</p>
       </div>
-      <Link to={props.data.button_href}><Button color="primary">{props.data.button_text}</Button></Link>
+      {/* PING INTEGRATION: logic to use standard anchor tag if rendering a button for profile mgmt updates. Links to PF LIP. */}
+      {props.data.title == "Personal Details" ? 
+        <a href={process.env.REACT_APP_HOST+props.data.pfProfileMgmtURI}><Button color="primary">{props.data.button_text}</Button></a> :
+        <Link to={props.data.button_href}><Button color="primary">{props.data.button_text}</Button></Link>}
     </div>
   );
 };

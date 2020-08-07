@@ -55,11 +55,11 @@ class CommunicationPreferences extends React.Component {
     if (this.state.consentId) {
       console.log("TEST", "Updating consents");
       const consent = { "sms": this.state.sms, "email": this.state.email, "homeAddress": this.state.mail };
-      this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.state.consentId)
+      this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.state.consentId, this.consentDef)
         .then(response => response.json())
         .then(consentData => {
           console.log("UpdateUserConsents", JSON.stringify(consentData));
-          if (consentData.count > 0) {
+          if (consentData.count > 0) { //TODO WTH am I resetting state when it was already set in step1. WTF??? Remove and regression test.
             this.setState({
               sms: consentData._embedded.consents[0].data.sms,
               email: consentData._embedded.consents[0].data.email,
@@ -77,7 +77,7 @@ class CommunicationPreferences extends React.Component {
         });
     } else {
       console.log("TEST", "Creating consent.");
-      const consent = {"sms":this.state.sms, "email": this.state.email, "homeAddress": this.state.mail};
+      const consent = { "sms": this.state.sms, "email": this.state.email, "homeAddress": this.state.mail };
       this.PingData.createUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
@@ -124,33 +124,57 @@ class CommunicationPreferences extends React.Component {
 
   /* BEGIN PING INTEGRATION */
   componentDidMount() {
-    this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
-      .then(token => {
-        this.Session.setAuthenticatedUserItem("AT", token); //for later reuse to reduce getToken calls.
-        this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
-          .then(response => response.json())
-          .then(consentData => {
-            console.log("getUserConsents", JSON.stringify(consentData));
-            if (consentData.count > 0) {
-              this.setState({
-                sms: consentData._embedded.consents[0].data.sms,
-                email: consentData._embedded.consents[0].data.email,
-                mail: consentData._embedded.consents[0].data.homeAddress,
-                smsChecked: consentData._embedded.consents[0].data.sms == "yes" ? true : false,
-                emailChecked: consentData._embedded.consents[0].data.email == "yes" ? true : false,
-                mailChecked: consentData._embedded.consents[0].data.homeAddress == "yes" ? true : false, 
-                consentId: consentData._embedded.consents[0].id
-              });
-              console.log("STATE", this.state);
-            }
-          })
-          .catch(e => {
-            console.error("GetUserConsents Exception", e)
-          });
-      })
-      .catch(e => {
-        console.error("GetToken Exception", e);
-      });
+    if (this.Session.getAuthenticatedUserItem("AT")) {
+      const token = this.Session.getAuthenticatedUserItem("AT");
+      this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
+        .then(response => response.json())
+        .then(consentData => {
+          console.log("getUserConsents", JSON.stringify(consentData));
+          if (consentData.count > 0) {
+            this.setState({
+              sms: consentData._embedded.consents[0].data.sms,
+              email: consentData._embedded.consents[0].data.email,
+              mail: consentData._embedded.consents[0].data.homeAddress,
+              smsChecked: consentData._embedded.consents[0].data.sms == "yes" ? true : false,
+              emailChecked: consentData._embedded.consents[0].data.email == "yes" ? true : false,
+              mailChecked: consentData._embedded.consents[0].data.homeAddress == "yes" ? true : false,
+              consentId: consentData._embedded.consents[0].id
+            });
+            console.log("STATE", this.state);
+          }
+        })
+        .catch(e => {
+          console.error("GetUserConsents Exception", e)
+        });
+    } else {
+      this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
+        .then(token => {
+          this.Session.setAuthenticatedUserItem("AT", token); //for later reuse to reduce getToken calls.
+          this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
+            .then(response => response.json())
+            .then(consentData => {
+              console.log("getUserConsents", JSON.stringify(consentData));
+              if (consentData.count > 0) {
+                this.setState({
+                  sms: consentData._embedded.consents[0].data.sms,
+                  email: consentData._embedded.consents[0].data.email,
+                  mail: consentData._embedded.consents[0].data.homeAddress,
+                  smsChecked: consentData._embedded.consents[0].data.sms == "yes" ? true : false,
+                  emailChecked: consentData._embedded.consents[0].data.email == "yes" ? true : false,
+                  mailChecked: consentData._embedded.consents[0].data.homeAddress == "yes" ? true : false,
+                  consentId: consentData._embedded.consents[0].id
+                });
+                console.log("STATE", this.state);
+              }
+            })
+            .catch(e => {
+              console.error("GetUserConsents Exception", e)
+            });
+        })
+        .catch(e => {
+          console.error("GetToken Exception", e);
+        });
+    }
   }
   /* END PING INTEGRATION */
 
@@ -201,7 +225,7 @@ class CommunicationPreferences extends React.Component {
                     }
                     <FormGroup className="buttons submit-buttons">
                       <Button color="primary" onClick={this.showStep2}>Save</Button>
-                    <a href={process.env.PUBLIC_URL + "/banking/profile-settings"} className="text-info cancel">Cancel</a>
+                      <a href={process.env.PUBLIC_URL + "/banking/profile-settings"} className="text-info cancel">Cancel</a>
                     </FormGroup>
                   </Form>
                 </div>

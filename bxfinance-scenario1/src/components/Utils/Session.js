@@ -65,7 +65,7 @@ export default class Session {
     
     @return true
      */
-    killAuthenticatedUser() {
+    clearUserAppSession() {
         sessionStorage.clear();
         return true;
     }

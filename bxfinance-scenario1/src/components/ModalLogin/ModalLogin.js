@@ -24,6 +24,7 @@ import data from './data.json';
 
 import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
 import Session from '../Utils/Session'; /* PING INTEGRATION: */
+import ModalLoginPassword from '../ModalLoginPassword/ModalLoginPassword'; /* PING INTEGRATION: */
 
 class ModalLogin extends React.Component {
   constructor() {
@@ -64,10 +65,10 @@ class ModalLogin extends React.Component {
     /* BEGIN PING INTEGRATION: tab 2 modal is device selection 
     which we don't use so we don't change state. Only call our handler. 
     Tab 4 is forgot username, so send them to PF endpoint. */
-    if (tab == '2' || tab == '5') {
+    if (tab == '2' || tab == '5') { //TODO 5 is for When SSPR with AuthN API and PID SDK is fixed. Its the confirmation screen. Though it may not be needed. Don't we just redirect to the dashboard?
       this.handleSubmit(tab);
     } else if (tab == '4') {
-      window.location.href = process.env.REACT_APP_HOST + data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API is fixed, this ideally should be switched to a fetch(). No redirects for true SPA. TTM syndrome */
+      window.location.href = process.env.REACT_APP_HOST + data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
     } else {
       /* END PING INTEGRATION */
       this.setState({
@@ -88,6 +89,7 @@ class ModalLogin extends React.Component {
     this.setState({ userName: event.target.value });
   }
   handleEmailChange(event) {
+    //TODO this is not used since PF is handling SSPR. This may change in the future. Issue with SSPR and PID SDK when using authN API.
     // grabbing whatever the user is typing in the email form as they type, and
     // saving it to state. (Controlled input).
     this.setState({ email: event.target.value });
@@ -95,23 +97,33 @@ class ModalLogin extends React.Component {
 
   // Handler for "Next" and "Recover Username" buttons.
   handleSubmit(tab) {
-    let identifier = '';
-    let flowResponse = {};
-    console.log("handlesubmittab:", tab);
+    const identifier = tab == '2' ? this.state.userName : this.state.email; //TODO if not 2 we assume 5 (not is use anymore). Will there ever be other tab IDs. Maybe with future feature requests?
+    const flowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
+
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
       const flowId = params.get('flowId'); /* TODO will we ever have something other than a flowId to handle? */
-      
-      console.log("handlesubmit flowid", flowId);
-      
-      identifier = tab == '2' ? this.state.userName : this.state.email; //TODO if not 2 we assume 5. Will there ever be other tab IDs.
-      flowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
-      this.PingAuthN.handleFlowStatus(flowResponse, identifier);
 
-      /* this.PingAuthN.authnAPI("GET", flowId)
+      console.log("handlesubmit flowResponse", flowResponse);
+
+      this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, identifier: identifier })
         .then(response => response.json())
-        .then(jsonResult => this.PingAuthN.handleFlowStatus(jsonResult, identifier))
-        .catch(error => console.error('HANDLESUBMIT ERROR', error)); */
+        .then(jsonResult => {
+          console.log("jsonResult", jsonResult);
+          if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
+            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
+            //Close ModalLogin. We need to get password.
+            this.toggle();
+            //pop the username/password modal.
+            this.refs.modalLoginPassword.toggle(this.state.userName);
+          } else if (jsonResult.status == "RESUME") {
+            // Let handleAuthNflow handle it.
+            this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult });
+          } //TODO do we need an else{} to catch other status? Is that possible?
+        })
+        .catch(e => {
+          console.error("handleAuthNflow exception:", e);
+        });
     } /* TODO what do we do if they submit with no querystring? Is that even possible?*/
   }
   // END PING INTEGRATIONS
@@ -168,7 +180,7 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="4">{/* Recover userName. */}
+                <TabPane tabId="4">{/* Recover userName. This is now handled by PF. */}
                   <h4>{data.form.buttons.recover_username}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="email">{data.form.fields.email.label}</Label>
@@ -188,6 +200,7 @@ class ModalLogin extends React.Component {
             </form>
           </ModalBody>
         </Modal>
+        <ModalLoginPassword ref="modalLoginPassword" />
       </div>
     );
   }
