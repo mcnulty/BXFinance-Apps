@@ -50,7 +50,7 @@ export default class PingAuthN {
         const refId = REF;
         const myHeaders = new Headers();
         myHeaders.append("ping.instanceid", adapter);
-        myHeaders.append("Authorization", "Basic cmVhY3QtdXNlcjoyRmVkZXJhdGVNMHJl"); /* TODO this should be obfuscated somehow. */
+        myHeaders.append("Authorization", "Basic cmVhY3QtdXNlcjoyRmVkZXJhdGVNMHJl"); /* TODO should we obfuscate somehow. */
 
         const requestOptions = {
             method: 'POST',
@@ -58,9 +58,9 @@ export default class PingAuthN {
             redirect: 'follow'
         };
 
-        const url = process.env.REACT_APP_HOST + this.pfPickupURI
+        const url = process.env.REACT_APP_HOST + this.pfPickupURI + refId
 
-        return fetch(url + refId, requestOptions);
+        return fetch(url, requestOptions);
     }
 
     /* 

@@ -36,6 +36,7 @@ class ModalError extends React.Component {
     });
   }
   render() {
+    const closeBtn = <div />;
     return (
       <div>
         <Modal isOpen={this.state.isOpen} toggle={this.toggle.bind(this)} className="modal-error">
