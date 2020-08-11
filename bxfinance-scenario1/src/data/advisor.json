@@ -92,6 +92,78 @@
 			"button": "Learn More"
 		}
 	},
+	"table_data": [
+		{
+			"name": "Adams, Rita",
+			"active": true,
+			"date_contacted": "05/24/2019",
+			"portfolio": "$25,745"
+		},
+		{
+			"name": "Alcantara, Wayne",
+			"active": true,
+			"date_contacted": "01/22/2020",
+			"portfolio": "$345,723"
+		},
+		{
+			"name": "Amezio, Jill",
+			"active": true,
+			"date_contacted": "01/22/2020",
+			"portfolio": "$1,165,706"
+		},
+		{
+			"name": "Astor, Mary",
+			"active": false,
+			"date_contacted": "04/24/2009",
+			"portfolio": "- -"
+		},
+		{
+			"name": "Atkinson, Lake",
+			"active": false,
+			"date_contacted": "02/15/2017",
+			"portfolio": "- -"
+		},
+		{
+			"name": "Atkinson, Judy",
+			"active": true,
+			"date_contacted": "11/15/2019",
+			"portfolio": "$2,312,221"
+		},
+		{
+			"name": "Azenio, Kayla Shay",
+			"active": true,
+			"date_contacted": "05/24/2019",
+			"portfolio": "$145,482"
+		},
+		{
+			"name": "Azzaria, Waylon",
+			"active": false,
+			"date_contacted": "07/20/2020",
+			"portfolio": "$622,104"
+		}
+	],
+	"client_detail": {
+		"side": {
+			"content": "<strong>Smith, Jane</strong> <br> 4700 Red River St. <br> Roebuck, IL 60434 <br> Home: 617.525.4435 <br> Mobile: 614.787.2278 <br> <a href=\"#\">See Notes</a> | <a href=\"#\">Modify Records</a>",
+			"button": "Message Client"
+		},
+		"content": {
+			"title": "Linked Account Balances",
+			"accounts": [
+				{
+					"account": "BXFinance Savings (Account 1)",
+					"amount": "$1567.82"
+				},
+				{
+					"account": "BXFinance Savings (Account 2)",
+					"amount": "$38034.22"
+				}
+			],
+			"links": "<a href=\"#\">Add an Account</a> | <a href=\"#\">Modify Account Nicknames</a>",
+			"portfolio_overview": "Porfolio Overview",
+			"portfolio_view": "View Portfolio"
+		}
+	},
 	"clients_recent": {
 		"title": "Recent Clients",
 		"content": "04/24/2020 | Initial Contact | <a href=\"#\">Notes</a> <br> 05/23/2020 | Linked Accounts | <a href=\"#\">Notes</a> <br> 06/03/2020 | Consult Call | <a href=\"#\">Notes</a>",
