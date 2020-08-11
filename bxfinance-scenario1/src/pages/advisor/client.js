@@ -125,7 +125,7 @@ class AdvisorClient extends React.Component {
             <Row>
               <Col lg="4">
                 <h5>{data.profile.advisor.title}</h5>
-                <Card>
+                <Card className="card-side">
                   <CardBody>
                     <Media>
                       <Media left href="#">
@@ -141,7 +141,7 @@ class AdvisorClient extends React.Component {
                   </CardBody>
                 </Card>
                 <h5 className="mt-5">{data.alerts.title}</h5>
-                <Card className="mb-5">
+                <Card className="card-side mb-5">
                   <CardBody>
                     {
                       Object.keys(data.alerts.messages).map(key => {
@@ -166,7 +166,42 @@ class AdvisorClient extends React.Component {
                   </Row>
                   <Row>
                     <Col>
-                      <img src={process.env.PUBLIC_URL + "/images/advisor-client.png"} className="img-fluid mt-3 mb-5" />
+                      <Card className="client-detail">
+                        <CardBody>
+                          <Row>
+                            <Col md="4" className="col-side">
+                              <Media>
+                                <Media body>
+                                  <p dangerouslySetInnerHTML={{__html: data.client_detail.side.content}}></p>
+                                  <Button color="primary">{data.client_detail.side.button}</Button>
+                                </Media>
+                              </Media>
+                            </Col>
+                            <Col md="8" className="col-content">
+                              <p><strong>{data.client_detail.content.title}</strong></p>
+                              {data.client_detail.content.accounts.map((item, i) => {
+                                return (
+                                  <Row key={i}>
+                                    <Col md="8">{item.account}</Col>
+                                    <Col md="4">{item.amount}</Col>
+                                  </Row>
+                                );
+                              })}
+                              <p className="mt-3" dangerouslySetInnerHTML={{__html: data.client_detail.content.links}}></p>
+                              <Row>
+                                <Col md="8">
+                                  <p><strong>{data.client_detail.content.portfolio_overview}</strong></p>
+                                  <img src={process.env.PUBLIC_URL + "/images/advisor-client-chart.png"} className="img-fluid" />
+                                </Col>
+                                <Col md="4">
+                                  <p><strong>{data.client_detail.content.portfolio_view}</strong></p>
+                                  <img src={process.env.PUBLIC_URL + "/images/advisor-client-pie-chart.png"} className="img-fluid" />
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </CardBody>
+                      </Card>
                     </Col>
                   </Row>
                 </div>

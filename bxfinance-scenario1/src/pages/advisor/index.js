@@ -9,7 +9,9 @@ import {
   Nav,
   NavItem,
   NavLink,
-  Media
+  Media,
+  Table,
+  CustomInput
 } from 'reactstrap';
 import { Link, NavLink as RRNavLink, useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -177,7 +179,33 @@ class Advisor extends React.Component {
                   </Row>
                   <Row>
                     <Col>
-                      <img src={process.env.PUBLIC_URL + "/images/advisor-table.png"} className="img-fluid mt-3 mb-5" />
+                      <Card className="mt-3 mb-5">
+                        <Table striped className="table-client">
+                          <thead>
+                            <tr>
+                              <th className="pl-4">Name</th>
+                              <th className="text-center">Active</th>
+                              <th className="text-center">Last Contacted</th>
+                              <th className="text-center">Total Portfolio</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {data.table_data.map((item, i) => {
+                              var id = i++;
+                              return (
+                                <tr key={i}>
+                                  <td className="text-info pl-4">{item.name}</td>
+                                  <td className="text-center"><CustomInput type="checkbox" id={i} checked={item.active} /></td>
+                                  <td className="text-center">{item.date_contacted}</td>
+                                  <td className="text-center">{item.portfolio}</td>
+                                  <td><a href="#"><small>Modify</small></a></td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      </Card>
                     </Col>
                   </Row>
                 </div>

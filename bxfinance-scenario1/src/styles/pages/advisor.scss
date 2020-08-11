@@ -23,8 +23,35 @@
     .card {
       border-radius: 11px;
       border: none;
-      @include media-breakpoint-up(lg) {
-        max-width: 300px;
+
+      &.card-side {
+        @include media-breakpoint-up(lg) {
+          max-width: 300px;
+        }
+      }
+
+      &.client-detail {
+        margin-bottom: 3rem;
+
+        .card-body {
+          padding: 0;
+        }
+
+        .col-side {
+          border-right: 1px solid #ccc;
+
+          .media-body {
+            padding: 2rem;
+          }
+        }
+
+        .col-content {
+          padding: 2rem 3rem;
+        }
+
+        a {
+          font-size: 12px;
+        }
       }
     }
 
