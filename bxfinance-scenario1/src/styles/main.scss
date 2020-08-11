@@ -75,3 +75,18 @@ a,
   padding: 35px;
   margin-bottom: 20px;
 }
+
+.table-client {
+  thead {
+    th {
+      border: 0;
+      font-weight: 500;
+    }
+  }
+
+  tbody {
+    td {
+      border: 0;
+    }
+  }
+}
