@@ -43,7 +43,9 @@ export default class PingOAuth {
 
         const urlEncodedBody = new URLSearchParams();
         urlEncodedBody.append("pf.username", uid);
-        urlEncodedBody.append("pf.pass", swaprods);
+        urlEncodedBody.append("pf.pass", swaprods); //TODO this is total gap. On passwordless authN, we don't know the password. 
+                                                    //Will putting PA in place resolve this so we don't have to enforce "2FederateMore" for everyone?
+                                                    //But then that lessens the SPA UX with all the redirects to get a token. This needs to be resolved for all other demos.
 
         const requestOptions = {
             method: 'POST',
@@ -51,15 +53,11 @@ export default class PingOAuth {
             body: urlEncodedBody,
             redirect: 'follow'
         };
-        // if async process already started, await wont have any effect.
-        // add try catch around fetch calls
+        
         const url = process.env.REACT_APP_HOST + this.pfAuthZAPIURI + "response_type=" + responseType + "&client_id=" + client + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
         const response = await fetch(url, requestOptions);
-        // console.log("response", response);
         const authCode = response.url.substring(response.url.search("=") + 1);
-        // console.log("authcode extracted:", authCode);
-        //console.log("getauthcoderesponse:", response);
-        //return await fetch(url, requestOptions);;
+
         return authCode;
     }
 
@@ -77,13 +75,12 @@ export default class PingOAuth {
     */
    //TODO might need to change syntax for destructuring here. See "named and optional arguments" https://medium.com/dailyjs/named-and-optional-arguments-in-javascript-using-es6-destructuring-292a683d5b4e
     async getToken({uid, swaprods = "2FederateM0re", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
-        let grantType = "authorization_code"; //Defaulting to auth code for v1. If it changes in a later version this should be a defaulted param in the function.
         let response = {};
-        //let authCode = '0';
 
         if (responseType == "code") {
+            console.log("Using auth code grant");
             const authCode = await this.getAuthCode({uid:this.Session.getAuthenticatedUserItem("uid"), scopes:scopes});
-
+            let grantType = "authorization_code";
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
             myHeaders.append("Authorization", "Basic cGFfd2FtOjJGZWRlcmF0ZU0wcmU=");
@@ -92,16 +89,43 @@ export default class PingOAuth {
                 headers: myHeaders,
                 redirect: 'follow'
             };
-            let url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType + "&redirect_uri=" + redirectURI + "&code=" + authCode;
+            const url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType + "&redirect_uri=" + redirectURI + "&code=" + authCode;
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
             console.log("TOKEN", token);
 
             return token;
+
+        } else if (client == "marketingApp" || client == "anywealthadvisorApp") {
+            console.log("Using client credentials grant");
+            let grantType = "client_credentials";
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+            myHeaders.append("username", uid);
+
+            var urlencoded = new URLSearchParams();
+            urlencoded.append("client_id", client);
+            urlencoded.append("client_secret", "2Federate");
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: urlencoded,
+                redirect: 'follow'
+            };
+
+            const url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType;
+            const response = await fetch(url, requestOptions);
+            const jsonData = await response.json();
+            const token = await jsonData.access_token;
+            console.log("TOKEN", token);
+
+            return token;
+                
         } else {
-            //Assuming response_type=token (implicit) here based on our current PF configs. That assumptoin could change in future versions.
-            //TODO implement implicit call here when needed. Not needed in v1 release. So throw error for now.
+            //TODO implement implicit call here when needed. Not needed in v1 release. So throw error for now. 
+            //(Seems a little harsh.)
             throw new Error("Unexpected response_type exception in PingOAuth.getToken.");
         }
     }

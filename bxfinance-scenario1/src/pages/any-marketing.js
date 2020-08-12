@@ -20,12 +20,42 @@ import { faLinkedinIn, faFacebookF, faTwitter, faInstagram } from '@fortawesome/
 
 // Components
 import AccountsSubnav from '../components/AccountsSubnav';
+import PingData from '../components/Utils/PingData'; /* PING INTEGRATION: */
+import Session from '../components/Utils/Session'; /* PING INTEGRATION: */
+import PingOAuth from '../components/Utils/PingOAuth'; /* PING INTEGRATION: */
+import JSONSearch from '../components/Utils/JSONSearch'; /* PING INTEGRATION: */
 
 // Data
 import data from '../data/any-marketing.json';
 
 // Styles
 import '../styles/pages/any-marketing.scss';
+
+/* BEGIN PING INTEGRATION: */
+const fetchSelectedUser = (selectedUser) => {
+  const sessionObj = new Session();
+  const pingOAuthObj = new PingOAuth();
+  const pingDataObj = new PingData();
+  
+  let consent_token;
+  const hasToken = sessionObj.getAuthenticatedUserItem("consent_AT");
+  if (hasToken) {
+    consent_token = sessionObj.getAuthenticatedUserItem("consent_AT");
+    console.log("Using stored token", consent_token);
+    return pingDataObj.getUserConsentData(consent_token, selectedUser);
+  } else {
+    pingOAuthObj.getToken({ uid: 'marketingApp', client: 'marketingApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
+      .then(consent_token => {
+        console.log("Getting new token");
+        sessionObj.setAuthenticatedUserItem("consent_AT", consent_token);
+      })
+      .catch(error => {
+        console.error("getToken Exception", error);
+      });
+    return pingDataObj.getUserConsentData(consent_token, selectedUser);
+  }
+}
+/* END PING INTEGRATION: */
 
 // Autocomplete Suggestion List
 const SuggestionsList = props => {
@@ -70,6 +100,17 @@ const SearchAutocomplete = () => {
   const [selectedSuggestion, setSelectedSuggestion] = React.useState(0);
   const [displaySuggestions, setDisplaySuggestions] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+  /* BEGIN PING INTEGRATION: */
+  const initialState = {
+    fullName: "",
+    homeAddress: "",
+    email: "",
+    mobileNumber: ""
+  }
+  const [{ fullName, homeAddress, email, mobileNumber }, setConsentState] = React.useState(initialState);
+  /* END PING INTEGRATION: */
+
   const onChange = event => {
     const value = event.target.value;
     setInputValue(value);
@@ -80,6 +121,30 @@ const SearchAutocomplete = () => {
     setDisplaySuggestions(true);
   };
   const onSelectSuggestion = index => {
+    /* BEING PING INTEGRATION */
+    /* NOTE: If we don't get a full address, then we treat that as not consented.
+          E.g. Bad demo experience to consent and show mailing address with only a ZIP code. */
+    // TODO We should make all LIP reg fields required. We don't need to demo optional fields.
+    setConsentState(initialState); //Clearing previous values so they don't show while modal re-renders.
+    fetchSelectedUser(filteredSuggestions[index])
+      .then(response => response.json())
+      .then(jsonResults => {
+        let fullName;
+        try { fullName = jsonResults.Resources[0].cn[0]; }
+        catch (e) { }//Fail with the utmost grace and leisure.
+        let fullAddress;
+        try { fullAddress = jsonResults.Resources[0].street[0] + ", " + jsonResults.Resources[0].l[0] + ", " + jsonResults.Resources[0].postalCode[0]; }
+        catch (e) { }//Fail with the utmost grace and leisure.
+        let email;
+        try { email = jsonResults.Resources[0].mail[0]; }
+        catch (e) { }//Fail with the utmost grace and leisure.
+        let mobileNumber;
+        try { mobileNumber = jsonResults.Resources[0].mobile[0]; }
+        catch (e) { }//Fail with the utmost grace and leisure.
+        const newState = { fullName: fullName, homeAddress: fullAddress, email: email, mobileNumber: mobileNumber };
+        setConsentState(newState);
+      });
+    /* END PING INTEGRATION: */
     setSelectedSuggestion(index);
     setInputValue(filteredSuggestions[index]);
     setFilteredSuggestions([]);
@@ -103,19 +168,33 @@ const SearchAutocomplete = () => {
         />
         <img src={process.env.PUBLIC_URL + "/images/icons/search.svg"} className="img-search" />
       </form>
-      <Modal isOpen={isModalOpen} toggle={triggerModal} className="modal-lg any-marketing modal-record" centered="true" backdropClassName="modal-backdrop-record">
+      <Modal isOpen={isModalOpen} toggle={triggerModal} className="modal-lg any-marketing modal-record" centered={true} backdropClassName="modal-backdrop-record">
         <ModalHeader toggle={triggerModal}>Record Overview</ModalHeader>
         <ModalBody>
-          {data.record.fields.map((item, i) => {
-            return (
-              <Row className="mb-3" key={i}>
-                <Col md="3">{item.label}:</Col>
-                <Col md="6">
-                  { item.value ? item.value : <div className="bg-dark">test</div> }
-                </Col>
-              </Row>
-            );
-          })}
+          <Row className="mb-3" key={0}>
+            <Col md="3">Name:</Col>
+            <Col md="6">
+              {fullName ? fullName : <div className="bg-dark">test</div>}
+            </Col>
+          </Row>
+          <Row className="mb-3" key={1}>
+            <Col md="3">Mail Address:</Col>
+            <Col md="6">
+              {homeAddress ? homeAddress : <div className="bg-dark">test</div>}
+            </Col>
+          </Row>
+          <Row className="mb-3" key={2}>
+            <Col md="3">Email Address:</Col>
+            <Col md="6">
+              {email ? email : <div className="bg-dark">test</div>}
+            </Col>
+          </Row>
+          <Row className="mb-3" key={3}>
+            <Col md="3">SMS/TXT Phone:</Col>
+            <Col md="6">
+              {mobileNumber ? mobileNumber : <div className="bg-dark">test</div>}
+            </Col>
+          </Row>
           <div className="float-right">
             <Button color="primary" className="mr-3">{data.record.buttons.inspect}</Button>
             <Button color="primary">{data.record.buttons.modify}</Button>
@@ -133,12 +212,34 @@ class AnyMarketing extends React.Component {
     this.state = {
       isOpen: false
     };
+    this.PingData = new PingData(); /* PING INTEGRATION: */
+    this.Session = new Session(); /* PING INTEGRATION: */
+    this.PingOAuth = new PingOAuth(); /* PING INTEGRATION: */
+    this.JSONSearch = new JSONSearch(); /* PING INTEGRATION: */
   }
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen
     });
   }
+
+  /* BEGIN PING INTEGRATION: */
+  componentDidMount() {
+    // Getting users from PD.
+    this.PingData.getSearchableUsers({})
+      .then(response => response.json())
+      .then(jsonSearchResults => {
+        // Get an array of just uid's from the results.
+        const people = this.JSONSearch.findValues(jsonSearchResults._embedded.entries, "uid");
+        // Repopulate the data used in SearchAutocomplete().
+        data.dashboard.suggestions = people.map(person => `${person}`);
+      })
+      .catch(e => {
+        console.error("getSearchableUsers Exception", e)
+      });
+  }
+  /* END PING INTEGRATION: */
+
   render() {
     return (
       <div className="any-marketing">
@@ -160,6 +261,7 @@ class AnyMarketing extends React.Component {
                     <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} /></NavLink>
                   </NavItem>
                   <NavItem className="logout">
+                    {/* TODO add P1 SLO link for sign out. */}
                     <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</NavLink>
                   </NavItem>
                 </Nav>
@@ -235,15 +337,15 @@ class AnyMarketing extends React.Component {
                     return (
                       <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} />
                     );
-                  })      
+                  })
                 }
                 <h5 className="mt-5">{data.alerts.title}</h5>
                 {
                   Object.keys(data.alerts.messages).map(key => {
                     return (
-                      <p key={key} dangerouslySetInnerHTML={{__html: data.alerts.messages[key]}}></p>
+                      <p key={key} dangerouslySetInnerHTML={{ __html: data.alerts.messages[key] }}></p>
                     );
-                  })      
+                  })
                 }
                 <Button color="link" className="mb-4">{data.alerts.button}</Button>
               </Col>
@@ -300,7 +402,7 @@ class AnyMarketing extends React.Component {
                     <NavLink href="#"><FontAwesomeIcon icon={faInstagram} size="2x" /></NavLink>
                   </NavItem>
                 </Nav>
-                <p dangerouslySetInnerHTML={{__html: data.copyright}}></p>
+                <p dangerouslySetInnerHTML={{ __html: data.copyright }}></p>
               </Col>
               <Col md="6" lg="8" xl="6" className="order-1 order-md-2">
                 <Nav className="nav-main">
@@ -331,3 +433,30 @@ class AnyMarketing extends React.Component {
 }
 
 export default AnyMarketing;
+
+/*  Justin Case: 148 - 157 inclusive
+{data.record.fields.map((item, i) => {
+            return (
+              <Row className="mb-3" key={i}>
+                <Col md="3">{item.label}:</Col>
+                <Col md="6">
+                  {item.value ? item.value : <div className="bg-dark">test</div>}
+                </Col>
+              </Row>
+            );
+          })}
+*/
+
+/*
+
+  {data.record.fields.map((item, i) => {
+            return (
+              <Row className="mb-3" key={i}>
+                <Col md="3">{item.label}:</Col>
+                <Col md="6">
+                  {item.value ? item.value : <div className="bg-dark">test</div>}
+                </Col>
+              </Row>
+            );
+          })}
+  */

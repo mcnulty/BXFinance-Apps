@@ -44,6 +44,7 @@ class AccountsDashboard extends React.Component {
     this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid"))
       .then(response => response.json())
       .then(jsonData => {
+        console.log('UserEntry', jsonData);
         acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
         acctIDsArrSimple = this.JSONSearch.findValues(acctIDsArr, "ids");
         this.Session.setAuthenticatedUserItem("accts", acctIDsArrSimple[0]);

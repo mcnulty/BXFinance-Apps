@@ -17,6 +17,7 @@ import ModalRegisterConfirm from '../ModalRegisterConfirm';
 import ModalLogin from '../ModalLogin';
 import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
 import Session from '../Utils/Session'; /* PING INTEGRATION */
+import ModalError from '../ModalError'; /* PING INTEGRATION: */
 import './NavbarMain.scss';
 
 // Data
@@ -118,7 +119,7 @@ class NavbarMain extends React.Component {
               console.log("TEST", "In SLO");
               window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath;
             }
-            if (targetApp.includes("/advisor")) {//TODO I think we can re-use this for AnyMarketing.
+            if (jsonData.bxFinanceUserType == "AnyWealthAdvisor" || jsonData.bxFinanceUserType == "AnyMarketing") {
               this.Session.setAuthenticatedUserItem("email", jsonData.Email);
               this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
               this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
@@ -139,12 +140,14 @@ class NavbarMain extends React.Component {
               const fullAddress = jsonData.street + ", " + jsonData.city + ", " + jsonData.postalCode;
               this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
             }
+            // Send them to the target app
+            // TODO can we do this SPA style with history.push?
+            window.location.href = targetApp;
           })
-          .catch(error => console.error("Pickup Error:", error));
-
-        // Send them to the target app
-        // TODO can we do this SPA style with history.push?
-        window.location.href = targetApp;
+          .catch(error => {
+            console.error("Agentless Pickup Error:", error);
+            this.refs.ModalError.toggle();
+          });
       }
     }
     // END PING INTEGRATION
@@ -270,6 +273,7 @@ class NavbarMain extends React.Component {
         <ModalRegister ref="modalRegister" onSubmit={this.onModalRegisterSubmit.bind(this)} />
         <ModalRegisterConfirm ref="modalRegisterConfirm" />
         <ModalLogin ref="modalLogin" />
+        <ModalError ref="modalError" />
       </section>
     );
   }
