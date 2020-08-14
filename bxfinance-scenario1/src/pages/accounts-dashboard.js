@@ -69,7 +69,7 @@ class AccountsDashboard extends React.Component {
           console.log("TEST:", "we dont see accts arr.");
           this.PingOAuth.getToken({uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent'})
             .then(token => {
-              this.Session.setAuthenticatedUserItem("at", token);
+              this.Session.setAuthenticatedUserItem("AT", token);
               this.OpenBanking.provisionAccounts(token, this.Session.getAuthenticatedUserItem("uid"));
               this.OpenBanking.getAccountBalances(token)
                 .then(response => response.json())
