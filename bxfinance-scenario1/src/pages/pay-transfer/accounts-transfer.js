@@ -157,7 +157,7 @@ class AccountsTransfer extends React.Component {
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
                         <a href={process.env.PUBLIC_URL} className="text-info cancel">{data.form.buttons.cancel.label}</a>
-                        <Button color="primary" className="start-transfer" onClick={this.showStep2}>{data.form.buttons.start_transfer.label}</Button> {/* TODO PING INTEGRATION: onClick handler here */}
+                        <Button color="primary" className="start-transfer" onClick={this.showStep2}>{data.form.buttons.start_transfer.label}</Button> {/* PING INTEGRATION: onClick handler here */}
                       </Col>
                     </Row>
                   </Form>

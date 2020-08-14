@@ -95,7 +95,7 @@ export default class PingOAuth {
             const token = await jsonData.access_token;
             console.log("TOKEN", token);
 
-            return token;
+            return token; //TODO there should only be one return statement.
 
         } else if (client == "marketingApp" || client == "anywealthadvisorApp") {
             console.log("Using client credentials grant");

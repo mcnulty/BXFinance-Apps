@@ -59,16 +59,7 @@ class NavbarMain extends React.Component {
   }
   /* BEGIN PING INTEGRATION */
   startSLO() {
-    const success = this.Session.clearUserAppSession();
-    //TODO This needs to be put back once SLO is debugged. for now just sending to the home page
-    /* let rootDiv = document.getElementById("root"); //Grab the root div for the app
-    let logoutForm = document.createElement('form'); // Create a new form element
-    logoutForm.setAttribute("action", "/sp/startSLO.ping"); // Add the action attribute we want to POST to
-    logoutForm.setAttribute("id", "logoutForm"); // Add an Id Attribute
-    logoutForm.setAttribute("method", "post"); // Add the method attribute
-    rootDiv.appendChild(logoutForm); //Add the form to the DOM
-    document.forms["logoutForm"].submit(); //Submit the form, obviously. */
-    window.location.href = process.env.REACT_APP_HOST + "/app"; //TODO remove this once SLO is fixed.
+    this.Session.startSLO();
   }
 
   /* END PING INTEGRATION: */

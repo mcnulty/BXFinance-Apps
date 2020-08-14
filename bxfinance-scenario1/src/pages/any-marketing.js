@@ -32,7 +32,7 @@ import data from '../data/any-marketing.json';
 import '../styles/pages/any-marketing.scss';
 
 /* BEGIN PING INTEGRATION: */
-const fetchSelectedUser = (selectedUser) => {
+const fetchSelectedUserConsent = (selectedUser) => {
   const sessionObj = new Session();
   const pingOAuthObj = new PingOAuth();
   const pingDataObj = new PingData();
@@ -42,7 +42,7 @@ const fetchSelectedUser = (selectedUser) => {
   if (hasToken) {
     consent_token = sessionObj.getAuthenticatedUserItem("consent_AT");
     console.log("Using stored token", consent_token);
-    return pingDataObj.getUserConsentData(consent_token, selectedUser);
+    return pingDataObj.getUserConsentData(consent_token, "marketing", selectedUser);
   } else {
     pingOAuthObj.getToken({ uid: 'marketingApp', client: 'marketingApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
       .then(consent_token => {
@@ -52,7 +52,7 @@ const fetchSelectedUser = (selectedUser) => {
       .catch(error => {
         console.error("getToken Exception", error);
       });
-    return pingDataObj.getUserConsentData(consent_token, selectedUser);
+    return pingDataObj.getUserConsentData(consent_token, "marketing", selectedUser);
   }
 }
 /* END PING INTEGRATION: */
@@ -122,12 +122,9 @@ const SearchAutocomplete = () => {
   };
   const onSelectSuggestion = index => {
     /* BEING PING INTEGRATION */
-    /* NOTE: If we don't get a full address, then we treat that as not consented.
-          E.g. Bad demo experience to consent and show mailing address with only a ZIP code. */
-    // TODO We should make all LIP reg fields required. We don't need to demo optional fields.
     setConsentState(initialState); //Clearing previous values so they don't show while modal re-renders.
-    fetchSelectedUser(filteredSuggestions[index])
-      .then(response => response.json())
+    fetchSelectedUserConsent(filteredSuggestions[index])
+      //.then(response => response.json())
       .then(jsonResults => {
         let fullName;
         try { fullName = jsonResults.Resources[0].cn[0]; }
@@ -224,6 +221,10 @@ class AnyMarketing extends React.Component {
   }
 
   /* BEGIN PING INTEGRATION: */
+  startSLO() {
+    this.Session.startSLO();
+  }
+
   componentDidMount() {
     // Getting users from PD.
     this.PingData.getSearchableUsers({})
@@ -262,7 +263,7 @@ class AnyMarketing extends React.Component {
                   </NavItem>
                   <NavItem className="logout">
                     {/* TODO add P1 SLO link for sign out. */}
-                    <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</NavLink>
+                    <Link to="/" onClick={this.startSLO}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
                   </NavItem>
                 </Nav>
               </Collapse>
@@ -433,30 +434,3 @@ class AnyMarketing extends React.Component {
 }
 
 export default AnyMarketing;
-
-/*  Justin Case: 148 - 157 inclusive
-{data.record.fields.map((item, i) => {
-            return (
-              <Row className="mb-3" key={i}>
-                <Col md="3">{item.label}:</Col>
-                <Col md="6">
-                  {item.value ? item.value : <div className="bg-dark">test</div>}
-                </Col>
-              </Row>
-            );
-          })}
-*/
-
-/*
-
-  {data.record.fields.map((item, i) => {
-            return (
-              <Row className="mb-3" key={i}>
-                <Col md="3">{item.label}:</Col>
-                <Col md="6">
-                  {item.value ? item.value : <div className="bg-dark">test</div>}
-                </Col>
-              </Row>
-            );
-          })}
-  */
