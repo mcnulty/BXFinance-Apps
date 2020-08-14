@@ -5,23 +5,28 @@ Implements functions to integrate with PingData
 API endpoints.
 
 @author Michael Sanchez
-
 */
 
 export default class PingData {
 
-    // Didn't abstract these since they shouldn't ever change.
+    // Didn't abstract these since they shouldn't ever change. Right???
     pdReSTURI = "/directory/v1/"; //TODO breakout the version segment to its own variable in case it changes.
     pdRootDN = "dc=" + process.env.REACT_APP_HOST.substring(process.env.REACT_APP_HOST.indexOf('.') + 1);
     pdPeopleRDN = 'ou=People,' + this.pdRootDN;
     pdConsentURI = "/consent";
     pdConsentVersion = "/v1";
     pdConsentResource = "/consents";
-
+    pdSubtreeResource = "/subtree?";
+    dgScimURI = "/scim";
+    dgScimVersion = "/v2";
+    dgUsersResource = "/Users"
+    dgOpenBankingURI = "/OpenBanking";
+    dgOpenBankingVersion = "/v2";
+    dgBalancesResource = "/balances";
+    
     /* 
     Get User Entry
     Fetches a user record from PD.
-    
     @param uid the uid from the user's directory entry.
     @return response object
     */
@@ -43,8 +48,8 @@ export default class PingData {
 
     /* 
     Update user entry with bank accounts.
-
     @param acctIds an array of account IDs to add to the user entry.
+    @param uid The uid of the user fo which we are updating a user entry
     @return boolean to state success
     */
     updateUserEntry(acctIds, uid) {
@@ -81,9 +86,32 @@ export default class PingData {
     }
 
     /* 
+    Get Searchable Users
+    Fetches all users in the people dn for the suggestable search feature in the AnyAdvisor/Marketing portals
+    @param searchScope to what level in the directory to searchScope
+    @param limit max number of records to return. You could get less based on number of records found or PD configured limits
+    @return response object
+    */
+    getSearchableUsers({ searchScope = "singleLevel", limit = "100" }) {
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
+
+        var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+        // TODO we need some attribute or way to filter user to only include ones created for demos.
+        const url = process.env.REACT_APP_HOST + this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit;
+
+        return fetch(url, requestOptions);
+    }
+
+    /* 
     Get User Consents
     @param token the AT for the authenticated user
     @param uid the user's uid from their user record.
+    @param definition the consent definition ID.
     @return consent record in JSON format
     */
     getUserConsents(token, uid, definition) {
@@ -103,6 +131,8 @@ export default class PingData {
     Create User Consent
     @param token the AT for the authenticated user
     @param consent the JSON object of consents to update the "data" property of the consent object
+    @param uid the uid of the user fo which we are creating a consent record
+    @param definition the consent definition ID.
     @return consent record in JSON format
     */
     createUserConsent(token, consent, uid, definition) {
@@ -142,6 +172,7 @@ export default class PingData {
     @param token the AT for the authenticated user
     @param consent the JSON object of consents to update the "data" property of the consent object
     @param consentId the id of the user's existing consent record
+    @param definition the consent definition ID.
     @return consent record in JSON format
     */
     updateUserConsent(token, consent, consentId, definition) {
@@ -169,4 +200,37 @@ export default class PingData {
         const url = process.env.REACT_APP_HOST + this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "/" + consentId;
         return fetch(url, requestOptions);
     }
+
+    /* 
+    Get User Consented Data
+    @param token the access token of the marketingApp
+    @param forWhom whether this DG call is for an AnyWealthAdvisor or AnyMarketing rep.
+    @param uid the uid of the user data being requested
+    @return response object
+    */
+    async getUserConsentData(token, forWhom, uid) {
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + token);
+        let url;
+    
+        var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+        
+        if (forWhom == "marketing") {
+            console.log("Getting AnyMarketing consent data.");
+            const filterValue = '\"' + uid + '\"';
+            url = process.env.REACT_APP_HOST + this.dgScimURI + this.dgScimVersion + this.dgUsersResource + "?filter=uid eq " + filterValue;
+        } else {//advisor
+            console.log("Getting AnyWealth Advisor consent data.");
+            url = process.env.REACT_APP_HOST + this.dgOpenBankingURI + this.dgOpenBankingVersion + this.dgBalancesResource
+        }
+        const response = await fetch(url, requestOptions);
+        const jsonResponse = await response.json();
+        console.log("jsonResponse", jsonResponse);
+        return jsonResponse;
+    }
+    
 }

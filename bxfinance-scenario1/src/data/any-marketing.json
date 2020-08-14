@@ -131,7 +131,7 @@
 		"title": "Activity Dashboard",
 		"search_placeholder": "Enter Keywords...",
 		"suggestions": [
-			"janesmith@gmail.com"
+			"janesmith@gmail.com", "blah@fubar.com"
 		]
 	},
 	"metrics": {

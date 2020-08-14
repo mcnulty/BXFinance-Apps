@@ -253,7 +253,7 @@ class PrivacySecurity extends React.Component {
                               <CustomInput type="radio" id={`${partner1.name}_yes`} name={partner1.name} label="Yes" />
                               <CustomInput type="radio" id={`${partner1.name}_no`} readOnly checked name={partner1.name} label="No" />
                             </Col>
-                            <Col md={12} lg={4}><a href="#" className="partner-overlay">{partner1.learn_more}</a></Col>
+                            <Col md={12} lg={4}><a href="#" className="partner-overlay" onClick={this.toggleModal}>{partner1.learn_more}</a></Col>{/* TODO add back Learn More modal popup */}
                           </Row>
                         </div>
                         <div>
@@ -263,7 +263,7 @@ class PrivacySecurity extends React.Component {
                               <CustomInput type="radio" id={`${partner2.name}_yes`} name={partner2.name} label="Yes" />
                               <CustomInput type="radio" id={`${partner2.name}_no`} readOnly checked name={partner2.name} label="No" />
                             </Col>
-                            <Col md={12} lg={4}><a href="#" className="partner-overlay">{partner2.learn_more}</a></Col>
+                            <Col md={12} lg={4}><a href="#" className="partner-overlay" onClick={this.toggleModal}>{partner2.learn_more}</a></Col>{/* TODO add back Learn More modal popup */}
                           </Row>
                         </div>
                         {/* PING INTEGRATION: This block "partner3" is only partner block modified for demos. The others are static.  */}

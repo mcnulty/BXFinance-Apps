@@ -17,6 +17,7 @@ import ModalRegisterConfirm from '../ModalRegisterConfirm';
 import ModalLogin from '../ModalLogin';
 import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
 import Session from '../Utils/Session'; /* PING INTEGRATION */
+import ModalError from '../ModalError'; /* PING INTEGRATION: */
 import './NavbarMain.scss';
 
 // Data
@@ -58,16 +59,7 @@ class NavbarMain extends React.Component {
   }
   /* BEGIN PING INTEGRATION */
   startSLO() {
-    const success = this.Session.clearUserAppSession();
-    //TODO This needs to be put back once SLO is debugged. for now just sending to the home page
-    /* let rootDiv = document.getElementById("root"); //Grab the root div for the app
-    let logoutForm = document.createElement('form'); // Create a new form element
-    logoutForm.setAttribute("action", "/sp/startSLO.ping"); // Add the action attribute we want to POST to
-    logoutForm.setAttribute("id", "logoutForm"); // Add an Id Attribute
-    logoutForm.setAttribute("method", "post"); // Add the method attribute
-    rootDiv.appendChild(logoutForm); //Add the form to the DOM
-    document.forms["logoutForm"].submit(); //Submit the form, obviously. */
-    window.location.href = process.env.REACT_APP_HOST + "/app"; //TODO remove this once SLO is fixed.
+    this.Session.startSLO();
   }
 
   /* END PING INTEGRATION: */
@@ -118,7 +110,7 @@ class NavbarMain extends React.Component {
               console.log("TEST", "In SLO");
               window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath;
             }
-            if (targetApp.includes("/advisor")) {//TODO I think we can re-use this for AnyMarketing.
+            if (jsonData.bxFinanceUserType == "AnyWealthAdvisor" || jsonData.bxFinanceUserType == "AnyMarketing") {
               this.Session.setAuthenticatedUserItem("email", jsonData.Email);
               this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
               this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
@@ -139,12 +131,14 @@ class NavbarMain extends React.Component {
               const fullAddress = jsonData.street + ", " + jsonData.city + ", " + jsonData.postalCode;
               this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
             }
+            // Send them to the target app
+            // TODO can we do this SPA style with history.push?
+            window.location.href = targetApp;
           })
-          .catch(error => console.error("Pickup Error:", error));
-
-        // Send them to the target app
-        // TODO can we do this SPA style with history.push?
-        window.location.href = targetApp;
+          .catch(error => {
+            console.error("Agentless Pickup Error:", error);
+            this.refs.ModalError.toggle();
+          });
       }
     }
     // END PING INTEGRATION
@@ -270,6 +264,7 @@ class NavbarMain extends React.Component {
         <ModalRegister ref="modalRegister" onSubmit={this.onModalRegisterSubmit.bind(this)} />
         <ModalRegisterConfirm ref="modalRegisterConfirm" />
         <ModalLogin ref="modalLogin" />
+        <ModalError ref="modalError" />
       </section>
     );
   }

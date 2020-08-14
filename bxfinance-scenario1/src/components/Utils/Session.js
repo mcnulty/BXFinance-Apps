@@ -10,10 +10,11 @@ an authenticated session.
 */
 
 export default class Session {
-
+    constructor() {
+        this.clearUserAppSession = this.clearUserAppSession.bind(this);
+    }
     /* 
     Gets an item from the current origin's session storage.
-
     @param key the item name in storage
     @return DOMString
     */
@@ -24,7 +25,6 @@ export default class Session {
     /* 
     Set Authenticated User Item
     Sets an item in the current origin's sessions storage.
-
     @param key the item name to set in storage
     @param value the string value of the key
     @return boolean
@@ -50,7 +50,6 @@ export default class Session {
     /* 
     Remove Authenticated User Item
     Removes an item from the current origin's session storage.
-
     @param key the item name in storage to remove 
     @return boolean
     */
@@ -62,11 +61,27 @@ export default class Session {
     /* 
     Kill Authenticated User
     Clears out everything in the current origin's sessions storage.
-    
     @return true
      */
     clearUserAppSession() {
         sessionStorage.clear();
         return true;
     }
+
+    /* 
+    Start Single Logout
+    @return void
+    */
+   startSLO() {
+       const success = this.clearUserAppSession();
+       //TODO This needs to be put back once SLO is debugged. for now just sending to the home page
+       /* let rootDiv = document.getElementById("root"); //Grab the root div for the app
+       let logoutForm = document.createElement('form'); // Create a new form element
+       logoutForm.setAttribute("action", "/sp/startSLO.ping"); // Add the action attribute we want to POST to
+       logoutForm.setAttribute("id", "logoutForm"); // Add an Id Attribute
+       logoutForm.setAttribute("method", "post"); // Add the method attribute
+       rootDiv.appendChild(logoutForm); //Add the form to the DOM
+       document.forms["logoutForm"].submit(); //Submit the form, obviously. */
+       window.location.href = process.env.REACT_APP_HOST + "/app"; //TODO remove this once SLO is fixed.
+   }
 }

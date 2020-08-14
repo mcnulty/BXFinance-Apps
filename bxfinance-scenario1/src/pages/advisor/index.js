@@ -22,6 +22,8 @@ import NavbarMain from '../../components/NavbarMain';
 import FooterMain from '../../components/FooterMain';
 import AccountsSubnav from '../../components/AccountsSubnav';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
+import PingData from '../../components/Utils/PingData'; /* PING INTEGRATION: */
+import JSONSearch from '../../components/Utils/JSONSearch'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/advisor.json';
@@ -87,7 +89,7 @@ const SearchAutocomplete = () => {
     setFilteredSuggestions([]);
     setDisplaySuggestions(false);
     // go to client
-    history.push("/advisor/client");
+    history.push({ pathname: "/advisor/client", state: { client: filteredSuggestions[index]}});
   };
   return (
     <div>
@@ -111,8 +113,27 @@ class Advisor extends React.Component {
   constructor() {
     super();
     this.Session = new Session(); /* PING INTEGRATION: */
+    this.PingData = new PingData(); /* PING INTEGRATION: */
+    this.JSONSearch = new JSONSearch(); /* PING INTEGRATION: */
   }
-  
+
+  /* BEGIN PING INTEGRATION: */
+  componentDidMount() {
+    // Getting searchable users from PD.
+    this.PingData.getSearchableUsers({})
+      .then(response => response.json())
+      .then(jsonSearchResults => {
+        // Get an array of just uid's from the results.
+        const people = this.JSONSearch.findValues(jsonSearchResults._embedded.entries, "uid");
+        // Repopulate the data used in SearchAutocomplete().
+        data.clients.suggestions = people.map(person => `${person}`);
+      })
+      .catch(e => {
+        console.error("getSearchableUsers Exception", e)
+      });
+  }
+  /* END PING INTEGRATION: */
+
   render() {
     return (
       <div className="accounts advisor">
@@ -152,9 +173,9 @@ class Advisor extends React.Component {
                     {
                       Object.keys(data.alerts.messages).map(key => {
                         return (
-                          <p key={key} dangerouslySetInnerHTML={{__html: data.alerts.messages[key]}}></p>
+                          <p key={key} dangerouslySetInnerHTML={{ __html: data.alerts.messages[key] }}></p>
                         );
-                      })      
+                      })
                     }
                     <Button color="link">{data.alerts.button}</Button>
                   </CardBody>
@@ -166,7 +187,7 @@ class Advisor extends React.Component {
                     <Col lg="4">
                       <h5 className="mb-4">
                         {data.clients.title}
-                        <div class="form-inline float-right">
+                        <div className="form-inline float-right">
                           <select className="form-control form-control-select">
                             <option>Filters</option>
                           </select>
@@ -214,12 +235,12 @@ class Advisor extends React.Component {
                   <Row>
                     <Col md="6" className="mb-4">
                       <h5>{data.news.webinar.title}</h5>
-                      <p className="mb-2" dangerouslySetInnerHTML={{__html: data.news.webinar.content}}></p>
+                      <p className="mb-2" dangerouslySetInnerHTML={{ __html: data.news.webinar.content }}></p>
                       <Button color="link">{data.news.webinar.button}</Button>
                     </Col>
                     <Col md="6" className="mb-4">
                       <h5>{data.news.schedules.title}</h5>
-                      <p className="mb-2" dangerouslySetInnerHTML={{__html: data.news.schedules.content}}></p>
+                      <p className="mb-2" dangerouslySetInnerHTML={{ __html: data.news.schedules.content }}></p>
                       <Button color="link">{data.news.schedules.button}</Button>
                     </Col>
                   </Row>
