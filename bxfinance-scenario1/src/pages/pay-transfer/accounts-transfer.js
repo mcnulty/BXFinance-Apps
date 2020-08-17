@@ -28,6 +28,14 @@ import "../../styles/pages/pay-transfer/accounts-transfer.scss";
 
 class AccountsTransfer extends React.Component {
 
+  //Formatting dollar amounts to curency for confirmation or deny screens.
+  //Defaulting to USA for now.
+  currencyFormat = (value) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USA'
+    }).format(value);
+
   constructor(props) {
     super(props);
     this.state = {
@@ -55,6 +63,9 @@ class AccountsTransfer extends React.Component {
             } else {
               this.setState({ step: 4 }); //TODO this needs to be error modal.
             }
+          })
+          .catch(error => {
+            console.error("TransferMoney Exception", error);
           });
         break;
       case "confirm":
@@ -67,6 +78,9 @@ class AccountsTransfer extends React.Component {
             } else {
               this.setState({ step: 4 }); //TODO this needs to be error modal.
             }
+          })
+          .catch(error => {
+            console.error("TransferMoney Exception", error);
           });
         break;
       default: /* Denied */
@@ -82,6 +96,7 @@ class AccountsTransfer extends React.Component {
   /* BEGIN PING INTEGRATION: */
   handleAmountChange(event) {
     let amt = event.target.value;
+    amt = amt.replace(/,/g, '');
     const dollars = parseFloat(amt).toFixed(2);
     this.setState({ xfrAmount: dollars });
   }
@@ -178,7 +193,7 @@ class AccountsTransfer extends React.Component {
                     </div>
                     <div className="table-col">
                       <h3>Amount:</h3>
-                      <p>${this.state.xfrAmount}</p>
+                      <p>${this.currencyFormat(this.state.xfrAmount)}</p>
                     </div>
                   </div>
                   <div className="app-approval-banner">
@@ -208,7 +223,7 @@ class AccountsTransfer extends React.Component {
                     </div>
                     <div className="table-col table-col-33">
                       <h3>Amount:</h3>
-                      <p>${this.state.xfrAmount}</p>
+                    <p>${this.currencyFormat(this.state.xfrAmount)}</p>
                     </div>
                   </div>
                   <p>This transaction will take place in 1-2 business days.</p>
@@ -236,7 +251,7 @@ class AccountsTransfer extends React.Component {
                     </div>
                     <div className="table-col table-col-33">
                       <h3>Amount:</h3>
-                      <p style={{ color: '#ff0000' }}>${this.state.xfrAmount}</p>
+                    <p style={{ color: '#ff0000' }}>${this.currencyFormat(this.state.xfrAmount)}</p>
                     </div>
                   </div>
                   <p>Please contact a banking representative for transfers of this amount.</p>
