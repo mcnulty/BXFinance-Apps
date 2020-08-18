@@ -32,7 +32,7 @@ export default class PingData {
     */
     getUserEntry(uid) {
 
-        const userRDN = 'uid=' + uid;
+        const userRDN = 'uid=' + encodeURIComponent(uid);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ=="); /* TODO this should be obfuscated somehow. */
@@ -87,7 +87,8 @@ export default class PingData {
 
     /* 
     Get Searchable Users
-    Fetches all users in the people dn for the suggestable search feature in the AnyAdvisor/Marketing portals
+    Fetches all users in the people dn for the suggestable search feature in the AnyAdvisor/Marketing portals.
+    We filter out user that have the attribute bxFinanceUserType, because they are not banking users, but partners in the demo.
     @param searchScope to what level in the directory to searchScope
     @param limit max number of records to return. You could get less based on number of records found or PD configured limits
     @return response object
@@ -102,7 +103,7 @@ export default class PingData {
             redirect: 'follow'
         };
         // TODO we need some attribute or way to filter user to only include ones created for demos.
-        const url = process.env.REACT_APP_HOST + this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit;
+        const url = process.env.REACT_APP_HOST + this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit + "&filter=not(bxFinanceUserType pr)";
 
         return fetch(url, requestOptions);
     }
