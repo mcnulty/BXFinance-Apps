@@ -28,7 +28,7 @@ const AccountsBalance = (props) => {
             {
               Object.keys(props.balance.accounts).map(key => {
                 return (
-                  <tr>
+                  <tr key={key}>
                     <td><a href={props.balance.accounts[key].href}>{props.balance.accounts[key].account}</a></td>
                     {/* <td>{props.balance.accounts[key].balance} PING INTEGRATION: replaced this with below line.  */}
                     <td>{props.myAccounts.length > 0 && props.myAccounts[key].Amount.Amount}</td>
