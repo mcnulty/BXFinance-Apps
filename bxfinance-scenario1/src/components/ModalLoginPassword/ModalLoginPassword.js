@@ -89,7 +89,6 @@ updatesession() {
   // This is used as a callback function to the child component FormPassword.
   handlePswdChange(event) {
     this.setState({ swaprods: event.target.value }, () => {
-      console.log("User Input", this.state.swaprods);
     });
   }
   handleSubmit(tab) {
