@@ -42,7 +42,7 @@ class AccountsProfileSettings extends React.Component {
               {
                 Object.keys(data.sections).map(key => {
                   return (
-                    <AccountsSectionNav data={data.sections[key]} />
+                    <AccountsSectionNav key={key} data={data.sections[key]} />
                   );
                 })      
               }
