@@ -28,7 +28,7 @@ class AccountsProfileSettings extends React.Component {
               {
                 Object.keys(data.subnav).map(key => {
                   return (
-                    <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} />
+                    <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} profileMgmtURI={data.sections[0].pfProfileMgmtURI} />
                   );
                 })      
               }
