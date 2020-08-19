@@ -22,7 +22,11 @@ const AccountsSubnav = (props) => {
               {
                 Object.keys(props.subnav.links).map(key => {
                   return (
-                    <li key={key}><Link to={props.subnav.links[key].href} className={ props.subnav.links[key].active ? "active" : "" }>{props.subnav.links[key].title}</Link></li>
+                    /* PING INTEGRATION: Added logic to render Link as anchor to PF profile mgmt when it's Personal Details */
+                      props.subnav.links[key].title == "Personal Details" ? 
+                      <li key={key}><a href={process.env.REACT_APP_HOST+props.profileMgmtURI} className={props.subnav.links[key].active ? "active" : ""}>{props.subnav.links[key].title}</a></li>
+                      :
+                      <li key={key}><Link to={props.subnav.links[key].href} className={props.subnav.links[key].active ? "active" : ""}>{props.subnav.links[key].title}</Link></li>
                   );
                 })      
               }
