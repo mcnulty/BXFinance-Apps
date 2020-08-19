@@ -89,7 +89,7 @@ class NavbarMain extends React.Component {
               this.refs.modalLogin.toggle();
             }
             else if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
-              //TODO I dont think this needs to be here. we will never hit this here. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
+              //TODO I dont think this needs to be here. we will never hit this case in this component. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
               //pop the username/password modal.
               this.refs.modalLoginPassword.toggle();
             }
@@ -105,6 +105,7 @@ class NavbarMain extends React.Component {
           .then(response => response.json())
           .then((jsonData) => {
             if (jsonData.resumePath) { // Means we are in a SLO request. SSO doesnt use resumePath.
+              this.Session.clearUserAppSession();
               window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath + "?source=" + adapter;
             }
             if (jsonData.bxFinanceUserType == "AnyWealthAdvisor" || jsonData.bxFinanceUserType == "AnyMarketing") {
