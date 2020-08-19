@@ -282,10 +282,10 @@ class PrivacySecurity extends React.Component {
                               {
                                 Object.keys(partner3.permissions).map(index2 => {
                                   return (
-                                    <FormGroup check>
+                                    <FormGroup key={index2} check>
                                       <Label className="custom-checkbox" check>
                                         <Input type="checkbox" onClick={() => this.toggeAccount(index2, this.state["acct_" + index2])} checked={this.state["acct_" + index2]} /> {partner3.permissions[index2].label}
-                                        <span class="checkmark"><span></span></span>
+                                        <span className="checkmark"><span></span></span>
                                       </Label>
                                     </FormGroup>
                                   )

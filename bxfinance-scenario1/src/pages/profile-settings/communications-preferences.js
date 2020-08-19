@@ -240,7 +240,7 @@ class CommunicationPreferences extends React.Component {
                       Object.keys(data.steps[1].communication_types).map(index => {
                         return (
                           <>
-                            <FormGroup className={classNames({ "gray": (index % 2) })}>
+                            <FormGroup key={index} className={classNames({ "gray": (index % 2) })}>
                               <Label for={data.steps[0].communication_types[index].name}>{data.steps[0].communication_types[index].label}</Label>
                               <CustomInput type="radio" disabled id={`${data.steps[0].communication_types[index].name}_yes`} name={data.steps[0].communication_types[index].name} checked={this.state[name + "Checked"]} label="Yes" />
                               <CustomInput type="radio" disabled id={`${data.steps[0].communication_types[index].name}_no`} name={data.steps[0].communication_types[index].name} checked={!this.state[name + "Checked"]} label="No" />
