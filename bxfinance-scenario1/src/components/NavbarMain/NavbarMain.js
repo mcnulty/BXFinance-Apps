@@ -59,9 +59,10 @@ class NavbarMain extends React.Component {
   }
   /* BEGIN PING INTEGRATION */
   startSLO() {
-    this.Session.startSLO();
+    this.Session.clearUserAppSession();
+    const url = process.env.REACT_APP_HOST + "/sp/startSLO.ping?TargetResource=" + process.env.REACT_APP_HOST + process.env.PUBLIC_URL;
+    window.location.href = url; 
   }
-
   /* END PING INTEGRATION: */
 
   componentDidMount() {
@@ -89,7 +90,6 @@ class NavbarMain extends React.Component {
             }
             else if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
               //TODO I dont think this needs to be here. we will never hit this here. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
-              console.log("STATUS:", jsonResult.status)
               //pop the username/password modal.
               this.refs.modalLoginPassword.toggle();
             }
@@ -97,18 +97,15 @@ class NavbarMain extends React.Component {
           .catch(error => console.error('HANDLESUBMIT ERROR', error));
       } // Coming back as authenticated user from Agentless IK.
       else if (params.get("REF")) {
-        console.log("TEST", "Got REF");
         const REF = params.get("REF");
         const targetApp = decodeURIComponent(params.get("TargetResource"));
-        const adapter = targetApp.includes("/banking") ? "BXFSPRefID" : "AdvisorSPRefID";
+        const adapter = (targetApp.includes("marketing") || targetApp.includes("advisor")) ? "AdvisorSPRefID" : "BXFSPRefID";
 
         this.PingAuthN.pickUpAPI(REF, adapter)
           .then(response => response.json())
           .then((jsonData) => {
-            console.log("jsonData", JSON.stringify(jsonData));
-            if (jsonData.resumePath) { // Means we are in a SLO request. AIK doesnt use resumePath.
-              console.log("TEST", "In SLO");
-              window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath;
+            if (jsonData.resumePath) { // Means we are in a SLO request. SSO doesnt use resumePath.
+              window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath + "?source=" + adapter;
             }
             if (jsonData.bxFinanceUserType == "AnyWealthAdvisor" || jsonData.bxFinanceUserType == "AnyMarketing") {
               this.Session.setAuthenticatedUserItem("email", jsonData.Email);
