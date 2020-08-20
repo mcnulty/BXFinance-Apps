@@ -174,7 +174,7 @@ class PrivacySecurity extends React.Component {
               newState["acct_" + index] = acctId;
               this.setState(newState);
             });
-            console.log("STATE", this.state);
+            console.log("MOUNT STATE", this.state);
             this.toggle();
           }
         })
@@ -220,7 +220,7 @@ class PrivacySecurity extends React.Component {
     return (
       <div className="accounts privacy-security">
         <NavbarMain />
-        <WelcomeBar />
+        <WelcomeBar firstName={this.Session.getAuthenticatedUserItem("firstName")} />
         <Container>
           <div className="inner">
             <div className="sidebar">
