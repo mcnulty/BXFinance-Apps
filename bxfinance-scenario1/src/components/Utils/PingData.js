@@ -110,6 +110,7 @@ export default class PingData {
 
     /* 
     Get User Consents
+    This is called from customer apps for consent management.
     @param token the AT for the authenticated user
     @param uid the user's uid from their user record.
     @param definition the consent definition ID.
@@ -204,6 +205,7 @@ export default class PingData {
 
     /* 
     Get User Consented Data
+    This is called from AnyWealth Advisor and AnyMarketing portals. Uses DG for consent enforcement.
     @param token the access token of the marketingApp
     @param forWhom whether this DG call is for an AnyWealthAdvisor or AnyMarketing rep.
     @param uid the uid of the user data being requested
