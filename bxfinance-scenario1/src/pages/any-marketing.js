@@ -125,7 +125,7 @@ const SearchAutocomplete = () => {
     setConsentState(initialState); //Clearing previous values so they don't show while modal re-renders.
     fetchSelectedUserConsent(filteredSuggestions[index])
       //.then(response => response.json())
-      .then(jsonResults => {
+      .then(jsonResults => { console.log("consentdata", JSON.stringify(jsonResults));
         let fullName;
         try { fullName = jsonResults.Resources[0].cn[0]; }
         catch (e) { }//Fail with the utmost grace and leisure.
@@ -176,8 +176,8 @@ const SearchAutocomplete = () => {
           </Row>
           <Row className="mb-3" key={1}>
             <Col md="3">Mail Address:</Col>
-            <Col md="6">
-              {homeAddress ? homeAddress : <div className="bg-dark">test</div>}
+            <Col md="6">{console.log("homeaddress", homeAddress.length)}
+              {homeAddress.length > 0 ? homeAddress : <div className="bg-dark">test</div>}
             </Col>
           </Row>
           <Row className="mb-3" key={2}>

@@ -70,7 +70,7 @@ class AccountsDashboard extends React.Component {
           this.PingOAuth.getToken({uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent'})
             .then(token => {
               this.Session.setAuthenticatedUserItem("AT", token);
-              this.OpenBanking.provisionAccounts(token, this.Session.getAuthenticatedUserItem("uid"));
+              this.OpenBanking.provisionAccounts(token, this.Session.getAuthenticatedUserItem("uid")); //TODO does this NOT return the acct IDs provisioned???
               this.OpenBanking.getAccountBalances(token)
                 .then(response => response.json())
                 .then(jsonData => {

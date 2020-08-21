@@ -25,6 +25,7 @@ import PingData from '../../components/Utils/PingData'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/profile-settings/privacy-security.json';
+import pingEndpoints from '../../data/ping-endpoints.json'; /* PING INTEGRATION: */
 
 // Styles
 import "../../styles/pages/profile-settings/privacy-security.scss";
@@ -37,11 +38,11 @@ class PrivacySecurity extends React.Component {
       step: 1,
       isOpen: false,
       isModalOpen: false,
-      anywealthadvisor: "no",            /* PING INTEGRATION: */
-      anywealthadvisorChecked: false,    /* PING INTEGRATION: */
-      acct_0: 0,                         /* PING INTEGRATION: */
-      acct_1: 0,                         /* PING INTEGRATION: */
-      acct_2: 0                          /* PING INTEGRATION: */
+      anywealthadvisor: false,           /* PING INTEGRATION: Whether they are giving consent to the Advisor */
+      acct_0: 0,                         /* PING INTEGRATION: Will store List of the user's 3 existing accounts */
+      acct_1: 0,                         /* PING INTEGRATION: The value will be the acct ID, updated in componentDidMount() */
+      acct_2: 0,                         /* PING INTEGRATION: The IDs are later correlated to consentedAccts. */
+      consentedAccts: []                 /* PING INTEGRATION: the acct IDs for which have been given consent. */
     };
 
     this.showStep1 = this.showStep1.bind(this);
@@ -62,15 +63,15 @@ class PrivacySecurity extends React.Component {
 
   showStep2() {
     /* BEGIN PING INTEGRATION */
-    if (this.state.consentId) {
+    if (this.state.consentId) {//User has a consent record, so update.
       console.log("TEST", "Updating consents");
-      let accountIds = [];
+      /* let accountIds = [];
       let count;
       count = this.state.acct_0 > 0 && accountIds.push(this.state.acct_0);
       count = this.state.acct_1 > 0 && accountIds.push(this.state.acct_1);
       count = this.state.acct_2 > 0 && accountIds.push(this.state.acct_2);
-      const consent = accountIds;
-      this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.state.consentId, this.consentDef)
+      const consent = accountIds; */
+      this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), this.state.consentedAccts, this.state.consentId, this.consentDef)
         .then(response => response.json())
         .then(consentData => {
           console.log("UpdateUserConsents", JSON.stringify(consentData));
@@ -79,15 +80,15 @@ class PrivacySecurity extends React.Component {
         .catch(e => {
           console.error("UpdateUserConsents Exception", e)
         });
-    } else {
+    } else { //User has no consent record, so create.
       console.log("TEST", "Creating consents");
-      let accountIds = [];
+      /* let accountIds = [];
       let count;
       count = this.state.acct_0 > 0 && accountIds.push(this.state.acct_0);
       count = this.state.acct_1 > 0 && accountIds.push(this.state.acct_1);
       count = this.state.acct_2 > 0 && accountIds.push(this.state.acct_2);
-      const consent = accountIds;
-      this.PingData.createUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
+      const consent = accountIds; */
+      this.PingData.createUserConsent(this.Session.getAuthenticatedUserItem("AT"), this.state.consentedAccts, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
           console.log("CreateUserConsents", JSON.stringify(consentData));
@@ -116,23 +117,18 @@ class PrivacySecurity extends React.Component {
   }
 
   /* BEGIN PING INTEGRATION:  */
-  //this function sets state of comm. pref. selected soley based on event obj passed in during onclick.
-  // we extract the comm. type and consent pref. based on the substrings of the element ID. I.e "sms_yes".
+  //this function sets state of consent. pref. selected soley based on event obj passed in during onclick.
+  // we extract the partner name and consent pref. based on the substrings of the event target ID. I.e "anywealthadvisor_yes".
   toggleConsent(event) {
     let consentState = {};
     let checkedState = {};
     const delimiterPos = event.target.id.indexOf("_");
-    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1);
+    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1) == "yes" ? true : false;
     this.setState(consentState);
-    checkedState[event.target.id.substring(0, delimiterPos) + "Checked"] = event.target.id.substring(delimiterPos + 1) == "yes" ? true : false;
-    this.setState(checkedState);
-    //If the clicked "No" for Advisor consent, clear all account IDs from state.
+    //If the user clicked "No" for Advisor consent, clear all account IDs from state.
+    // "I don't know... I'm making this up as I go."
     if (event.target.id.substring(delimiterPos + 1) == "no") {
-      this.setState({
-        acct_0: 0,
-        acct_1: 0,
-        acct_2: 0
-      })
+      this.setState({ consentedAccts: [] });
     }
     console.log("STATE", this.state);
   }
@@ -140,21 +136,34 @@ class PrivacySecurity extends React.Component {
   toggeAccount(index, acctId) {
     console.log("TEST-index", index);
     console.log("TEST-acctId", acctId);
-    let consentAcctState = {};
-    if (acctId != 0) {
-      consentAcctState["acct_" + index] = 0;
-      this.setState(consentAcctState);
-    } else {
-      consentAcctState["acct_" + index] = acctId;
-      this.setState(consentAcctState);
+    const consentedAcctsArr = this.state.consentedAccts;
+    const acctPos = consentedAcctsArr.indexOf(acctId)
+    if (acctPos > -1) {// The acct clicked is already consented so we are removing consent.
+      consentedAcctsArr.splice(acctPos, 1)
+    } else {// The acct clicked was not consented so we are adding consent.
+      consentedAcctsArr.push(acctId);
     }
+    this.setState({consentedAccts: consentedAcctsArr});
   }
   /* END PING INTEGRATION:  */
 
 
   /* BEGIN PING INTEGRATION */
   componentDidMount() {
-    let newState = {};
+    let newState = [];
+    let acctIDsArr = [];
+    let consentedAcctsArr = [];
+    // Get the user's existing bank account IDs.
+    let acctIDs = this.Session.getAuthenticatedUserItem("accts");
+    acctIDsArr = acctIDs.split(",");
+
+    //Update state with user's existing 3 bank account IDs
+    acctIDsArr.forEach((acctId, index) => {
+      newState["acct_" + index] = acctId;
+    });
+    this.setState(newState);
+    console.log("MOUNT STATE", this.state);
+
     if (this.Session.getAuthenticatedUserItem("AT")) {
       const token = this.Session.getAuthenticatedUserItem("AT");
       this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
@@ -163,18 +172,20 @@ class PrivacySecurity extends React.Component {
           console.log("getUserConsents", JSON.stringify(consentData));
           if (consentData.count > 0) {
             this.setState({
-              anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? "yes" : "no",
-              anywealthadvisorChecked: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
+              anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
               consentId: consentData._embedded.consents[0].id
             });
-            //loop over share-balance array updating state for checkboxes.
+            //loop over share-balance array updating account consent state.
             // This loop ensures we handle n number of accts on someones record to avoid complexity, 
-            // since the page only ever displays and manages consent of the first 3. Otherwise the loop would need to exit after array[2].
-            consentData._embedded.consents[0].data["share-balance"].forEach((acctId, index) => {
-              newState["acct_" + index] = acctId;
-              this.setState(newState);
+            // in case we get more than 3 accts in the future. (We dont control the OpenBanking Mock API). 
+            // Otherwise the loop would need to exit after array[2].
+            consentedAcctsArr = consentData._embedded.consents[0].data["share-balance"];
+            consentedAcctsArr.forEach((acctId, index) => {
+              //If they acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
+              newState.push(acctId);
+
             });
-            console.log("MOUNT STATE", this.state);
+            this.setState({ consentedAccts: newState });
             this.toggle();
           }
         })
@@ -191,13 +202,21 @@ class PrivacySecurity extends React.Component {
               console.log("getUserConsents", JSON.stringify(consentData));
               if (consentData.count > 0) {
                 this.setState({
-                  anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? "yes" : "no",
-                  anywealthadvisorChecked: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
+                  anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
                   consentId: consentData._embedded.consents[0].id
                 });
-                //loop over share-balance array updating state for checkboxes.
+                //loop over share-balance array updating account consent state.
+                // This loop ensures we handle n number of accts on someones record to avoid complexity, 
+                // in case we get more than 3 accts in the future. (We dont control the OpenBanking Mock API). 
+                // Otherwise the loop would need to exit after array[2].
+                consentedAcctsArr = consentData._embedded.consents[0].data["share-balance"];
+                consentedAcctsArr.forEach((acctId, index) => {
+                  //If they acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
+                  newState.push(acctId);
 
-                console.log("STATE", this.state);
+                });
+                this.setState({ consentedAccts: newState });
+                this.toggle();
               }
             })
             .catch(e => {
@@ -215,19 +234,20 @@ class PrivacySecurity extends React.Component {
     const partner1 = data.steps[0].partners[0];
     const partner2 = data.steps[0].partners[1];
     const partner3 = data.steps[0].partners[2];
-    let name = partner3.name; /* PING INTEGRATION: */
+    let isChecked = false; /* PING INTEGRATION: */
+    let consentedAcctsArr = [];
 
     return (
       <div className="accounts privacy-security">
         <NavbarMain />
-        <WelcomeBar firstName={this.Session.getAuthenticatedUserItem("firstName")} />
+        <WelcomeBar firstName={this.Session.getAuthenticatedUserItem("firstName")} /> {/* PING INTEGRATION: added passing of firstName prop. */}
         <Container>
           <div className="inner">
             <div className="sidebar">
               {
                 Object.keys(data.subnav).map(key => {
                   return (
-                    <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} />
+                    <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} pingendpoints={pingEndpoints} />
                   );
                 })
               }
@@ -271,8 +291,8 @@ class PrivacySecurity extends React.Component {
                           <Row>
                             <Col md={12} lg={4}><img src={process.env.PUBLIC_URL + partner3.logo} alt="" /></Col>
                             <Col md={12} lg={4}>
-                              <CustomInput type="radio" onChange={(event) => this.toggleConsent(event)} id={`${partner3.name}_yes`} checked={this.state[name + "Checked"]} name={partner3.name} label="Yes" onClick={this.toggle} />
-                              <CustomInput type="radio" onChange={(event) => this.toggleConsent(event)} id={`${partner3.name}_no`} checked={!this.state[name + "Checked"]} name={partner3.name} label="No" onClick={this.toggle} />
+                              <CustomInput type="radio" onChange={(event) => this.toggleConsent(event)} id={`${partner3.name}_yes`} checked={this.state[partner3.name]} name={partner3.name} label="Yes" onClick={this.toggle} />
+                              <CustomInput type="radio" onChange={(event) => this.toggleConsent(event)} id={`${partner3.name}_no`} checked={!this.state[partner3.name]} name={partner3.name} label="No" onClick={this.toggle} />
                             </Col>
                             <Col md={12} lg={4}><a href="#" className="partner-overlay" onClick={this.toggleModal}>{partner3.learn_more}</a></Col>
                           </Row>
@@ -281,10 +301,11 @@ class PrivacySecurity extends React.Component {
                               <p>{partner3.permissions_hdr}</p>
                               {
                                 Object.keys(partner3.permissions).map(index2 => {
+                                  isChecked = this.state.consentedAccts.indexOf(this.state["acct_" + index2]) > -1 ? true : false;
                                   return (
                                     <FormGroup key={index2} check>
                                       <Label className="custom-checkbox" check>
-                                        <Input type="checkbox" onClick={() => this.toggeAccount(index2, this.state["acct_" + index2])} checked={this.state["acct_" + index2]} /> {partner3.permissions[index2].label}
+                                        <Input type="checkbox" onClick={() => this.toggeAccount(index2, this.state["acct_" + index2])} checked={isChecked} /> {partner3.permissions[index2].label}
                                         <span className="checkmark"><span></span></span>
                                       </Label>
                                     </FormGroup>
@@ -326,10 +347,11 @@ class PrivacySecurity extends React.Component {
                               {
                                 Object.keys(data.steps[1].partners[index].permissions).map(index2 => {
                                   const permission = data.steps[1].partners[index].permissions[index2];
+                                  isChecked = this.state.consentedAccts.indexOf(this.state["acct_" + index2]) > -1 ? true : false;
                                   return (
                                     <FormGroup check>
                                       <Label className="custom-checkbox" check>
-                                        <Input type="checkbox" checked={permission.checked} disabled /> {permission.label}
+                                        <Input type="checkbox" checked={isChecked} /> {permission.label}
                                         <span class="checkmark"><span></span></span>
                                       </Label>
                                     </FormGroup>

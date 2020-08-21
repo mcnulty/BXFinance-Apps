@@ -23,6 +23,7 @@ import PingData from '../../components/Utils/PingData'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/profile-settings/communication-preferences.json';
+import pingEndpoints from '../../data/ping-endpoints.json'; /* PING INTEGRATION: */
 
 // Styles
 import "../../styles/pages/profile-settings/communication-preferences.scss";
@@ -179,7 +180,7 @@ class CommunicationPreferences extends React.Component {
               {
                 Object.keys(data.subnav).map(key => {
                   return (
-                    <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} />
+                    <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} pingendpoints={pingEndpoints} />
                   );
                 })
               }

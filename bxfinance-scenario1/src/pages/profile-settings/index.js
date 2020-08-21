@@ -12,6 +12,7 @@ import CardRewards from '../../components/CardRewards';
 
 // Data
 import data from '../../data/accounts-profile-settings.json';
+import pingEndpoints from '../../data/ping-endpoints.json'; /* PING INTEGRATION: */
  
 // Styles
 import "../../styles/pages/accounts.scss";
@@ -28,7 +29,7 @@ class AccountsProfileSettings extends React.Component {
               {
                 Object.keys(data.subnav).map(key => {
                   return (
-                    <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} profileMgmtURI={data.sections[0].pfProfileMgmtURI} />
+                    <AccountsSubnav key={data.subnav[key].title} subnav={data.subnav[key]} pingendpoints={pingEndpoints} />
                   );
                 })      
               }

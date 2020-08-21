@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom'
 import "./AccountsSubnav.scss";
 
 const AccountsSubnav = (props) => {
-  
   const [isOpen, setIsOpen] = useState(props.subnav.open);
   const toggle = () => setIsOpen(!isOpen);
 
@@ -24,7 +23,7 @@ const AccountsSubnav = (props) => {
                   return (
                     /* PING INTEGRATION: Added logic to render Link as anchor to PF profile mgmt when it's Personal Details */
                       props.subnav.links[key].title == "Personal Details" ? 
-                      <li key={key}><a href={process.env.REACT_APP_HOST+props.profileMgmtURI} className={props.subnav.links[key].active ? "active" : ""}>{props.subnav.links[key].title}</a></li>
+                      <li key={key}><a href={process.env.REACT_APP_HOST + props.pingendpoints.pingfederate.profileMgmtURI} className={props.subnav.links[key].active ? "active" : ""}>{props.subnav.links[key].title}</a></li>
                       :
                       <li key={key}><Link to={props.subnav.links[key].href} className={props.subnav.links[key].active ? "active" : ""}>{props.subnav.links[key].title}</Link></li>
                   );
