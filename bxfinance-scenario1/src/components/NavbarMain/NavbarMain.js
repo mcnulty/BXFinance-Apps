@@ -29,6 +29,7 @@ class NavbarMain extends React.Component {
     super();
     this.state = {
       isOpen: false,
+      loggedOut: true
     };
     this.PingAuthN = new PingAuthN(); /* PING INTEGRATION */
     this.Session = new Session(); /* PING INTEGRATION */
@@ -67,14 +68,13 @@ class NavbarMain extends React.Component {
 
   componentDidMount() {
     // BEGIN PING INTEGRATION
-    // Begin app Session timeout setup.
-
-    // End app Session timeout setup.
-
+    const isLoggedOut = (this.Session.getAuthenticatedUserItem("subject") === null || this.Session.getAuthenticatedUserItem("subject") === 'undefined') ? true : false;
+    this.setState({ loggedOut: isLoggedOut});
+    
     // Check for a querystring; Will be fowId or REF.
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
-
+      
       // Coming back from authN API or Agentless adapter.
       if (params.get("flowId")) {
         this.PingAuthN.handleAuthNflow({ flowId: params.get("flowId") })
@@ -164,15 +164,15 @@ class NavbarMain extends React.Component {
                 </NavItem>
                 {/* BEGIN PING INTEGRATION: added conditional rendering logic for Sign In/Out links. */}
                 {/* TODO might need to change this to check state instead. Getting inconsistent results. */}
-                {!(this.Session.getAuthenticatedUserItem("subject")) &&
+                {this.state.loggedOut &&
                   <NavItem className="login">
                     <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
                   </NavItem>}
-                {(this.Session.getAuthenticatedUserItem("subject")) &&
+                {!this.state.loggedOut &&
                   <NavItem className="logout">
                   <Link to="/" onClick={this.startSLO.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
                   </NavItem>}
-                {!(this.Session.getAuthenticatedUserItem("subject")) &&
+                {this.state.loggedOut &&
                   <NavItem className="register">
                     <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
                   </NavItem>}
