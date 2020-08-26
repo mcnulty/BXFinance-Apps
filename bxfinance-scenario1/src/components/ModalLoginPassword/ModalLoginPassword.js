@@ -37,7 +37,9 @@ class ModalLoginPassword extends React.Component {
       loginMethodUnset: true,
       loginMethodFormGroupClass: '',
       userName: "",                   /* PING INTEGRATION: */
-      swaprods: ""                    /* PING INTEGRATION: */
+      swaprods: "",                   /* PING INTEGRATION: */
+      loginError: false,              /* PING INTEGRATION: */
+      loginErrorMsg: ""               /* PING INTEGRATION: */
     };
     this.PingAuthN = new PingAuthN(); /* PING INTEGRATION: */
     this.Session = new Session();     /* PING INTEGRATION: */
@@ -82,9 +84,7 @@ class ModalLoginPassword extends React.Component {
       loginMethodFormGroupClass: 'form-group-light'
     });
   }
-updatesession() {
-  console.log("TEST");
-}
+
   /* BEGIN PING INTEGRATION: */
   // This is used as a callback function to the child component FormPassword.
   handlePswdChange(event) {
@@ -94,7 +94,7 @@ updatesession() {
   handleSubmit(tab) {
     console.log("HANDLING SUBMIT");
     console.log("STATE", this.state);
-    const pswd = tab == '2' ? this.state.swaprods : "WTF?"; //TODO Do we care about the tab param here? Keep?
+    const pswd = tab == '2' ? this.state.swaprods : "WTF?"; //TODO Do we care about the tab param here? Toss?
     const flowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
 
     if (pswd) {
@@ -105,6 +105,13 @@ updatesession() {
           console.log("jsonResults", jsonResults);
           if (jsonResults.status == "RESUME") {
             this.PingAuthN.handleAuthNflow({flowResponse: jsonResults});
+          } else if (jsonResults.code == "VALIDATION_ERROR") {
+            console.log("Validation Error", jsonResults.details[0].userMessage);
+            this.setState({
+              loginError: true,
+              loginErrorMsg: jsonResults.details[0].userMessage
+            });
+            console.log("STATE TEST", JSON.stringify(this.state));
           } else {
             throw "Flow Status Exception: Unexpected status."; //TODO This is probably a corner case, but how do we handle the UI in this error?
           }
@@ -127,6 +134,7 @@ updatesession() {
               <TabContent activeTab={this.state.activeTab}>
                 <TabPane tabId="1">
                   <h4>{data.titles.welcome}</h4>
+                  {this.state.loginError && <div style={{color: 'red'}}>{this.state.loginErrorMsg}</div>} {/* PING INTEGRATION */}
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
                     <Input type="text" name="username" id="username" value={this.state.userName} placeholder={data.form.fields.username.placeholder} />
