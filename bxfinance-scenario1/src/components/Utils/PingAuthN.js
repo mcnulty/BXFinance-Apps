@@ -71,7 +71,7 @@ export default class PingAuthN {
     @param identifier the userName or email of the authenticating user
     @param swaprods the user's password if doing password authentication
     */
-    handleAuthNflow({flowId, flowResponse, identifier, swaprods}) {
+    handleAuthNflow({flowId, flowResponse, identifier, swaprods, rememberMe}) {
         console.log("handleAuthNflow ARGS:", arguments);
         let payload = '{}';
         if (!flowResponse){ flowResponse = {}; } //This won't exist if we only get a flowId. So create it to let switch/case default kick in.
@@ -96,7 +96,7 @@ export default class PingAuthN {
                 console.log("handleAuthNflow", "IN USERNAME_PASSWORD_REQUIRED");
                 console.log("flowresponse:", flowResponse);
                 console.log("swaprods:", swaprods);
-                payload = '{\n \"username\": \"' + flowResponse.username + '\", \"password\": \"' + swaprods + '\", \"rememberMyUsername\": \"false\", \"thisIsMyDevice\": \"true\", \"captchaResponse\": \"\" \n}';
+                payload = '{\n \"username\": \"' + flowResponse.username + '\", \"password\": \"' + swaprods + '\", \"rememberMyUsername\": \"' + rememberMe + '\", \"captchaResponse\": \"\" \n}';
                 console.log("payload",payload);
                 return this.authnAPI({method:"POST", flowId:flowResponse.id, contentType:"application/vnd.pingidentity.checkUsernamePassword+json", body:payload});
                 break;
