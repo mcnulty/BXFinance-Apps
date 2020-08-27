@@ -124,8 +124,6 @@ export default class PingOAuth {
             return token;
                 
         } else {
-            //TODO implement implicit call here when needed. Not needed in v1 release. So throw error for now. 
-            //(Seems a little harsh.)
             throw new Error("Unexpected response_type exception in PingOAuth.getToken.");
         }
     }
