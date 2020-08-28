@@ -232,7 +232,7 @@ export default class PingData {
         }
         const response = await fetch(url, requestOptions);
         const jsonResponse = await response.json();
-        console.log("jsonResponse", jsonResponse);
+        console.log("getUserConsentData", jsonResponse);
         return jsonResponse;
     }
     

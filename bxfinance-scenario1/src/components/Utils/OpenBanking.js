@@ -18,7 +18,8 @@ export default class OpenBanking {
         // Didn't abstract these since they shouldn't ever change.
         //TODO move these out of the constructor. Not sure why I did this. Not necessary. Didn't do it anywhere else. That's what I get for working on a Saturday.
         this.mockOBConsenthost = process.env.REACT_APP_HOST + "/OpenBanking";
-        this.mockOBhost = "https://demo-openbanking-api-server.herokuapp.com/OpenBanking";
+        // this.mockOBhost = "https://demo-openbanking-api-server.herokuapp.com/OpenBanking";
+        this.mockOBhost="https://babbtx-aspsp.herokuapp.com/OpenBanking";
         this.mockOBAPIver = "/v2";
         this.mockOBbalURI = "/balances";
         this.mockOBacctsURI = "/accounts";
@@ -71,7 +72,7 @@ export default class OpenBanking {
             headers: myHeaders,
             redirect: 'follow'
         };
-        const url = this.mockOBConsenthost + this.mockOBAPIver + this.mockOBbalURI;
+        const url = this.mockOBhost + this.mockOBAPIver + this.mockOBbalURI;
         return fetch(url, requestOptions);
         /* const response = fetch(url, requestOptions);
         const jsonData = response.json();

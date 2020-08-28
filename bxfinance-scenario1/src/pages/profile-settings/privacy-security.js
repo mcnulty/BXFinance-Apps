@@ -63,7 +63,7 @@ class PrivacySecurity extends React.Component {
 
   showStep2() {
     /* BEGIN PING INTEGRATION */
-    if (this.state.consentId) {//User has a consent record, so update.
+    if (this.state.consentedAccts.length > 0) {//User has a consent record, so update.
       console.log("TEST", "Updating consents");
       /* let accountIds = [];
       let count;
@@ -123,7 +123,7 @@ class PrivacySecurity extends React.Component {
     let consentState = {};
     let checkedState = {};
     const delimiterPos = event.target.id.indexOf("_");
-    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1) == "yes" ? true : false;
+    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1) == true ? true : false;
     this.setState(consentState);
     //If the user clicked "No" for Advisor consent, clear all account IDs from state.
     // "I don't know... I'm making this up as I go."
@@ -159,7 +159,7 @@ class PrivacySecurity extends React.Component {
 
     //Update state with user's existing 3 bank account IDs
     acctIDsArr.forEach((acctId, index) => {
-      newState["acct_" + index] = acctId;
+      newState["acct_" + index] = parseInt(acctId);
     });
     this.setState(newState);
     console.log("MOUNT STATE", this.state);

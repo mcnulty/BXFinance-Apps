@@ -66,7 +66,11 @@ export default class Session {
     }
 
     /* 
-    
+    Get cookie
+    We set a cookie when users check "Remember Me" when logging in.
+    We need to check for this cookie in a couple different places to set state.
+    @param cookieName the name of the cookie we want the value of.
+    @return cookie value, or an empty string if not found.
     */
     getCookie(cookieName) {
         const name = cookieName + "=";

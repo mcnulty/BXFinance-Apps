@@ -135,7 +135,7 @@ class NavbarMain extends React.Component {
           })
           .catch(error => {
             console.error("Agentless Pickup Error:", error);
-            this.refs.ModalError.toggle();
+            this.refs.modalError.toggle();
           });
       }
     }

@@ -34,11 +34,11 @@ class CommunicationPreferences extends React.Component {
     super(props);
     this.state = {
       step: 1,
-      sms: "no",            /* PING INTEGRATION: */
+      sms: false,            /* PING INTEGRATION: */
       smsChecked: false,    /* PING INTEGRATION: */
-      email: "no",          /* PING INTEGRATION: */
+      email: false,          /* PING INTEGRATION: */
       emailChecked: false,  /* PING INTEGRATION: */
-      mail: "no",             /* PING INTEGRATION: */
+      mail: false,             /* PING INTEGRATION: */
       mailChecked: false    /* PING INTEGRATION: */
     };
 
@@ -77,9 +77,9 @@ class CommunicationPreferences extends React.Component {
               sms: consentData._embedded.consents[0].data.sms,
               email: consentData._embedded.consents[0].data.email,
               mail: consentData._embedded.consents[0].data.homeAddress,
-              smsChecked: consentData._embedded.consents[0].data.sms == "yes" ? true : false,
-              emailChecked: consentData._embedded.consents[0].data.email == "yes" ? true : false,
-              mailChecked: consentData._embedded.consents[0].data.homeAddress == "yes" ? true : false,
+              smsChecked: consentData._embedded.consents[0].data.sms == true ? true : false,
+              emailChecked: consentData._embedded.consents[0].data.email == true ? true : false,
+              mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
               consentId: consentData._embedded.consents[0].id
             });
             console.log("STATE", this.state);
@@ -103,7 +103,7 @@ class CommunicationPreferences extends React.Component {
     let consentState = {};
     let checkedState = {};
     const delimiterPos = event.target.id.indexOf("_");
-    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1);
+    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1) == "yes" ? true : false;
     this.setState(consentState);
     checkedState[event.target.id.substring(0, delimiterPos) + "Checked"] = event.target.id.substring(delimiterPos + 1) == "yes" ? true : false;
     this.setState(checkedState);
@@ -125,9 +125,9 @@ class CommunicationPreferences extends React.Component {
               sms: consentData._embedded.consents[0].data.sms,
               email: consentData._embedded.consents[0].data.email,
               mail: consentData._embedded.consents[0].data.homeAddress,
-              smsChecked: consentData._embedded.consents[0].data.sms == "yes" ? true : false,
-              emailChecked: consentData._embedded.consents[0].data.email == "yes" ? true : false,
-              mailChecked: consentData._embedded.consents[0].data.homeAddress == "yes" ? true : false,
+              smsChecked: consentData._embedded.consents[0].data.sms == true ? true : false,
+              emailChecked: consentData._embedded.consents[0].data.email == true ? true : false,
+              mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
               consentId: consentData._embedded.consents[0].id
             });
             console.log("STATE", this.state);
@@ -149,9 +149,9 @@ class CommunicationPreferences extends React.Component {
                   sms: consentData._embedded.consents[0].data.sms,
                   email: consentData._embedded.consents[0].data.email,
                   mail: consentData._embedded.consents[0].data.homeAddress,
-                  smsChecked: consentData._embedded.consents[0].data.sms == "yes" ? true : false,
-                  emailChecked: consentData._embedded.consents[0].data.email == "yes" ? true : false,
-                  mailChecked: consentData._embedded.consents[0].data.homeAddress == "yes" ? true : false,
+                  smsChecked: consentData._embedded.consents[0].data.sms == true ? true : false,
+                  emailChecked: consentData._embedded.consents[0].data.email == true ? true : false,
+                  mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
                   consentId: consentData._embedded.consents[0].id
                 });
                 console.log("STATE", this.state);
