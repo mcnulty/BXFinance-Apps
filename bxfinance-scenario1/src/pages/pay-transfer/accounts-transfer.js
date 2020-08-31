@@ -19,6 +19,7 @@ import AccountsDropdown from '../../components/AccountsDropdown';
 import CardRewards from '../../components/CardRewards';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
 import OpenBanking from '../../components/Utils/OpenBanking'; /* PING INTEGRATION: */
+import { Link } from 'react-router-dom' /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/accounts-transfer.json';
@@ -171,7 +172,8 @@ class AccountsTransfer extends React.Component {
                     </Row>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <a href={process.env.PUBLIC_URL} className="text-info cancel">{data.form.buttons.cancel.label}</a>
+                        {/* <a href={process.env.PUBLIC_URL} className="text-info cancel">{data.form.buttons.cancel.label}</a> */}
+                        <Link to="/banking" className="text-info cancel">{data.form.buttons.cancel.label}</Link>
                         <Button color="primary" className="start-transfer" onClick={this.showStep2}>{data.form.buttons.start_transfer.label}</Button> {/* PING INTEGRATION: onClick handler here */}
                       </Col>
                     </Row>
@@ -219,11 +221,11 @@ class AccountsTransfer extends React.Component {
                   <div className="table">
                     <div className="table-col table-col-67">
                       <h3>You have initiated a transfer from:</h3>
-                      <p>BXChecking (...4458) to AnyBank (...5661)</p>
+                      <p>BXChecking (...4458) to BXSavings (...5661)</p>
                     </div>
                     <div className="table-col table-col-33">
                       <h3>Amount:</h3>
-                    <p>${this.currencyFormat(this.state.xfrAmount)}</p>
+                      <p>${this.currencyFormat(this.state.xfrAmount)}</p>
                     </div>
                   </div>
                   <p>This transaction will take place in 1-2 business days.</p>
@@ -232,7 +234,8 @@ class AccountsTransfer extends React.Component {
                   <Form>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a>
+                        {/* <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a> */}
+                        <Link to="/banking/pay-and-transfer">{data.form.buttons.close.label}</Link>
                         <Button color="primary" className="start-transfer" onClick={this.showStep1}>{data.form.buttons.start_new_transfer.label}</Button>
                       </Col>
                     </Row>
@@ -247,11 +250,11 @@ class AccountsTransfer extends React.Component {
                   <div className="table">
                     <div className="table-col table-col-67">
                       <h3>You have exceeded a transfer limit from:</h3>
-                      <p>BXChecking (...4458) to AnyBank (...5661)</p>
+                      <p>BXChecking (...4458) to BXSavings (...5661)</p>
                     </div>
                     <div className="table-col table-col-33">
                       <h3>Amount:</h3>
-                    <p style={{ color: '#ff0000' }}>${this.currencyFormat(this.state.xfrAmount)}</p>
+                      <p style={{ color: '#ff0000' }}>${this.currencyFormat(this.state.xfrAmount)}</p>
                     </div>
                   </div>
                   <p>Please contact a banking representative for transfers of this amount.</p>
