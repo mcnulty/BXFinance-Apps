@@ -235,7 +235,7 @@ class AccountsTransfer extends React.Component {
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
                         {/* <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a> */}
-                        <Link to="/banking/pay-and-transfer">{data.form.buttons.close.label}</Link>
+                        <Link to="/banking/pay-and-transfer" className="text-link cancel">{data.form.buttons.close.label}</Link>
                         <Button color="primary" className="start-transfer" onClick={this.showStep1}>{data.form.buttons.start_new_transfer.label}</Button>
                       </Col>
                     </Row>
@@ -263,7 +263,8 @@ class AccountsTransfer extends React.Component {
                   <Form>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a>
+                        {/* <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a> */}
+                        <Link to="/banking/pay-and-transfer" className="text-link cancel">{data.form.buttons.close.label}</Link>
                         <Button color="primary" className="start-transfer" onClick={this.showStep1}>{data.form.buttons.start_new_transfer.label}</Button>
                       </Col>
                     </Row>
