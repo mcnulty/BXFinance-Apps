@@ -9,6 +9,7 @@ import AccountsSubnav from '../../components/AccountsSubnav';
 import AccountsDropdown from '../../components/AccountsDropdown';
 import AccountsSectionNav from '../../components/AccountsSectionNav';
 import CardRewards from '../../components/CardRewards';
+import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/accounts-pay-transfer.json';
@@ -17,11 +18,15 @@ import data from '../../data/accounts-pay-transfer.json';
 import "../../styles/pages/accounts.scss";
 
 class AccountsPayTransfer extends React.Component {
+  constructor() {
+    super();
+    this.Session = new Session();
+  }
   render() {
     return(
       <div className="accounts accounts-overview">
         <NavbarMain />
-        <WelcomeBar />
+        <WelcomeBar firstName={this.Session.getAuthenticatedUserItem("firstName")}/>
         <Container>
           <div className="inner">
             <div className="sidebar">
