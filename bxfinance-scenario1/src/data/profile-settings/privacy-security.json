@@ -161,7 +161,7 @@
           ],
           "banner": "Would you like to visit your AnyWealthAdvisor personal investment portal at www.anywealthadvisor.org?",
           "cta_text": "Go to my Portal >",
-          "cta_destination": "/any-wealth-advisor"
+          "cta_destination": "/app/any-wealth-advisor"
         }
       ],
       "other_things": "<p>Other things you can do</p><ul><li>Review other <a href=\"/privacy-security\">Partner Sharing Settings</a></li><li>Review other <a href=\"/privacy-security\">Privacy &amp; Security Settings</a></li></ul>",

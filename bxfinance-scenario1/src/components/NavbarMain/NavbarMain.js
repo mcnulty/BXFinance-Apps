@@ -130,7 +130,7 @@ class NavbarMain extends React.Component {
               this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
             }
             // Send them to the target app
-            // TODO can we do this SPA style with history.push?
+            // TODO can we do this SPA style with history.push? We would need to map targetApp to respective Router path.
             window.location.href = targetApp;
           })
           .catch(error => {
@@ -163,7 +163,6 @@ class NavbarMain extends React.Component {
                   <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} /></NavLink>
                 </NavItem>
                 {/* BEGIN PING INTEGRATION: added conditional rendering logic for Sign In/Out links. */}
-                {/* TODO might need to change this to check state instead. Getting inconsistent results. */}
                 {this.state.loggedOut &&
                   <NavItem className="login">
                     <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>

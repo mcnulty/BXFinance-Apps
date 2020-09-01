@@ -17,6 +17,7 @@ import { faLinkedinIn, faFacebookF, faTwitter, faInstagram } from '@fortawesome/
 
 // Components
 import WelcomeBar from '../components/WelcomeBar/';
+import Session from '../components/Utils/Session';  /* PING INTEGRATION: */
 
 // Data
 import data from '../data/any-wealth-advisor.json';
@@ -30,6 +31,7 @@ class AnyWealthAdvisor extends React.Component {
     this.state = {
       isOpen: false
     };
+    this.Session = new Session();
   }
   toggle() {
     this.setState({
@@ -114,7 +116,7 @@ class AnyWealthAdvisor extends React.Component {
             </Collapse>
           </Navbar>
         </section>
-        <WelcomeBar />
+        <WelcomeBar firstName={this.Session.getAuthenticatedUserItem("firstName")}/>
         <section className="section-content">
           <Container>
             <Row>

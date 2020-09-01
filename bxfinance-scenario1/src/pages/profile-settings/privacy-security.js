@@ -22,6 +22,7 @@ import CardRewards from '../../components/CardRewards';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
 import PingOAuth from '../../components/Utils/PingOAuth'; /* PING INTEGRATION: */
 import PingData from '../../components/Utils/PingData'; /* PING INTEGRATION: */
+import { Link } from 'react-router-dom' /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/profile-settings/privacy-security.json';
@@ -326,7 +327,8 @@ class PrivacySecurity extends React.Component {
                           <Col>
                             <FormGroup className="buttons submit-buttons">
                               <Button color="primary" onClick={this.showStep2}>{data.steps[0].btn_save}</Button>
-                              <a href="/banking/profile-settings" className="text-info cancel">{data.steps[0].btn_cancel}</a>
+                              {/* <a href="/banking/profile-settings" className="text-info cancel">{data.steps[0].btn_cancel}</a> */}
+                            <Link to="/banking/profile-settings" className="text-info cancel">{data.steps[0].btn_cancel}</Link>
                             </FormGroup>
                           </Col>
                         </Row>
