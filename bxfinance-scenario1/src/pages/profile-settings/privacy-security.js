@@ -43,7 +43,8 @@ class PrivacySecurity extends React.Component {
       acct_0: 0,                         /* PING INTEGRATION: Will store List of the user's 3 existing accounts */
       acct_1: 0,                         /* PING INTEGRATION: The value will be the acct ID, updated in componentDidMount() */
       acct_2: 0,                         /* PING INTEGRATION: The IDs are later correlated to consentedAccts. */
-      consentedAccts: []                 /* PING INTEGRATION: the acct IDs for which have been given consent. */
+      consentedAccts: [],                /* PING INTEGRATION: the acct IDs for which have been given consent. */
+      consentId: 0                       /* PING INTEGRATION: Id from the user's consent record, if one exists. */
     };
 
     this.showStep1 = this.showStep1.bind(this);
@@ -64,7 +65,7 @@ class PrivacySecurity extends React.Component {
 
   showStep2() {
     /* BEGIN PING INTEGRATION */
-    if (this.state.consentedAccts.length > 0) {//User has a consent record, so update.
+    if (this.state.consentId != 0) {//User has a consent record, so update.
       console.log("TEST", "Updating consents");
       /* let accountIds = [];
       let count;
