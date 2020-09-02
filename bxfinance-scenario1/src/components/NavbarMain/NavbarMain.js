@@ -46,12 +46,15 @@ class NavbarMain extends React.Component {
   }
   triggerModalLogin() {
     /* BEGIN PING INTEGRATION */
+    // Decided to just trigger an authn flow anytime we call this method.
+    window.location.href = process.env.REACT_APP_HOST + data.startSSOURI;
+    /* The below logic had the risk of submitting username to an expired flowId if the user just sat there for a time. 
     if (!window.location.search) {
       window.location.href = process.env.REACT_APP_HOST + data.startSSOURI;
-    }/* END PING INTEGRATION */
+    }
     else { 
       this.refs.modalLogin.toggle(); //This is left here just in case the user closes the modal and clicks "sign in" after we already have a flowId in the URL.
-    }
+    } END PING INTEGRATION */
   }
   toggle() {
     this.setState({
@@ -137,6 +140,9 @@ class NavbarMain extends React.Component {
             console.error("Agentless Pickup Error:", error);
             this.refs.modalError.toggle();
           });
+      } //Just came home from registering as a new user, so auto trigger login flow for better UX.
+      else if (params.get("LocalIdentityProfileID")) {
+        this.triggerModalLogin();
       }
     }
     // END PING INTEGRATION
