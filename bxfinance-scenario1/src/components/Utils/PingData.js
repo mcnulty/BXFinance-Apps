@@ -183,12 +183,17 @@ export default class PingData {
         let raw = "";
         myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
-
-        if (definition == "share-account-balances") {
-            consentObject = { "data": { "share-balance": [] } };
+        console.log("updateUserConsent to:", consent);
+        
+        if (definition == "share-account-balances") { //TODO should we really be passing in the updated consent object, including status????
+            const status = consent.length > 0 ? "accepted" : "revoked";
+            consentObject = { "status": status, "data": { "share-balance": [] } };
             consentObject.data["share-balance"] = consent;
         } else { //share-comm-preferences
-            consentObject = { "data": {} };
+            let status = "revoked";
+            let consentValues = Object.values(consent);
+            status = consentValues.find(val => val === true) ? "accepted" : "revoked";
+            consentObject = { "status": status, "data": {} };
             consentObject.data = consent;
         }
         raw = JSON.stringify(consentObject);

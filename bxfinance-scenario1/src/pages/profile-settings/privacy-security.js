@@ -44,7 +44,7 @@ class PrivacySecurity extends React.Component {
       acct_1: 0,                         /* PING INTEGRATION: The value will be the acct ID, updated in componentDidMount() */
       acct_2: 0,                         /* PING INTEGRATION: The IDs are later correlated to consentedAccts. */
       consentedAccts: [],                /* PING INTEGRATION: the acct IDs for which have been given consent. */
-      consentId: 0                       /* PING INTEGRATION: Id from the user's consent record, if one exists. */
+      consentId: "0"                       /* PING INTEGRATION: Id from the user's consent record, if one exists. */
     };
 
     this.showStep1 = this.showStep1.bind(this);
@@ -65,7 +65,9 @@ class PrivacySecurity extends React.Component {
 
   showStep2() {
     /* BEGIN PING INTEGRATION */
-    if (this.state.consentId != 0) {//User has a consent record, so update.
+    if (this.state.consentId !== "0"
+    ) {//User has a consent record, so update.
+      console.log("consentID", this.state.consentId);
       console.log("TEST", "Updating consents");
       /* let accountIds = [];
       let count;
@@ -83,6 +85,7 @@ class PrivacySecurity extends React.Component {
           console.error("UpdateUserConsents Exception", e)
         });
     } else { //User has no consent record, so create.
+      console.log("consentID", this.state.consentId);
       console.log("TEST", "Creating consents");
       /* let accountIds = [];
       let count;
@@ -107,11 +110,24 @@ class PrivacySecurity extends React.Component {
     this.setState({ step: 1 });
   }
 
-  toggle() {
-    this.setState({
-      isOpen: !this.state.isOpen
-    });
+  toggle(event) {
+    //Making sure we only open on yes and close on no and only if in the opposite state.
+    if (event.target.id.includes("yes") && !this.state.isOpen) {
+      this.setState({
+        isOpen: !this.state.isOpen,
+        anywealthadvisor: true
+      });
+    }
+    if (event.target.id.includes("no") && this.state.isOpen) {
+      this.setState({
+        isOpen: !this.state.isOpen,
+        anywealthadvisor: false,
+        consentedAccts: []
+      });
+    }
+
   }
+
   toggleModal() {
     this.setState({
       isModalOpen: !this.state.isModalOpen
@@ -121,23 +137,22 @@ class PrivacySecurity extends React.Component {
   /* BEGIN PING INTEGRATION:  */
   //this function sets state of consent. pref. selected soley based on event obj passed in during onclick.
   // we extract the partner name and consent pref. based on the substrings of the event target ID. I.e "anywealthadvisor_yes".
+  // TODO move this logic into toggle().
   toggleConsent(event) {
-    let consentState = {};
+    /* let consentState = {};
     let checkedState = {};
     const delimiterPos = event.target.id.indexOf("_");
-    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1) == true ? true : false;
+    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1) == "yes" ? true : false;
     this.setState(consentState);
     //If the user clicked "No" for Advisor consent, clear all account IDs from state.
     // "I don't know... I'm making this up as I go."
     if (event.target.id.substring(delimiterPos + 1) == "no") {
       this.setState({ consentedAccts: [] });
-    }
-    console.log("STATE", this.state);
+    }*/
+    console.log("STATE", JSON.stringify(this.state));
   }
 
   toggeAccount(index, acctId) {
-    console.log("TEST-index", index);
-    console.log("TEST-acctId", acctId);
     const consentedAcctsArr = this.state.consentedAccts;
     const acctPos = consentedAcctsArr.indexOf(acctId)
     if (acctPos > -1) {// The acct clicked is already consented so we are removing consent.
@@ -145,34 +160,37 @@ class PrivacySecurity extends React.Component {
     } else {// The acct clicked was not consented so we are adding consent.
       consentedAcctsArr.push(acctId);
     }
-    this.setState({consentedAccts: consentedAcctsArr});
+    this.setState({ consentedAccts: consentedAcctsArr });
   }
   /* END PING INTEGRATION:  */
 
 
   /* BEGIN PING INTEGRATION */
   componentDidMount() {
-    let newState = [];
+    let acctState = [];
     let acctIDsArr = [];
+    let consentState = [];
     let consentedAcctsArr = [];
     // Get the user's existing bank account IDs.
+    
     let acctIDs = this.Session.getAuthenticatedUserItem("accts");
     acctIDsArr = acctIDs.split(",");
 
     //Update state with user's existing 3 bank account IDs
     acctIDsArr.forEach((acctId, index) => {
-      newState["acct_" + index] = parseInt(acctId);
+      acctState["acct_" + index] = parseInt(acctId);
     });
-    this.setState(newState);
+    this.setState(acctState);
     console.log("MOUNT STATE", this.state);
 
     if (this.Session.getAuthenticatedUserItem("AT")) {
+      // TODO we should move the following code into a method. Duplicating it below based on whether we have a token or not is bad design. Error prone maintenance.
       const token = this.Session.getAuthenticatedUserItem("AT");
       this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
           console.log("getUserConsents", JSON.stringify(consentData));
-          if (consentData.count > 0) {
+          if (consentData.count > 0) { //Do we have a consent record? (There is no status if no record)
             this.setState({
               anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
               consentId: consentData._embedded.consents[0].id
@@ -183,18 +201,22 @@ class PrivacySecurity extends React.Component {
             // Otherwise the loop would need to exit after array[2].
             consentedAcctsArr = consentData._embedded.consents[0].data["share-balance"];
             consentedAcctsArr.forEach((acctId, index) => {
-              //If they acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
-              newState.push(acctId);
+              //If the acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
+              consentState.push(acctId);
 
             });
-            this.setState({ consentedAccts: newState });
-            this.toggle();
+            this.setState({
+              consentedAccts: consentState,
+              isOpen: consentData._embedded.consents[0].status === "accepted" ? true : false
+            });
           }
         })
         .catch(e => {
           console.error("GetUserConsents Exception", e)
         });
     } else {
+      // TODO really need to get away from nested then()s. getToken returns token but as promise. Can we force resolve it like this?
+      // const token = Promise.resolve(this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' }));
       this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
         .then(token => {
           this.Session.setAuthenticatedUserItem("AT", token); //for later reuse to reduce getToken calls.
@@ -202,7 +224,7 @@ class PrivacySecurity extends React.Component {
             .then(response => response.json())
             .then(consentData => {
               console.log("getUserConsents", JSON.stringify(consentData));
-              if (consentData.count > 0) {
+              if (consentData.count > 0) { //Do we have a consent record? (There is no status if no record)
                 this.setState({
                   anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
                   consentId: consentData._embedded.consents[0].id
@@ -213,12 +235,14 @@ class PrivacySecurity extends React.Component {
                 // Otherwise the loop would need to exit after array[2].
                 consentedAcctsArr = consentData._embedded.consents[0].data["share-balance"];
                 consentedAcctsArr.forEach((acctId, index) => {
-                  //If they acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
-                  newState.push(acctId);
+                  //If the acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
+                  consentState.push(acctId);
 
                 });
-                this.setState({ consentedAccts: newState });
-                this.toggle();
+                this.setState({
+                  consentedAccts: consentState,
+                  isOpen: consentData._embedded.consents[0].status === "accepted" ? true : false
+                });
               }
             })
             .catch(e => {
@@ -229,6 +253,7 @@ class PrivacySecurity extends React.Component {
           console.error("GetToken Exception", e);
         });
     }
+    console.log("MOUNT STATE", JSON.stringify(this.state));
   }
   /* END PING INTEGRATION: */
 
@@ -329,7 +354,7 @@ class PrivacySecurity extends React.Component {
                             <FormGroup className="buttons submit-buttons">
                               <Button color="primary" onClick={this.showStep2}>{data.steps[0].btn_save}</Button>
                               {/* <a href="/banking/profile-settings" className="text-info cancel">{data.steps[0].btn_cancel}</a> */}
-                            <Link to="/banking/profile-settings" className="text-info cancel">{data.steps[0].btn_cancel}</Link>
+                              <Link to="/banking/profile-settings" className="text-info cancel">{data.steps[0].btn_cancel}</Link>
                             </FormGroup>
                           </Col>
                         </Row>

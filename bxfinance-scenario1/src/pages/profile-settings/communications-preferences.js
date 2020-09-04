@@ -39,7 +39,8 @@ class CommunicationPreferences extends React.Component {
       email: false,          /* PING INTEGRATION: */
       emailChecked: false,  /* PING INTEGRATION: */
       mail: false,             /* PING INTEGRATION: */
-      mailChecked: false    /* PING INTEGRATION: */
+      mailChecked: false,    /* PING INTEGRATION: */
+      consentId: "0"
     };
 
     this.showStep2 = this.showStep2.bind(this);
@@ -53,13 +54,14 @@ class CommunicationPreferences extends React.Component {
 
   showStep2() {
     /* BEGIN PING INTEGRATION */
-    if (this.state.consentId) { //Updating existing consent record.
+    if (this.state.consentId !== "0") { //Updating existing consent record.
       const consent = { "sms": this.state.sms, "email": this.state.email, "homeAddress": this.state.mail };
       this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.state.consentId, this.consentDef)
         .then(response => response.json())
         .then(consentData => {
+          console.log("updateUserConsent", JSON.stringify(consentData));
           if (consentData.count > 0) { //TODO WTH am I resetting state when it was already set in step1. WTF??? Remove and regression test.
-            console.log("Consent updated. State:", this.state);
+            console.log("Consent updated State:", this.state);
           }
         })
         .catch(e => {
@@ -72,16 +74,16 @@ class CommunicationPreferences extends React.Component {
         .then(response => response.json())
         .then(consentData => {
           console.log("createUserConsent", JSON.stringify(consentData));
-          if (consentData.count > 0) {
-            this.setState({
+          if (consentData.count > 0) { //TODO WTH am I resetting state when it was already set in step1. WTF??? Remove and regression test.
+            /* this.setState({
               sms: consentData._embedded.consents[0].data.sms,
               email: consentData._embedded.consents[0].data.email,
               mail: consentData._embedded.consents[0].data.homeAddress,
               smsChecked: consentData._embedded.consents[0].data.sms == true ? true : false,
               emailChecked: consentData._embedded.consents[0].data.email == true ? true : false,
               mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
-              consentId: consentData._embedded.consents[0].id
-            });
+              consentId: consentData._embedded.consents[0].id 
+            });*/
             console.log("STATE", this.state);
           }
         })
@@ -122,6 +124,7 @@ class CommunicationPreferences extends React.Component {
           console.log("getUserConsents", JSON.stringify(consentData));
           if (consentData.count > 0) {
             this.setState({
+              // TODO this is probably overkill having a checked version of the consent. You could probably infer from the consent value.
               sms: consentData._embedded.consents[0].data.sms,
               email: consentData._embedded.consents[0].data.email,
               mail: consentData._embedded.consents[0].data.homeAddress,
