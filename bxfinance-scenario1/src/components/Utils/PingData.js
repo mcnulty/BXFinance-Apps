@@ -32,7 +32,7 @@ export default class PingData {
     */
     getUserEntry(uid) {
 
-        const userRDN = 'uid=' + uid;
+        const userRDN = 'uid=' + encodeURIComponent(uid);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ=="); /* TODO this should be obfuscated somehow. */
@@ -87,7 +87,8 @@ export default class PingData {
 
     /* 
     Get Searchable Users
-    Fetches all users in the people dn for the suggestable search feature in the AnyAdvisor/Marketing portals
+    Fetches all users in the people dn for the suggestable search feature in the AnyAdvisor/Marketing portals.
+    We filter out user that have the attribute bxFinanceUserType, because they are not banking users, but partners in the demo.
     @param searchScope to what level in the directory to searchScope
     @param limit max number of records to return. You could get less based on number of records found or PD configured limits
     @return response object
@@ -102,13 +103,14 @@ export default class PingData {
             redirect: 'follow'
         };
         // TODO we need some attribute or way to filter user to only include ones created for demos.
-        const url = process.env.REACT_APP_HOST + this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit;
+        const url = process.env.REACT_APP_HOST + this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit + "&filter=not(bxFinanceUserType pr)";
 
         return fetch(url, requestOptions);
     }
 
     /* 
     Get User Consents
+    This is called from customer apps for consent management.
     @param token the AT for the authenticated user
     @param uid the user's uid from their user record.
     @param definition the consent definition ID.
@@ -181,12 +183,17 @@ export default class PingData {
         let raw = "";
         myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
-
-        if (definition == "share-account-balances") {
-            consentObject = { "data": { "share-balance": [] } };
+        console.log("updateUserConsent to:", consent);
+        
+        if (definition == "share-account-balances") { //TODO should we really be passing in the updated consent object, including status????
+            const status = consent.length > 0 ? "accepted" : "revoked";
+            consentObject = { "status": status, "data": { "share-balance": [] } };
             consentObject.data["share-balance"] = consent;
         } else { //share-comm-preferences
-            consentObject = { "data": {} };
+            let status = "revoked";
+            let consentValues = Object.values(consent);
+            status = consentValues.find(val => val === true) ? "accepted" : "revoked";
+            consentObject = { "status": status, "data": {} };
             consentObject.data = consent;
         }
         raw = JSON.stringify(consentObject);
@@ -203,6 +210,7 @@ export default class PingData {
 
     /* 
     Get User Consented Data
+    This is called from AnyWealth Advisor and AnyMarketing portals. Uses DG for consent enforcement.
     @param token the access token of the marketingApp
     @param forWhom whether this DG call is for an AnyWealthAdvisor or AnyMarketing rep.
     @param uid the uid of the user data being requested
@@ -229,7 +237,7 @@ export default class PingData {
         }
         const response = await fetch(url, requestOptions);
         const jsonResponse = await response.json();
-        console.log("jsonResponse", jsonResponse);
+        console.log("getUserConsentData", jsonResponse);
         return jsonResponse;
     }
     

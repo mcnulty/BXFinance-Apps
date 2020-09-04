@@ -37,7 +37,10 @@ class ModalLoginPassword extends React.Component {
       loginMethodUnset: true,
       loginMethodFormGroupClass: '',
       userName: "",                   /* PING INTEGRATION: */
-      swaprods: ""                    /* PING INTEGRATION: */
+      swaprods: "",                   /* PING INTEGRATION: */
+      loginError: false,              /* PING INTEGRATION: */
+      loginErrorMsg: "",              /* PING INTEGRATION: */
+      rememberMe: ""                  /* PING INTEGRATION: */
     };
     this.PingAuthN = new PingAuthN(); /* PING INTEGRATION: */
     this.Session = new Session();     /* PING INTEGRATION: */
@@ -60,8 +63,6 @@ class ModalLoginPassword extends React.Component {
     tab 2 modal is device selection 
     which we don't use so we don't change state. Only call our handler. 
     Tab 4 is forgot username, so send them to PF endpoint. */
-    console.log("TOGGLING TAB");
-    console.log("STATE", this.state);
 
     if (tab == '2') {
       this.handleSubmit(tab);
@@ -82,32 +83,50 @@ class ModalLoginPassword extends React.Component {
       loginMethodFormGroupClass: 'form-group-light'
     });
   }
-updatesession() {
-  console.log("TEST");
-}
+
   /* BEGIN PING INTEGRATION: */
+  // Controlled input for the Remember Me checkbox.
+  //If they check it, we save their username to a cookie for the next time they log in.
+  //ModalLogin.js will check for cookies and prepop the username field.
+  handleRememberMeChange() {
+    this.setState((prevState) => {
+      if (prevState.rememberMe) {
+        document.cookie = "rememberMe=";
+      } else {
+        document.cookie = "rememberMe=" + this.state.userName;
+      }
+      return {rememberMe: !prevState.rememberMe};
+    });
+  }
   // This is used as a callback function to the child component FormPassword.
   handlePswdChange(event) {
     this.setState({ swaprods: event.target.value }, () => {
-      console.log("User Input", this.state.swaprods);
     });
   }
   handleSubmit(tab) {
-    console.log("HANDLING SUBMIT");
-    console.log("STATE", this.state);
-    const pswd = tab == '2' ? this.state.swaprods : "WTF?"; //TODO Do we care about the tab param here? Keep?
+    this.setState({
+      loginError: false,
+      loginErrorMsg: ""
+    });
+    const pswd = tab == '2' ? this.state.swaprods : "WTF?"; //TODO Do we care about the tab param here? Toss?
     const flowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
 
     if (pswd) {
       console.log("pswd", pswd);
-      this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, swaprods: this.state.swaprods })
+      this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
         .then(response => response.json())
         .then(jsonResults => {
           console.log("jsonResults", jsonResults);
           if (jsonResults.status == "RESUME") {
             this.PingAuthN.handleAuthNflow({flowResponse: jsonResults});
+          } else if (jsonResults.code == "VALIDATION_ERROR") {
+            console.log("Validation Error", jsonResults.details[0].userMessage);
+            this.setState({
+              loginError: true,
+              loginErrorMsg: jsonResults.details[0].userMessage
+            });
           } else {
-            throw "Flow Status Exception: Unexpected status."; //TODO This is probably a corner case, but how do we handle the UI in this error?
+            throw "Flow Status Exception: Unexpected status."; //TODO This is probably a corner case, but we need to use ModalError.js for this.
           }
         })
         .catch(e => {
@@ -115,6 +134,11 @@ updatesession() {
         });
     } 
   }
+   componentDidMount() {
+     const rememberMe = this.Session.getCookie("rememberMe");
+     if (rememberMe.length)
+       this.setState({ rememberMe: true });
+   }
   /* END PING INTEGRATION: */
 
   render() {
@@ -128,6 +152,7 @@ updatesession() {
               <TabContent activeTab={this.state.activeTab}>
                 <TabPane tabId="1">
                   <h4>{data.titles.welcome}</h4>
+                  {this.state.loginError && <span style={{color: 'red'}}>{this.state.loginErrorMsg}</span>} {/* PING INTEGRATION */}
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
                     <Input type="text" name="username" id="username" value={this.state.userName} placeholder={data.form.fields.username.placeholder} />
@@ -138,7 +163,7 @@ updatesession() {
                   </FormGroup>
                   {/* <FormPassword setPassword={this.handlePswdChange} name="password" label={data.form.fields.password.label} placeholder={data.form.fields.password.placeholder} /> */}
                   <FormGroup className="form-group-light">
-                    <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
+                    <CustomInput onClick={this.handleRememberMeChange.bind(this)} type="checkbox" id="remember" label={data.form.fields.remember.label} checked={this.state.rememberMe} />
                   </FormGroup>
                   <div className="mb-3">
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('2') }}>{data.form.buttons.next}</Button>

@@ -1,5 +1,5 @@
 {
-	"title": "Error Title",
+	"title": "Sorry. Unexpected Error",
 	"content": "<p>Error message</p>",
-	"button": "CTA Button"
+	"button": "Continue"
 }

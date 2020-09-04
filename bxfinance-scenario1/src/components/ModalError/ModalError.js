@@ -27,13 +27,24 @@ class ModalError extends React.Component {
   constructor() {
     super();
     this.state = {
-      isOpen: false
+      isOpen: false,
+      errorTitle: "Unexpected Error.",
+      errorMsg: "Please contact Technical Enablement.",
+      callBack: {}
     };
+    this.toggle = this.toggle.bind(this);
   }
-  toggle() {
+  toggle(title, msg, callBack) {
     this.setState({
-      isOpen: !this.state.isOpen
+      isOpen: !this.state.isOpen,
+      errorTitle: title,
+      errorMsg: msg,
+      callBack: callBack
     });
+  }
+  continueBtn() {
+    this.state.callBack();
+    console.log("callback", this.state.callBack);
   }
   render() {
     const closeBtn = <div />;
@@ -42,9 +53,9 @@ class ModalError extends React.Component {
         <Modal isOpen={this.state.isOpen} toggle={this.toggle.bind(this)} className="modal-error">
           <ModalHeader toggle={this.toggle.bind(this)} close={closeBtn}><img src={process.env.PUBLIC_URL + "/images/logo.svg"} alt="logo" /></ModalHeader>
           <ModalBody>
-            <h4>{data.title}</h4>
-            <div dangerouslySetInnerHTML={{__html: data.content}}></div>
-            <Button color="primary" onClick={this.toggle.bind(this)}>{data.button}</Button>
+            <h4>{this.state.errorTitle}</h4>
+            <div>{this.state.errorMsg}</div>
+            <Button color="primary" onClick={this.continueBtn.bind(this)}>{data.button}</Button>
           </ModalBody>
         </Modal>
       </div>

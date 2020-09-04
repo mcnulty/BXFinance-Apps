@@ -126,6 +126,12 @@ class ModalLogin extends React.Component {
         });
     } /* TODO what do we do if they submit with no querystring? Is that even possible?*/
   }
+  
+  componentDidMount() {
+    const rememberMe = this.Session.getCookie("rememberMe");
+    if (rememberMe.length)
+    this.setState({userName: rememberMe});
+  }
   // END PING INTEGRATIONS
 
   render() {
@@ -141,10 +147,10 @@ class ModalLogin extends React.Component {
                   <h4>{data.titles.welcome}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
-                    <Input onChange={this.handleIDChange.bind(this)} type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} /> {/* PING INTEGRATION added onChange. */}
+                    <Input onChange={this.handleIDChange.bind(this)} type="text" name="username" id="username" placeholder={data.form.fields.username.placeholder} value={this.state.userName} /> {/* PING INTEGRATION added onChange. */}
                   </FormGroup>
                   <FormGroup className="form-group-light">
-                    <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} />
+                    {/* <CustomInput type="checkbox" id="remember" label={data.form.fields.remember.label} /> */}
                   </FormGroup>
                   <div className="mb-3">
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('2'); }}>{data.form.buttons.next}</Button> {/* PING INTEGRATION see onClick function. */}

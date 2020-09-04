@@ -53,9 +53,9 @@ const updateSelectedUserAndConsent = (selectedUser, stateCallback) => {
       pingDataObj.getUserConsentData(consentToken, "advisor")
         .then(consentData => {
           if (consentData.Data !== undefined) {//In case we have no consent record.
-            newState.acct_0 = consentData.Data.Balance[0].Amount.Amount && consentData.Data.Balance[0].Amount.Amount;
-            newState.acct_1 = consentData.Data.Balance[1].Amount.Amount && consentData.Data.Balance[1].Amount.Amount;
-            newState.acct_2 = consentData.Data.Balance[2].Amount.Amount && consentData.Data.Balance[2].Amount.Amount;
+            newState.acct_0 = typeof consentData.Data.Balance[0] !== 'undefined' ? consentData.Data.Balance[0].Amount.Amount : 0;
+            newState.acct_1 = typeof consentData.Data.Balance[1] !== 'undefined' ? consentData.Data.Balance[1].Amount.Amount : 0;
+            newState.acct_2 = typeof consentData.Data.Balance[2] !== 'undefined' ? consentData.Data.Balance[2].Amount.Amount : 0;
             console.log("newState", newState);
             stateCallback(newState);
           }
@@ -137,7 +137,7 @@ const SearchAutocomplete = (props) => {
     updateSelectedUserAndConsent(filteredSuggestions[index], props.stateCallback); /* PING INTEGRATION: */
 
     setSelectedSuggestion(index);
-    setInputValue(filteredSuggestions[index]);
+    //setInputValue(filteredSuggestions[index]); /* PING INTEGRATION: commented this out because we don't want the selected username to persist in the search box.*/
     setFilteredSuggestions([]);
     setDisplaySuggestions(false);
   };

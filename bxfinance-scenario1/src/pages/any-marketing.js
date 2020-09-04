@@ -24,38 +24,13 @@ import PingData from '../components/Utils/PingData'; /* PING INTEGRATION: */
 import Session from '../components/Utils/Session'; /* PING INTEGRATION: */
 import PingOAuth from '../components/Utils/PingOAuth'; /* PING INTEGRATION: */
 import JSONSearch from '../components/Utils/JSONSearch'; /* PING INTEGRATION: */
+import ModalError from '../components/ModalError/'; /* PING INTEGRATION: */
 
 // Data
 import data from '../data/any-marketing.json';
 
 // Styles
 import '../styles/pages/any-marketing.scss';
-
-/* BEGIN PING INTEGRATION: */
-const fetchSelectedUserConsent = (selectedUser) => {
-  const sessionObj = new Session();
-  const pingOAuthObj = new PingOAuth();
-  const pingDataObj = new PingData();
-  
-  let consent_token;
-  const hasToken = sessionObj.getAuthenticatedUserItem("consent_AT");
-  if (hasToken) {
-    consent_token = sessionObj.getAuthenticatedUserItem("consent_AT");
-    console.log("Using stored token", consent_token);
-    return pingDataObj.getUserConsentData(consent_token, "marketing", selectedUser);
-  } else {
-    pingOAuthObj.getToken({ uid: 'marketingApp', client: 'marketingApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
-      .then(consent_token => {
-        console.log("Getting new token");
-        sessionObj.setAuthenticatedUserItem("consent_AT", consent_token);
-      })
-      .catch(error => {
-        console.error("getToken Exception", error);
-      });
-    return pingDataObj.getUserConsentData(consent_token, "marketing", selectedUser);
-  }
-}
-/* END PING INTEGRATION: */
 
 // Autocomplete Suggestion List
 const SuggestionsList = props => {
@@ -122,26 +97,39 @@ const SearchAutocomplete = () => {
   };
   const onSelectSuggestion = index => {
     /* BEING PING INTEGRATION */
+    const pingOAuthObj = new PingOAuth(); /* PING INTEGRATION: */
+    const pingDataObj = new PingData(); /* PING INTEGRATION: */
     setConsentState(initialState); //Clearing previous values so they don't show while modal re-renders.
-    fetchSelectedUserConsent(filteredSuggestions[index])
-      //.then(response => response.json())
-      .then(jsonResults => {
-        let fullName;
-        try { fullName = jsonResults.Resources[0].cn[0]; }
-        catch (e) { }//Fail with the utmost grace and leisure.
-        let fullAddress;
-        try { fullAddress = jsonResults.Resources[0].street[0] + ", " + jsonResults.Resources[0].l[0] + ", " + jsonResults.Resources[0].postalCode[0]; }
-        catch (e) { }//Fail with the utmost grace and leisure.
-        let email;
-        try { email = jsonResults.Resources[0].mail[0]; }
-        catch (e) { }//Fail with the utmost grace and leisure.
-        let mobileNumber;
-        try { mobileNumber = jsonResults.Resources[0].mobile[0]; }
-        catch (e) { }//Fail with the utmost grace and leisure.
-        const newState = { fullName: fullName, homeAddress: fullAddress, email: email, mobileNumber: mobileNumber };
-        setConsentState(newState);
+    pingOAuthObj.getToken({ uid: 'marketingApp', client: 'marketingApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
+      .then(consent_token => {
+        console.log("Getting new token");
+        pingDataObj.getUserConsentData(consent_token, "marketing", filteredSuggestions[index])
+          .then(jsonResults => {
+            console.log("consentdata", JSON.stringify(jsonResults));
+            let fullName;
+            try { fullName = jsonResults.Resources[0].cn[0]; }
+            catch (e) { }//Fail with the utmost grace and leisure.
+            let fullAddress;
+            try { fullAddress = jsonResults.Resources[0].street[0] + ", " + jsonResults.Resources[0].l[0] + ", " + jsonResults.Resources[0].postalCode[0]; }
+            catch (e) { }//Fail with the utmost grace and leisure.
+            let email;
+            try { email = jsonResults.Resources[0].mail[0]; }
+            catch (e) { }//Fail with the utmost grace and leisure.
+            let mobileNumber;
+            try { mobileNumber = jsonResults.Resources[0].mobile[0]; }
+            catch (e) { }//Fail with the utmost grace and leisure.
+            const newState = { fullName: fullName, homeAddress: fullAddress, email: email, mobileNumber: mobileNumber };
+            setConsentState(newState);
+          })
+          .catch(error => {
+            console.error("getUserConsentData Exception", error);
+          });
+      })
+      .catch(error => {
+        console.error("getToken Exception", error);
       });
     /* END PING INTEGRATION: */
+
     setSelectedSuggestion(index);
     setInputValue(filteredSuggestions[index]);
     setFilteredSuggestions([]);
@@ -177,19 +165,19 @@ const SearchAutocomplete = () => {
           <Row className="mb-3" key={1}>
             <Col md="3">Mail Address:</Col>
             <Col md="6">
-              {homeAddress ? homeAddress : <div className="bg-dark">test</div>}
+              {homeAddress !== 'undefined' ? homeAddress : <div className="bg-dark">test</div>}
             </Col>
           </Row>
           <Row className="mb-3" key={2}>
             <Col md="3">Email Address:</Col>
             <Col md="6">
-              {email ? email : <div className="bg-dark">test</div>}
+              {email !== 'undefined' ? email : <div className="bg-dark">test</div>}
             </Col>
           </Row>
           <Row className="mb-3" key={3}>
             <Col md="3">SMS/TXT Phone:</Col>
             <Col md="6">
-              {mobileNumber ? mobileNumber : <div className="bg-dark">test</div>}
+              {mobileNumber !== 'undefined' ? mobileNumber : <div className="bg-dark">test</div>}
             </Col>
           </Row>
           <div className="float-right">
@@ -207,7 +195,8 @@ class AnyMarketing extends React.Component {
   constructor() {
     super();
     this.state = {
-      isOpen: false
+      isOpen: false,
+      loggedOut: true
     };
     this.PingData = new PingData(); /* PING INTEGRATION: */
     this.Session = new Session(); /* PING INTEGRATION: */
@@ -221,11 +210,21 @@ class AnyMarketing extends React.Component {
   }
 
   /* BEGIN PING INTEGRATION: */
+  signOut() {
+    this.Session.clearUserAppSession();
+    this.refs.modalError.toggle("Session Ended", "You are logged out of MyCRM. Please click continue.", this.startSLO);
+  }
   startSLO() {
-    this.Session.startSLO();
+    //TODO SLO not working with P14E at the moment so just logging out local session and redirecting to P14E dock.
+    //TODO This method is also used when users click Sign In. PA should really handle this.
+    //const url = process.env.REACT_APP_HOST + "/sp/startSLO.ping";
+    const url = "https://desktop.pingone.com/anywealthadvisor";
+    window.location.href = url; 
   }
 
   componentDidMount() {
+    const isLoggedOut = (this.Session.getAuthenticatedUserItem("subject") === null || this.Session.getAuthenticatedUserItem("subject") === 'undefined') ? true : false;
+    this.setState({ loggedOut: isLoggedOut});
     // Getting users from PD.
     this.PingData.getSearchableUsers({})
       .then(response => response.json())
@@ -263,7 +262,10 @@ class AnyMarketing extends React.Component {
                   </NavItem>
                   <NavItem className="logout">
                     {/* TODO add P1 SLO link for sign out. */}
-                    <Link to="/" onClick={this.startSLO}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
+                    {!this.state.loggedOut && 
+                    <a onClick={this.signOut.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</a>}
+                    {this.state.loggedOut && 
+                    <a onClick={this.signOut.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.logout}</a>}
                   </NavItem>
                 </Nav>
               </Collapse>
@@ -428,6 +430,7 @@ class AnyMarketing extends React.Component {
             </Row>
           </Container>
         </footer>
+        <ModalError ref="modalError" /> {/* PING INTEGRATION */}
       </div>
     );
   }

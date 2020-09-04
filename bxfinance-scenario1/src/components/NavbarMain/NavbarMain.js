@@ -29,6 +29,7 @@ class NavbarMain extends React.Component {
     super();
     this.state = {
       isOpen: false,
+      loggedOut: true
     };
     this.PingAuthN = new PingAuthN(); /* PING INTEGRATION */
     this.Session = new Session(); /* PING INTEGRATION */
@@ -45,12 +46,15 @@ class NavbarMain extends React.Component {
   }
   triggerModalLogin() {
     /* BEGIN PING INTEGRATION */
+    // Decided to just trigger an authn flow anytime we call this method.
+    window.location.href = process.env.REACT_APP_HOST + data.startSSOURI;
+    /* The below logic had the risk of submitting username to an expired flowId if the user just sat there for a time. 
     if (!window.location.search) {
       window.location.href = process.env.REACT_APP_HOST + data.startSSOURI;
-    }/* END PING INTEGRATION */
+    }
     else { 
       this.refs.modalLogin.toggle(); //This is left here just in case the user closes the modal and clicks "sign in" after we already have a flowId in the URL.
-    }
+    } END PING INTEGRATION */
   }
   toggle() {
     this.setState({
@@ -59,21 +63,21 @@ class NavbarMain extends React.Component {
   }
   /* BEGIN PING INTEGRATION */
   startSLO() {
-    this.Session.startSLO();
+    this.Session.clearUserAppSession();
+    const url = process.env.REACT_APP_HOST + "/sp/startSLO.ping?TargetResource=" + process.env.REACT_APP_HOST + process.env.PUBLIC_URL;
+    window.location.href = url; 
   }
-
   /* END PING INTEGRATION: */
 
   componentDidMount() {
     // BEGIN PING INTEGRATION
-    // Begin app Session timeout setup.
-
-    // End app Session timeout setup.
-
+    const isLoggedOut = (this.Session.getAuthenticatedUserItem("subject") === null || this.Session.getAuthenticatedUserItem("subject") === 'undefined') ? true : false;
+    this.setState({ loggedOut: isLoggedOut});
+    
     // Check for a querystring; Will be fowId or REF.
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
-
+      
       // Coming back from authN API or Agentless adapter.
       if (params.get("flowId")) {
         this.PingAuthN.handleAuthNflow({ flowId: params.get("flowId") })
@@ -88,8 +92,7 @@ class NavbarMain extends React.Component {
               this.refs.modalLogin.toggle();
             }
             else if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
-              //TODO I dont think this needs to be here. we will never hit this here. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
-              console.log("STATUS:", jsonResult.status)
+              //TODO I dont think this needs to be here. we will never hit this case in this component. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
               //pop the username/password modal.
               this.refs.modalLoginPassword.toggle();
             }
@@ -97,18 +100,16 @@ class NavbarMain extends React.Component {
           .catch(error => console.error('HANDLESUBMIT ERROR', error));
       } // Coming back as authenticated user from Agentless IK.
       else if (params.get("REF")) {
-        console.log("TEST", "Got REF");
         const REF = params.get("REF");
         const targetApp = decodeURIComponent(params.get("TargetResource"));
-        const adapter = targetApp.includes("/banking") ? "BXFSPRefID" : "AdvisorSPRefID";
+        const adapter = (targetApp.includes("marketing") || targetApp.includes("advisor")) ? "AdvisorSPRefID" : "BXFSPRefID";
 
         this.PingAuthN.pickUpAPI(REF, adapter)
           .then(response => response.json())
           .then((jsonData) => {
-            console.log("jsonData", JSON.stringify(jsonData));
-            if (jsonData.resumePath) { // Means we are in a SLO request. AIK doesnt use resumePath.
-              console.log("TEST", "In SLO");
-              window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath;
+            if (jsonData.resumePath) { // Means we are in a SLO request. SSO doesnt use resumePath.
+              this.Session.clearUserAppSession();
+              window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath + "?source=" + adapter;
             }
             if (jsonData.bxFinanceUserType == "AnyWealthAdvisor" || jsonData.bxFinanceUserType == "AnyMarketing") {
               this.Session.setAuthenticatedUserItem("email", jsonData.Email);
@@ -132,13 +133,16 @@ class NavbarMain extends React.Component {
               this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
             }
             // Send them to the target app
-            // TODO can we do this SPA style with history.push?
+            // TODO can we do this SPA style with history.push? We would need to map targetApp to respective Router path.
             window.location.href = targetApp;
           })
           .catch(error => {
             console.error("Agentless Pickup Error:", error);
-            this.refs.ModalError.toggle();
+            this.refs.modalError.toggle();
           });
+      } //Just came home from registering as a new user, so auto trigger login flow for better UX.
+      else if (params.get("LocalIdentityProfileID")) {
+        this.triggerModalLogin();
       }
     }
     // END PING INTEGRATION
@@ -165,16 +169,15 @@ class NavbarMain extends React.Component {
                   <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} /></NavLink>
                 </NavItem>
                 {/* BEGIN PING INTEGRATION: added conditional rendering logic for Sign In/Out links. */}
-                {/* TODO might need to change this to check state instead. Getting inconsistent results. */}
-                {!(this.Session.getAuthenticatedUserItem("subject")) &&
+                {this.state.loggedOut &&
                   <NavItem className="login">
                     <NavLink href="#" onClick={this.triggerModalLogin.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.login}</NavLink>
                   </NavItem>}
-                {(this.Session.getAuthenticatedUserItem("subject")) &&
+                {!this.state.loggedOut &&
                   <NavItem className="logout">
                   <Link to="/" onClick={this.startSLO.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</Link>
                   </NavItem>}
-                {!(this.Session.getAuthenticatedUserItem("subject")) &&
+                {this.state.loggedOut &&
                   <NavItem className="register">
                     <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
                   </NavItem>}

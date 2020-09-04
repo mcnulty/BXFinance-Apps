@@ -19,6 +19,7 @@ import AccountsDropdown from '../../components/AccountsDropdown';
 import CardRewards from '../../components/CardRewards';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
 import OpenBanking from '../../components/Utils/OpenBanking'; /* PING INTEGRATION: */
+import { Link } from 'react-router-dom' /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/accounts-transfer.json';
@@ -27,6 +28,14 @@ import data from '../../data/accounts-transfer.json';
 import "../../styles/pages/pay-transfer/accounts-transfer.scss";
 
 class AccountsTransfer extends React.Component {
+
+  //Formatting dollar amounts to curency for confirmation or deny screens.
+  //Defaulting to USA for now.
+  currencyFormat = (value) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USA'
+    }).format(value);
 
   constructor(props) {
     super(props);
@@ -47,7 +56,7 @@ class AccountsTransfer extends React.Component {
       case "approved":
         // TODO need error handling and checking status of transfermoney response.
         //TODO since using token from session, need ability to get new token if expired.
-        this.OpenBanking.transferMoney(this.state.xfrAmount, this.Session.getAuthenticatedUserItem("at"))
+        this.OpenBanking.transferMoney(this.state.xfrAmount, this.Session.getAuthenticatedUserItem("AT"))
           .then(response => response.json())
           .then(jsonData => {
             if (jsonData.status == "Money Transferred!") {
@@ -55,11 +64,14 @@ class AccountsTransfer extends React.Component {
             } else {
               this.setState({ step: 4 }); //TODO this needs to be error modal.
             }
+          })
+          .catch(error => {
+            console.error("TransferMoney Exception", error);
           });
         break;
       case "confirm":
         this.setState({ step: 2 });
-        this.OpenBanking.transferMoney(this.state.xfrAmount, this.Session.getAuthenticatedUserItem("at"))
+        this.OpenBanking.transferMoney(this.state.xfrAmount, this.Session.getAuthenticatedUserItem("AT"))
           .then(response => response.json())
           .then(jsonData => {
             if (jsonData.status == "Money Transferred!") {
@@ -67,6 +79,9 @@ class AccountsTransfer extends React.Component {
             } else {
               this.setState({ step: 4 }); //TODO this needs to be error modal.
             }
+          })
+          .catch(error => {
+            console.error("TransferMoney Exception", error);
           });
         break;
       default: /* Denied */
@@ -82,6 +97,7 @@ class AccountsTransfer extends React.Component {
   /* BEGIN PING INTEGRATION: */
   handleAmountChange(event) {
     let amt = event.target.value;
+    amt = amt.replace(/,/g, '');
     const dollars = parseFloat(amt).toFixed(2);
     this.setState({ xfrAmount: dollars });
   }
@@ -156,7 +172,8 @@ class AccountsTransfer extends React.Component {
                     </Row>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <a href={process.env.PUBLIC_URL} className="text-info cancel">{data.form.buttons.cancel.label}</a>
+                        {/* <a href={process.env.PUBLIC_URL} className="text-info cancel">{data.form.buttons.cancel.label}</a> */}
+                        <Link to="/banking" className="text-info cancel">{data.form.buttons.cancel.label}</Link>
                         <Button color="primary" className="start-transfer" onClick={this.showStep2}>{data.form.buttons.start_transfer.label}</Button> {/* PING INTEGRATION: onClick handler here */}
                       </Col>
                     </Row>
@@ -178,7 +195,7 @@ class AccountsTransfer extends React.Component {
                     </div>
                     <div className="table-col">
                       <h3>Amount:</h3>
-                      <p>${this.state.xfrAmount}</p>
+                      <p>${this.currencyFormat(this.state.xfrAmount)}</p>
                     </div>
                   </div>
                   <div className="app-approval-banner">
@@ -204,11 +221,11 @@ class AccountsTransfer extends React.Component {
                   <div className="table">
                     <div className="table-col table-col-67">
                       <h3>You have initiated a transfer from:</h3>
-                      <p>BXChecking (...4458) to AnyBank (...5661)</p>
+                      <p>BXChecking (...4458) to BXSavings (...5661)</p>
                     </div>
                     <div className="table-col table-col-33">
                       <h3>Amount:</h3>
-                      <p>${this.state.xfrAmount}</p>
+                      <p>${this.currencyFormat(this.state.xfrAmount)}</p>
                     </div>
                   </div>
                   <p>This transaction will take place in 1-2 business days.</p>
@@ -217,7 +234,8 @@ class AccountsTransfer extends React.Component {
                   <Form>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a>
+                        {/* <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a> */}
+                        <Link to="/banking/pay-and-transfer" className="text-link cancel">{data.form.buttons.close.label}</Link>
                         <Button color="primary" className="start-transfer" onClick={this.showStep1}>{data.form.buttons.start_new_transfer.label}</Button>
                       </Col>
                     </Row>
@@ -232,11 +250,11 @@ class AccountsTransfer extends React.Component {
                   <div className="table">
                     <div className="table-col table-col-67">
                       <h3>You have exceeded a transfer limit from:</h3>
-                      <p>BXChecking (...4458) to AnyBank (...5661)</p>
+                      <p>BXChecking (...4458) to BXSavings (...5661)</p>
                     </div>
                     <div className="table-col table-col-33">
                       <h3>Amount:</h3>
-                      <p style={{ color: '#ff0000' }}>${this.state.xfrAmount}</p>
+                      <p style={{ color: '#ff0000' }}>${this.currencyFormat(this.state.xfrAmount)}</p>
                     </div>
                   </div>
                   <p>Please contact a banking representative for transfers of this amount.</p>
@@ -245,7 +263,8 @@ class AccountsTransfer extends React.Component {
                   <Form>
                     <Row className="submit-buttons">
                       <Col md={12} className="text-right">
-                        <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a>
+                        {/* <a href={process.env.PUBLIC_URL} className="text-link cancel">{data.form.buttons.close.label}</a> */}
+                        <Link to="/banking/pay-and-transfer" className="text-link cancel">{data.form.buttons.close.label}</Link>
                         <Button color="primary" className="start-transfer" onClick={this.showStep1}>{data.form.buttons.start_new_transfer.label}</Button>
                       </Col>
                     </Row>

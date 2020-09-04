@@ -28,7 +28,7 @@
       "links": [
         {
           "title": "Personal Details",
-          "active": false,
+          "active": true,
           "href": "#"
         },
         {

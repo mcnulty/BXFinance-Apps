@@ -10,9 +10,7 @@ an authenticated session.
 */
 
 export default class Session {
-    constructor() {
-        this.clearUserAppSession = this.clearUserAppSession.bind(this);
-    }
+
     /* 
     Gets an item from the current origin's session storage.
     @param key the item name in storage
@@ -59,29 +57,34 @@ export default class Session {
     }
 
     /* 
-    Kill Authenticated User
-    Clears out everything in the current origin's sessions storage.
-    @return true
+    Clear user App Session
+    Clears out everything in the current origin's session storage.
+    @return void
      */
     clearUserAppSession() {
         sessionStorage.clear();
-        return true;
     }
 
     /* 
-    Start Single Logout
-    @return void
+    Get cookie
+    We set a cookie when users check "Remember Me" when logging in.
+    We need to check for this cookie in a couple different places to set state.
+    @param cookieName the name of the cookie we want the value of.
+    @return cookie value, or an empty string if not found.
     */
-   startSLO() {
-       const success = this.clearUserAppSession();
-       //TODO This needs to be put back once SLO is debugged. for now just sending to the home page
-       /* let rootDiv = document.getElementById("root"); //Grab the root div for the app
-       let logoutForm = document.createElement('form'); // Create a new form element
-       logoutForm.setAttribute("action", "/sp/startSLO.ping"); // Add the action attribute we want to POST to
-       logoutForm.setAttribute("id", "logoutForm"); // Add an Id Attribute
-       logoutForm.setAttribute("method", "post"); // Add the method attribute
-       rootDiv.appendChild(logoutForm); //Add the form to the DOM
-       document.forms["logoutForm"].submit(); //Submit the form, obviously. */
-       window.location.href = process.env.REACT_APP_HOST + "/app"; //TODO remove this once SLO is fixed.
-   }
+    getCookie(cookieName) {
+        const name = cookieName + "=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
 }

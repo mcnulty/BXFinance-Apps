@@ -44,7 +44,7 @@ class AccountsDashboard extends React.Component {
     this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid"))
       .then(response => response.json())
       .then(jsonData => {
-        console.log('UserEntry', jsonData);
+        console.log('UserEntry', JSON.stringify(jsonData));
         acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
         acctIDsArrSimple = this.JSONSearch.findValues(acctIDsArr, "ids");
         this.Session.setAuthenticatedUserItem("accts", acctIDsArrSimple[0]);
@@ -69,11 +69,12 @@ class AccountsDashboard extends React.Component {
           console.log("TEST:", "we dont see accts arr.");
           this.PingOAuth.getToken({uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent'})
             .then(token => {
-              this.Session.setAuthenticatedUserItem("at", token);
-              this.OpenBanking.provisionAccounts(token, this.Session.getAuthenticatedUserItem("uid"));
+              this.Session.setAuthenticatedUserItem("AT", token);
+              const success = this.OpenBanking.provisionAccounts(token, this.Session.getAuthenticatedUserItem("uid")); //TODO ideally would have error handling around "success" value.
               this.OpenBanking.getAccountBalances(token)
                 .then(response => response.json())
                 .then(jsonData => {
+                  console.log("balances", JSON.stringify(jsonData));
                   this.setState({ myAccounts: jsonData.Data.Balance });
                   acctIDsArr = this.JSONSearch.findValues(jsonData.Data.Balance, "AccountId");
                   this.Session.setAuthenticatedUserItem("accts", acctIDsArr);
