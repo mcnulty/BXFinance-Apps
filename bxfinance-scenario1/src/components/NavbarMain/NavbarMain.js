@@ -47,10 +47,10 @@ class NavbarMain extends React.Component {
   triggerModalLogin() {
     /* BEGIN PING INTEGRATION */
     // Decided to just trigger an authn flow anytime we call this method.
-    window.location.href = process.env.REACT_APP_HOST + data.startSSOURI;
+    window.location.href = data.startSSOURI;
     /* The below logic had the risk of submitting username to an expired flowId if the user just sat there for a time. 
     if (!window.location.search) {
-      window.location.href = process.env.REACT_APP_HOST + data.startSSOURI;
+      window.location.href = data.startSSOURI;
     }
     else { 
       this.refs.modalLogin.toggle(); //This is left here just in case the user closes the modal and clicks "sign in" after we already have a flowId in the URL.
@@ -64,7 +64,7 @@ class NavbarMain extends React.Component {
   /* BEGIN PING INTEGRATION */
   startSLO() {
     this.Session.clearUserAppSession();
-    const url = process.env.REACT_APP_HOST + "/sp/startSLO.ping?TargetResource=" + process.env.REACT_APP_HOST + process.env.PUBLIC_URL;
+    const url = "/sp/startSLO.ping?TargetResource=" + process.env.REACT_APP_HOST + process.env.PUBLIC_URL;
     window.location.href = url; 
   }
   /* END PING INTEGRATION: */
@@ -109,7 +109,7 @@ class NavbarMain extends React.Component {
           .then((jsonData) => {
             if (jsonData.resumePath) { // Means we are in a SLO request. SSO doesnt use resumePath.
               this.Session.clearUserAppSession();
-              window.location.href = process.env.REACT_APP_HOST + jsonData.resumePath + "?source=" + adapter;
+              window.location.href = jsonData.resumePath + "?source=" + adapter;
             }
             if (jsonData.bxFinanceUserType == "AnyWealthAdvisor" || jsonData.bxFinanceUserType == "AnyMarketing") {
               this.Session.setAuthenticatedUserItem("email", jsonData.Email);
@@ -179,7 +179,7 @@ class NavbarMain extends React.Component {
                   </NavItem>}
                 {this.state.loggedOut &&
                   <NavItem className="register">
-                    <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
+                    <NavLink href={data.pfRegURI}>{data.menus.utility.register_intro} <strong>{data.menus.utility.register}</strong></NavLink>
                   </NavItem>}
                 {/* END PING INTEGRATION */}
               </Nav>
@@ -259,7 +259,7 @@ class NavbarMain extends React.Component {
               </NavItem>
               <NavItem className="register">
                 {/* PING INTEGRATION: added env var and link to PF LIP reg form. */}
-                <NavLink href={process.env.REACT_APP_HOST + data.pfRegURI}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.register}</NavLink>
+                <NavLink href={data.pfRegURI}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.register}</NavLink>
               </NavItem>
             </Nav>
           </Collapse>

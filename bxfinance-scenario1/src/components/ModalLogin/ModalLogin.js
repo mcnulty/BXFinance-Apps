@@ -68,7 +68,7 @@ class ModalLogin extends React.Component {
     if (tab == '2' || tab == '5') { //TODO 5 is for When SSPR with AuthN API and PID SDK is fixed. Its the confirmation screen. Though it may not be needed. Don't we just redirect to the dashboard?
       this.handleSubmit(tab);
     } else if (tab == '4') {
-      window.location.href = process.env.REACT_APP_HOST + data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+      window.location.href = data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
     } else {
       /* END PING INTEGRATION */
       this.setState({

@@ -217,7 +217,7 @@ class AnyMarketing extends React.Component {
   startSLO() {
     //TODO SLO not working with P14E at the moment so just logging out local session and redirecting to P14E dock.
     //TODO This method is also used when users click Sign In. PA should really handle this.
-    //const url = process.env.REACT_APP_HOST + "/sp/startSLO.ping";
+    //const url = "/sp/startSLO.ping";
     const url = "https://desktop.pingone.com/anywealthadvisor";
     window.location.href = url; 
   }
