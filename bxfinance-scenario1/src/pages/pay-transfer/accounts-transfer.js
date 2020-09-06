@@ -29,19 +29,12 @@ import "../../styles/pages/pay-transfer/accounts-transfer.scss";
 
 class AccountsTransfer extends React.Component {
 
-  //Formatting dollar amounts to curency for confirmation or deny screens.
-  //Defaulting to USA for now.
-  currencyFormat = (value) =>
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USA'
-    }).format(value);
-
   constructor(props) {
     super(props);
     this.state = {
       step: 1,
-      xfrAmount: '0' /* PING INTEGRATION: */
+      xfrAmount: '0', /* PING INTEGRATION: */
+      xfrFailMsg: ''
     };
 
     this.showStep2 = this.showStep2.bind(this);
@@ -49,6 +42,14 @@ class AccountsTransfer extends React.Component {
     this.Session = new Session(); /* PING INTEGRATION: */
     this.OpenBanking = new OpenBanking(); /* PING INTEGRATION: */
   }
+
+  //Formatting dollar amounts to currency for confirmation or deny screens.
+  //Defaulting to USA for now.
+  currencyFormat = (value) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USA'
+    }).format(value);
 
   showStep2() {
     const status = this.state.xfrAmount < 1000 ? "approved" : this.state.xfrAmount >= 1000 && this.state.xfrAmount <= 100000 ? "confirm" : "denied";
@@ -74,10 +75,14 @@ class AccountsTransfer extends React.Component {
         this.OpenBanking.transferMoney(this.state.xfrAmount, this.Session.getAuthenticatedUserItem("AT"))
           .then(response => response.json())
           .then(jsonData => {
+            console.log("xfr response", JSON.stringify(jsonData));
             if (jsonData.status == "Money Transferred!") {
               this.setState({ step: 3 });
             } else {
-              this.setState({ step: 4 }); //TODO this needs to be error modal.
+              this.setState({ 
+                xfrFailMsg: "We did not receive your transaction approval for:",
+                step: 4 
+              }); //TODO this needs to be error modal.
             }
           })
           .catch(error => {
@@ -85,7 +90,10 @@ class AccountsTransfer extends React.Component {
           });
         break;
       default: /* Denied */
-        this.setState({ step: 4 });
+        this.setState({ 
+          xfrFailMsg: "You have exceeded a transfer limit from:",
+          step: 4 
+        });
     }
   }
 
@@ -249,8 +257,7 @@ class AccountsTransfer extends React.Component {
                   <h2>Transfer Denied</h2>
                   <div className="table">
                     <div className="table-col table-col-67">
-                      <h3>You have exceeded a transfer limit from:</h3>
-                      <p>BXChecking (...4458) to BXSavings (...5661)</p>
+                    <h3>{this.state.xfrFailMsg}</h3><p>BXChecking (...4458) to BXSavings (...5661)</p>
                     </div>
                     <div className="table-col table-col-33">
                       <h3>Amount:</h3>
