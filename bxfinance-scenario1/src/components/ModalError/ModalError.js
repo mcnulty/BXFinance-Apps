@@ -30,7 +30,7 @@ class ModalError extends React.Component {
       isOpen: false,
       errorTitle: "Unexpected Error.",
       errorMsg: "Please contact Technical Enablement.",
-      callBack: {}
+      callBack: ""
     };
     this.toggle = this.toggle.bind(this);
   }
@@ -43,8 +43,13 @@ class ModalError extends React.Component {
     });
   }
   continueBtn() {
-    this.state.callBack();
-    console.log("callback", this.state.callBack);
+    console.log("modalError callback", this.state.callBack);
+    console.log(typeof this.state.callBack);
+    if (typeof this.state.callBack === 'function') {
+      this.state.callBack();
+    } else {
+      window.location.href = "/app/";
+    }
   }
   render() {
     const closeBtn = <div />;

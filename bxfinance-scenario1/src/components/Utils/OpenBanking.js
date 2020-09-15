@@ -38,6 +38,7 @@ export default class OpenBanking {
       @response object
       */
     provisionAccounts(token, uid) {
+        //If we had to time to be cool, we could have extracted the uid from the token.
         let acctIdsArr = [];
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);

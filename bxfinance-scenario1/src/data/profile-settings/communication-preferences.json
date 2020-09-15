@@ -107,7 +107,7 @@
           "label": "Mail (1278 Sutherland Dr. Roebuck, IL 60610)"
         }
       ],
-      "other_things": "<p>Other things you can do</p><ul><li>Review other <a href=\"/privacy-security\">Privacy &amp; Security Settings</a></li></ul>",
+      "other_things": "<p>Other things you can do</p><ul><li>Review other <a href=\"privacy-security\">Privacy &amp; Security Settings</a></li></ul>",
       "btn_back": "Close"
     }
   ]

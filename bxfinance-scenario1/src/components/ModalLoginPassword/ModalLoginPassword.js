@@ -116,7 +116,7 @@ class ModalLoginPassword extends React.Component {
       this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
         .then(response => response.json())
         .then(jsonResults => {
-          console.log("jsonResults", jsonResults);
+          console.log("modalLoginPassword jsonResults", jsonResults);
           if (jsonResults.status == "RESUME") {
             this.PingAuthN.handleAuthNflow({flowResponse: jsonResults});
           } else if (jsonResults.code == "VALIDATION_ERROR") {

@@ -109,7 +109,7 @@ class ModalLogin extends React.Component {
       this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, identifier: identifier })
         .then(response => response.json())
         .then(jsonResult => {
-          console.log("jsonResult", jsonResult);
+          console.log("modalLogin jsonResult", jsonResult);
           if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
             let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
             //Close ModalLogin. We need to get password.

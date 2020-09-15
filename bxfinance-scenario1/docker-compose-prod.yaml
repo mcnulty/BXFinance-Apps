@@ -2,5 +2,5 @@ version: '3.3'
 services:
     BXFinance:
         ports:
-            - '5000:80'
-        image: 'BXFinance:prod'
+            - '5000:5000'
+        image: 'bxfinance-app:prod'
