@@ -119,7 +119,7 @@ class NavbarMain extends React.Component {
     //end the local app session
     this.Session.clearUserAppSession();
     //An advisor should just be taken back to P14E dock. A partner persona shouldn't get SLO'd.
-    if (window.location.pathname === "/app/advisor") {
+    if (window.location.pathname === "/app/advisor/client") {
       window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
     } else {
       //Banking customers get SLO'd.
