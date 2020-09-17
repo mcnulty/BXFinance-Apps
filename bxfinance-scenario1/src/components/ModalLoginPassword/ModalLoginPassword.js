@@ -67,9 +67,9 @@ class ModalLoginPassword extends React.Component {
     if (tab == '2') {
       this.handleSubmit(tab);
     } else if (tab == '4') {
-      window.location.href = process.env.REACT_APP_HOST + data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+      window.location.href = data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
     } else if (tab == '5') {
-      window.location.href = process.env.REACT_APP_HOST + data.pfPwdChangeURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+      window.location.href = data.pfPwdChangeURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
     } else {
       /* END PING INTEGRATION */
       this.setState({ // TODO I dont think we need this anymore.
@@ -116,7 +116,7 @@ class ModalLoginPassword extends React.Component {
       this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
         .then(response => response.json())
         .then(jsonResults => {
-          console.log("jsonResults", jsonResults);
+          console.log("modalLoginPassword jsonResults", jsonResults);
           if (jsonResults.status == "RESUME") {
             this.PingAuthN.handleAuthNflow({flowResponse: jsonResults});
           } else if (jsonResults.code == "VALIDATION_ERROR") {

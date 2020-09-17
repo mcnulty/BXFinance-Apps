@@ -34,6 +34,7 @@ export default class PingOAuth {
     @param
     @return string
     */
+   //TODO I *think* we can get rid of the UID and swaprods params now that we aren't using them. Need thorough regression testing when removed.
     async getAuthCode({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         //swaprods... get it?
         //console.log("TEST:", "getting auth code")
@@ -42,8 +43,8 @@ export default class PingOAuth {
         myHeaders.append("Authorization", "Basic cGFfd2FtOjJGZWRlcmF0ZU0wcmU=");
 
         const urlEncodedBody = new URLSearchParams();
-        urlEncodedBody.append("pf.username", uid);
-        urlEncodedBody.append("pf.pass", swaprods); //TODO this is total gap. On passwordless authN, we don't know the password. 
+        // urlEncodedBody.append("pf.username", uid);
+        // urlEncodedBody.append("pf.pass", swaprods); //TODO this is total gap. On passwordless authN, we don't know the password. 
                                                     //Will putting PA in place resolve this so we don't have to enforce "2FederateMore" for everyone?
                                                     //But then that lessens the SPA UX with all the redirects to get a token. This needs to be resolved for all other demos.
 
@@ -74,6 +75,7 @@ export default class PingOAuth {
     @return string base64 encoded
     */
    //TODO might need to change syntax for destructuring here. See "named and optional arguments" https://medium.com/dailyjs/named-and-optional-arguments-in-javascript-using-es6-destructuring-292a683d5b4e
+   //TODO I *think* we can get rid of the UID and swaprods params now that we aren't using them. Need thorough regression testing when removed.
     async getToken({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         let response = {};
 

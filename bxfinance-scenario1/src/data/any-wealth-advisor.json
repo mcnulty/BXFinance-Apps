@@ -27,7 +27,8 @@
 			"search": "Search",
 			"locations": "Find a Location",
 			"support": "Get Support",
-			"logout": "Sign Out"
+			"logout": "Sign Out",
+			"back": "Back to BXFinance"
 		},
 		"footer": [
 			{

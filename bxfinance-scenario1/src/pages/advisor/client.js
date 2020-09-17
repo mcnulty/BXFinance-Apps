@@ -348,14 +348,3 @@ class AdvisorClient extends React.Component {
 }
 
 export default withRouter(AdvisorClient);
-
-/*
-{data.client_detail.content.accounts.map((item, i) => {
-                                return (
-                                  <Row key={i}>
-                                    <Col md="8">{item.account}</Col>
-                                    <Col md="4">{item.amount}</Col>
-                                  </Row>
-                                );
-                              })}
-*/

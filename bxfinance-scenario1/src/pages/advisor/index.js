@@ -160,7 +160,6 @@ class Advisor extends React.Component {
                       </Media>
                       <Media body>
                         {/* PING INTEGRATION */}
-                        <strong>{this.Session.getAuthenticatedUserItem("firstName") + " " + this.Session.getAuthenticatedUserItem("lastName")}</strong>
                         <span dangerouslySetInnerHTML={{ __html: data.profile.advisor.content }}></span>
                         <Button color="link">{data.profile.advisor.button}</Button>
                       </Media>

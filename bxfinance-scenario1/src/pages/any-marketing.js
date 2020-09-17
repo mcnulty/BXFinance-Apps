@@ -211,15 +211,10 @@ class AnyMarketing extends React.Component {
 
   /* BEGIN PING INTEGRATION: */
   signOut() {
+    // end the local app session.
     this.Session.clearUserAppSession();
-    this.refs.modalError.toggle("Session Ended", "You are logged out of MyCRM. Please click continue.", this.startSLO);
-  }
-  startSLO() {
-    //TODO SLO not working with P14E at the moment so just logging out local session and redirecting to P14E dock.
-    //TODO This method is also used when users click Sign In. PA should really handle this.
-    //const url = process.env.REACT_APP_HOST + "/sp/startSLO.ping";
-    const url = "https://desktop.pingone.com/anywealthadvisor";
-    window.location.href = url; 
+    //A marketing rep should just be taken back to P14E dock. A workforce persona shouldn't get SLO'd.
+    window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
   }
 
   componentDidMount() {
@@ -263,9 +258,9 @@ class AnyMarketing extends React.Component {
                   <NavItem className="logout">
                     {/* TODO add P1 SLO link for sign out. */}
                     {!this.state.loggedOut && 
-                    <a onClick={this.signOut.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</a>}
+                      <a onClick={this.signOut.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</a>}
                     {this.state.loggedOut && 
-                    <a onClick={this.signOut.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.logout}</a>}
+                      <a onClick={this.signOut.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.login} className="mr-1" /> {data.menus.utility.logout}</a>}
                   </NavItem>
                 </Nav>
               </Collapse>

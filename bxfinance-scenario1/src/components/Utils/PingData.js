@@ -31,7 +31,10 @@ export default class PingData {
     @return response object
     */
     getUserEntry(uid) {
-
+        //TODO remove this once dev root DN is fixed.
+        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
+            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
+        }
         const userRDN = 'uid=' + encodeURIComponent(uid);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -53,6 +56,10 @@ export default class PingData {
     @return boolean to state success
     */
     updateUserEntry(acctIds, uid) {
+        //TODO remove this once dev root DN is fixed.
+        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
+            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
+        }
         const userRDN = 'uid=' + uid;
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -94,6 +101,10 @@ export default class PingData {
     @return response object
     */
     getSearchableUsers({ searchScope = "singleLevel", limit = "100" }) {
+        //TODO remove this once dev root DN is fixed.
+        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
+            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
+        }
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
 

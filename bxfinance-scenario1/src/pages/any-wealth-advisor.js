@@ -38,6 +38,11 @@ class AnyWealthAdvisor extends React.Component {
       isOpen: !this.state.isOpen
     });
   }
+  /* BEGIN PING INTEGRATION: */
+  backToDashboard() {
+    window.location.href = "/app/banking";
+  }
+  /* END PING INTEGRATION: */
   render() {
     return (
       <div className="any-wealth-advisor">
@@ -59,7 +64,7 @@ class AnyWealthAdvisor extends React.Component {
                     <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} /></NavLink>
                   </NavItem>
                   <NavItem className="logout">
-                    <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</NavLink>
+                    <NavLink onClick={this.backToDashboard.bind(this)}><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.back} className="mr-1" /> {data.menus.utility.back}</NavLink>
                   </NavItem>
                 </Nav>
               </Collapse>
@@ -121,9 +126,9 @@ class AnyWealthAdvisor extends React.Component {
           <Container>
             <Row>
               <Col lg="3">
-                <h5>{data.profile.accounts.title}</h5>
+                {/* <h5>{data.profile.accounts.title}</h5>
                 <p dangerouslySetInnerHTML={{__html: data.profile.accounts.content}}></p>
-                <Button color="link">{data.profile.accounts.button}</Button>
+                <Button color="link">{data.profile.accounts.button}</Button> */}
                 <h5 className="mt-5">{data.profile.advisor.title}</h5>
                 <Media>
                   <Media left href="#">

@@ -81,11 +81,6 @@ export default class PingAuthN {
                 console.log("handleAuthNflow","IN IDENTIFIER");
                 payload = '{\n  \"identifier\": \"' + identifier + '\"\n}';
                 return this.authnAPI({method:"POST", flowId:flowResponse.id, contentType:"application/vnd.pingidentity.submitIdentifier+json", body:payload});
-                    /* .then(response => response.json())
-                    .then(data => {
-                        this.handleAuthNflow({flowResponse:data})
-                    })
-                    .catch(error => console.error("HandleAuthNflow ERROR", error)); */
                 break;
             case "RESUME":
                 console.log("handleAuthNflow", "IN RESUME");
@@ -95,12 +90,14 @@ export default class PingAuthN {
             case "USERNAME_PASSWORD_REQUIRED":
                 console.log("handleAuthNflow", "IN USERNAME_PASSWORD_REQUIRED");
                 console.log("flowresponse:", flowResponse);
-                console.log("swaprods:", swaprods);
                 payload = '{\n \"username\": \"' + flowResponse.username + '\", \"password\": \"' + swaprods + '\", \"rememberMyUsername\": \"' + rememberMe + '\", \"captchaResponse\": \"\" \n}';
                 console.log("payload",payload);
                 return this.authnAPI({method:"POST", flowId:flowResponse.id, contentType:"application/vnd.pingidentity.checkUsernamePassword+json", body:payload});
                 break;
-            default: // No status yet, need to get it.
+            case "FAILED":
+                console.log("handleAuthNflow failed", flowResponse.message);
+                return flowResponse;
+            default: // Why are we here???
                 console.log("handleAuthNflow", "In default: getting flow status.");
                 return this.authnAPI({method:"GET", flowId:flowId});
         }
