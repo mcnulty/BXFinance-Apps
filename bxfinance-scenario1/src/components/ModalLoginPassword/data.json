@@ -1,6 +1,7 @@
 {
 	"pfPwdChangeURI": "/ext/pwdchange/Identify?AdapterId=HTMLFormWithLIP",
 	"pfAcctRecoveryURI": "/ext/idrecovery/Recover?AdapterId=HTMLFormWithLIP",
+	"pfPwdResetURI": "/ext/pwdreset/Identify?AdapterId=HTMLFormWithLIP",
 	"titles": {
 		"welcome": "Welcome back",
 		"login_method": "How would you like to sign in?",

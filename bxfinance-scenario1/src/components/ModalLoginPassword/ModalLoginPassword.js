@@ -69,7 +69,7 @@ class ModalLoginPassword extends React.Component {
     } else if (tab == '4') {
       window.location.href = data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
     } else if (tab == '5') {
-      window.location.href = data.pfPwdChangeURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+      window.location.href = data.pfPwdResetURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
     } else {
       /* END PING INTEGRATION */
       this.setState({ // TODO I dont think we need this anymore.
