@@ -17,4 +17,4 @@ RUN npm install
 COPY . ./
 
 # start app
-CMD ["npm", "start", ".env.development"]
+CMD ["npm", "start", ".env"]

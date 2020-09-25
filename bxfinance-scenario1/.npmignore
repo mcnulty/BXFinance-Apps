@@ -1,5 +1,5 @@
 .dockerignore
 Dockerfile
-Dockerfile.prod
+Dockerfile.dev
 docker-compose.yaml
-docker-compose-prod.yaml
+docker-compose-dev.yaml
