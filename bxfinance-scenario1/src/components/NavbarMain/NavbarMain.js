@@ -355,8 +355,7 @@ class NavbarMain extends React.Component {
         <ModalRegister ref="modalRegister" onSubmit={this.onModalRegisterSubmit.bind(this)} />
         <ModalRegisterConfirm ref="modalRegisterConfirm" />
         <ModalLogin ref="modalLogin" />
-        <ModalError ref="modalError" />
-        {/* PING INTEGRATION */}
+        <ModalError ref="modalError" />{/* PING INTEGRATION */}
       </section>
     );
   }
