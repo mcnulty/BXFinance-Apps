@@ -9,9 +9,9 @@ API endpoints.
 
 export default class PingData {
 
-    // Didn't abstract these since they shouldn't ever change. Right???
+    // Didn't abstract these since they shouldn't ever change. Right??? Maybe move these to JSON data file.
     pdReSTURI = "/directory/v1/"; //TODO breakout the version segment to its own variable in case it changes.
-    pdRootDN = "dc=" + process.env.REACT_APP_HOST.substring(process.env.REACT_APP_HOST.indexOf('.') + 1);
+    pdRootDN = "dc=bxfinance.org";
     pdPeopleRDN = 'ou=People,' + this.pdRootDN;
     pdConsentURI = "/consent";
     pdConsentVersion = "/v1";
@@ -31,10 +31,6 @@ export default class PingData {
     @return response object
     */
     getUserEntry(uid) {
-        //TODO remove this once dev root DN is fixed.
-        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
-            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
-        }
         const userRDN = 'uid=' + encodeURIComponent(uid);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -56,10 +52,6 @@ export default class PingData {
     @return boolean to state success
     */
     updateUserEntry(acctIds, uid) {
-        //TODO remove this once dev root DN is fixed.
-        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
-            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
-        }
         const userRDN = 'uid=' + uid;
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -101,10 +93,6 @@ export default class PingData {
     @return response object
     */
     getSearchableUsers({ searchScope = "singleLevel", limit = "100" }) {
-        //TODO remove this once dev root DN is fixed.
-        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
-            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
-        }
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
 
@@ -196,7 +184,7 @@ export default class PingData {
         myHeaders.append("Content-Type", "application/json");
         console.log("updateUserConsent to:", consent);
         
-        if (definition == "share-account-balances") { //TODO should we really be passing in the updated consent object, including status????
+        if (definition == "share-account-balances") { //TODO should we be passing in the whole updated consent object, including status????
             const status = consent.length > 0 ? "accepted" : "revoked";
             consentObject = { "status": status, "data": { "share-balance": [] } };
             consentObject.data["share-balance"] = consent;
