@@ -130,7 +130,7 @@
 	},
 	"dashboard": {
 		"title": "Activity Dashboard",
-		"search_placeholder": "Enter Keywords...",
+		"search_placeholder": "Search Customers...",
 		"suggestions": [
 			"janesmith@gmail.com", "blah@fubar.com"
 		]

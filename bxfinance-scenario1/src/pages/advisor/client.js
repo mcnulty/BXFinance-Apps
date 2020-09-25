@@ -240,8 +240,6 @@ class AdvisorClient extends React.Component {
                         <Media object src={process.env.PUBLIC_URL + "/images/anywealthadvisor-photo.png"} alt="Generic placeholder image" />
                       </Media>
                       <Media body>
-                        {/* PING INTEGRATION */}
-                        <strong>{this.Session.getAuthenticatedUserItem("firstName") + " " + this.Session.getAuthenticatedUserItem("lastName")}</strong>
                         <span dangerouslySetInnerHTML={{ __html: data.profile.advisor.content }}></span>
                         <Button color="link">{data.profile.advisor.button}</Button>
                       </Media>
