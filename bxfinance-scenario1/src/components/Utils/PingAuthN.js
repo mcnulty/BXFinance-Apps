@@ -37,7 +37,7 @@ export default class PingAuthN {
             body: body,
             credentials: 'include'
         }
-        const url = process.env.REACT_APP_HOST + this.pfAuthnAPIURI + flowId;
+        const url = this.pfAuthnAPIURI + flowId;
         return fetch(url, requestOptions);
     }
 
@@ -58,7 +58,7 @@ export default class PingAuthN {
             redirect: 'follow'
         };
 
-        const url = process.env.REACT_APP_HOST + this.pfPickupURI + refId
+        const url = this.pfPickupURI + refId
 
         return fetch(url, requestOptions);
     }

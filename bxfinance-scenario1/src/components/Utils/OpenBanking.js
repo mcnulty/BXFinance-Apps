@@ -17,8 +17,7 @@ export default class OpenBanking {
     constructor() {
         // Didn't abstract these since they shouldn't ever change.
         //TODO move these out of the constructor. Not sure why I did this. Not necessary. Didn't do it anywhere else. That's what I get for working on a Saturday.
-        this.mockOBConsenthost = process.env.REACT_APP_HOST + "/OpenBanking";
-        // this.mockOBhost = "https://demo-openbanking-api-server.herokuapp.com/OpenBanking";
+        this.mockOBConsenthost = "/OpenBanking";
         this.mockOBhost = "https://babbtx-aspsp.herokuapp.com/OpenBanking";
         this.mockOBAPIver = "/v2";
         this.mockOBbalURI = "/balances";
@@ -102,7 +101,7 @@ export default class OpenBanking {
             headers: myHeaders,
             redirect: 'follow'
         };
-        const url = process.env.REACT_APP_HOST + this.xfrMoneyURI + amount;
+        const url = this.xfrMoneyURI + amount;
         return fetch(url, requestOptions);
         /* .then(response => response.text())
         .then(result => console.log("XFR Response",result))

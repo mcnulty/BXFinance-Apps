@@ -55,7 +55,7 @@ export default class PingOAuth {
             redirect: 'follow'
         };
         
-        const url = process.env.REACT_APP_HOST + this.pfAuthZAPIURI + "response_type=" + responseType + "&client_id=" + client + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
+        const url = this.pfAuthZAPIURI + "response_type=" + responseType + "&client_id=" + client + "&redirect_uri=" + redirectURI + "&scope=" + scopes;
         const response = await fetch(url, requestOptions);
         const authCode = response.url.substring(response.url.search("=") + 1);
 
@@ -91,7 +91,7 @@ export default class PingOAuth {
                 headers: myHeaders,
                 redirect: 'follow'
             };
-            const url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType + "&redirect_uri=" + redirectURI + "&code=" + authCode;
+            const url = this.pfTokenAPIURI + "grant_type=" + grantType + "&redirect_uri=" + redirectURI + "&code=" + authCode;
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
@@ -117,7 +117,7 @@ export default class PingOAuth {
                 redirect: 'follow'
             };
 
-            const url = process.env.REACT_APP_HOST + this.pfTokenAPIURI + "grant_type=" + grantType;
+            const url = this.pfTokenAPIURI + "grant_type=" + grantType;
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;

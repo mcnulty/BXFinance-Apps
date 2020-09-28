@@ -41,7 +41,7 @@ export default class PingData {
             headers: myHeaders,
             redirect: 'manual'
         };
-        const url = process.env.REACT_APP_HOST + this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
+        const url = this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
         return fetch(url, requestOptions);
     }
 
@@ -74,7 +74,7 @@ export default class PingData {
         };
 
         //TODO add try catch error handling here. And stop the .then() logging. Remove or return the response.
-        const url = process.env.REACT_APP_HOST + this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
+        const url = this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
         fetch(url, requestOptions)
             .then(response => response.text())
             .then(result => console.log(result))
@@ -102,7 +102,7 @@ export default class PingData {
             redirect: 'follow'
         };
         // TODO we need some attribute or way to filter user to only include ones created for demos.
-        const url = process.env.REACT_APP_HOST + this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit + "&filter=not(bxFinanceUserType pr)";
+        const url = this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit + "&filter=not(bxFinanceUserType pr)";
 
         return fetch(url, requestOptions);
     }
@@ -124,7 +124,7 @@ export default class PingData {
             headers: myHeaders,
             redirect: 'follow'
         };
-        const url = process.env.REACT_APP_HOST + this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "?subject=" + uid + "&definition=" + definition;
+        const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "?subject=" + uid + "&definition=" + definition;
         return fetch(url, requestOptions);
     }
 
@@ -164,7 +164,7 @@ export default class PingData {
             body: raw,
             redirect: 'follow'
         };
-        const url = process.env.REACT_APP_HOST + this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource;
+        const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource;
         return fetch(url, requestOptions);
     }
 
@@ -203,7 +203,7 @@ export default class PingData {
             body: raw,
             redirect: 'follow'
         };
-        const url = process.env.REACT_APP_HOST + this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "/" + consentId;
+        const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "/" + consentId;
         return fetch(url, requestOptions);
     }
 
@@ -229,10 +229,10 @@ export default class PingData {
         if (forWhom == "marketing") {
             console.log("Getting AnyMarketing consent data.");
             const filterValue = '\"' + uid + '\"';
-            url = process.env.REACT_APP_HOST + this.dgScimURI + this.dgScimVersion + this.dgUsersResource + "?filter=uid eq " + filterValue;
+            url = this.dgScimURI + this.dgScimVersion + this.dgUsersResource + "?filter=uid eq " + filterValue;
         } else {//advisor
             console.log("Getting AnyWealth Advisor consent data.");
-            url = process.env.REACT_APP_HOST + this.dgOpenBankingURI + this.dgOpenBankingVersion + this.dgBalancesResource
+            url = this.dgOpenBankingURI + this.dgOpenBankingVersion + this.dgBalancesResource
         }
         const response = await fetch(url, requestOptions);
         const jsonResponse = await response.json();
