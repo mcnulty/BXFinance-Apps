@@ -17,6 +17,8 @@ export default class JSONSearch {
     @return array of results
     */
     findValues(obj, key) {
+        console.info("JSONSearch.js", "Recursively searching your object for " + key);
+
         let list = [];
         if (!obj) return list;
         if (obj instanceof Array) {
