@@ -36,18 +36,14 @@ export default class PingOAuth {
     */
    //TODO I *think* we can get rid of the UID and swaprods params now that we aren't using them. Need thorough regression testing when removed.
     async getAuthCode({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
-        //swaprods... get it?
-        //console.log("TEST:", "getting auth code")
+        console.info("PingOAuth.js", "Getting an auth code for the getToken() call.");
+
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
         myHeaders.append("Authorization", "Basic cGFfd2FtOjJGZWRlcmF0ZU0wcmU=");
 
         const urlEncodedBody = new URLSearchParams();
-        // urlEncodedBody.append("pf.username", uid);
-        // urlEncodedBody.append("pf.pass", swaprods); //TODO this is total gap. On passwordless authN, we don't know the password. 
-                                                    //Will putting PA in place resolve this so we don't have to enforce "2FederateMore" for everyone?
-                                                    //But then that lessens the SPA UX with all the redirects to get a token. This needs to be resolved for all other demos.
-
+        
         const requestOptions = {
             method: 'POST',
             headers: myHeaders,
@@ -77,10 +73,12 @@ export default class PingOAuth {
    //TODO might need to change syntax for destructuring here. See "named and optional arguments" https://medium.com/dailyjs/named-and-optional-arguments-in-javascript-using-es6-destructuring-292a683d5b4e
    //TODO I *think* we can get rid of the UID and swaprods params now that we aren't using them. Need thorough regression testing when removed.
     async getToken({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
+        console.info("PingAuthN.js", "Getting a token.");
+
         let response = {};
 
         if (responseType == "code") {
-            console.log("Using auth code grant");
+            console.info("PingAuthN.js", "Using auth code grant");
             const authCode = await this.getAuthCode({uid:this.Session.getAuthenticatedUserItem("uid"), scopes:scopes});
             let grantType = "authorization_code";
             const myHeaders = new Headers();
@@ -95,12 +93,12 @@ export default class PingOAuth {
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
-            console.log("TOKEN", token);
+            console.info("PingAuthN.js", "TOKEN: " + token);
 
             return token; //TODO there should only be one return statement.
 
         } else if (client == "marketingApp" || client == "anywealthadvisorApp") {
-            console.log("Using client credentials grant");
+            console.info("PingAuthN.js", "Using client credentials grant");
             let grantType = "client_credentials";
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -121,12 +119,13 @@ export default class PingOAuth {
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
-            console.log("TOKEN", token);
+            console.info("PingAuthN.js Token =", token);
 
             return token;
                 
         } else {
-            throw new Error("Unexpected response_type exception in PingOAuth.getToken.");
+            // If you ended up here, you coded yourself into this problem.
+            throw new Error("PingAuthN.js", "Unexpected response_type or client exception in getToken().");
         }
     }
 }
