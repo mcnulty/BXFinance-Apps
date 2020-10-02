@@ -116,6 +116,8 @@ class NavbarMain extends React.Component {
   }
   /* BEGIN PING INTEGRATION */
   startSLO() {
+    console.info("NavbarMain.js", "Logging out via SLO.");
+
     //end the local app session
     this.Session.clearUserAppSession();
     //An advisor should just be taken back to P14E dock. A partner persona shouldn't get SLO'd.
@@ -135,20 +137,16 @@ class NavbarMain extends React.Component {
     const isLoggedOut = (this.Session.getAuthenticatedUserItem("subject") === null || this.Session.getAuthenticatedUserItem("subject") === 'undefined') ? true : false;
     this.setState({ loggedOut: isLoggedOut });
 
-    // Check for a querystring; Will be fowId or REF.
+    // Check for a querystring; Will be fowId or REF in our current use cases.
     if (window.location.search) {
+      let testNum = Math.random();
       const params = new URLSearchParams(window.location.search);
-      console.log("params obj", JSON.stringify(params));
-      console.log("params string", params.toString());
 
       // Coming back from authN API or Agentless adapter.
       if (params.get("flowId")) {
-        console.log("TEST", "Got flowId");
         this.PingAuthN.handleAuthNflow({ flowId: params.get("flowId") })
           .then(response => response.json())
           .then(jsonResult => {
-            console.log("STATUS:", jsonResult.status);
-            console.log("RESULTS:", JSON.stringify(jsonResult));
             let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO do we still need this?
             if (jsonResult.status == "IDENTIFIER_REQUIRED") {
               //pop the ID first modal. 
@@ -163,23 +161,29 @@ class NavbarMain extends React.Component {
             }
           })
           .catch(error => console.error('HANDLESUBMIT ERROR', error));
-      } // Coming back as authenticated user from Agentless IK.
+      } // Coming back as authenticated user or SLO request from Agentless IK.
       else if (params.get("REF")) {
-        console.log("TEST got ref", params.get("REF"));
-        console.log("TEST also got Target", params.get("TargetResource"));
         const REF = params.get("REF");
-        const targetApp = decodeURIComponent(params.get("TargetResource"));
+        let targetApp = decodeURIComponent(params.get("TargetResource"));
         const adapter = (targetApp.includes("marketing") || targetApp.includes("advisor")) ? "AdvisorSPRefID" : "BXFSPRefID";
 
         this.PingAuthN.pickUpAPI(REF, adapter)
           .then(response => response.json())
           .then((jsonData) => {
-            console.log("authn jsonData", jsonData);
+            console.log("Pickup response", jsonData);
             if (jsonData.resumePath) { // Means we are in a SLO request. SSO doesnt use resumePath.
               this.Session.clearUserAppSession();
-              window.location.href = jsonData.resumePath + "?source=" + adapter;
+              /* 
+              SP-init front-channel SLO with AIK won't work in a pure SPA.
+              All sessions are properly revoked but the PF cookie changes after
+              the REF pickup, so the resumePath returns an Expired page.
+              Since all sessions are cleaned up, we are just handling the redirect
+              back to the TargetResource ourselves which is /app/.
+              */
+              targetApp = process.env.REACT_APP_HOST + process.env.PUBLIC_URL + "/";
+              //targetApp = jsonData.resumePath + "?source=" + adapter;
             }
-            if (jsonData.bxFinanceUserType == "AnyWealthAdvisor" || jsonData.bxFinanceUserType == "AnyMarketing") {
+            else if (jsonData.bxFinanceUserType == "AnyWealthAdvisor" || jsonData.bxFinanceUserType == "AnyMarketing") {
               this.Session.setAuthenticatedUserItem("email", jsonData.Email);
               this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
               this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
@@ -202,7 +206,6 @@ class NavbarMain extends React.Component {
             }
             // Send them to the target app
             // TODO can we do this SPA style with history.push? We would need to map targetApp to respective Router path.
-            console.log("going to targetApp", targetApp);
             window.location.href = targetApp;
           })
           .catch(error => {
@@ -211,7 +214,7 @@ class NavbarMain extends React.Component {
           });
       } //Just came home from registering as a new user, so auto trigger login flow for better UX.
       else if (params.get("letme")) {
-        console.log("TEST", "Got letme from Reg");
+        console.info("NavbarMain.js", "Returning from registration, so triggering log in process.");
         this.triggerModalLogin();
       }
     }
