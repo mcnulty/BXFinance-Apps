@@ -17,6 +17,8 @@ export default class Session {
     @return DOMString
     */
     getAuthenticatedUserItem(key) {
+        console.info("Session.js", "Getting a item from local browser session.");
+
         return sessionStorage.getItem(key);
     }
 
@@ -35,14 +37,10 @@ export default class Session {
                                 using separate data containers.)
     */
     setAuthenticatedUserItem(key, value) {
-        try {
-            sessionStorage.setItem(key, value);
-            return true;
-        } catch (error) {
-            // Fail with the utmost grace and leisure
-            console.error("setAuthenticateduserItem Error:", error); /* TODO this should be removed for prod. Change this to a throw new error() ? */
-            return error; /* TODO risk of throwing this error is minimal. Do we handle errors in app in v1??? */
-        }
+        console.info("Session.js", "Saving an item into local browser session.");
+
+        sessionStorage.setItem(key, value);
+        return true;
     }
 
     /* 
@@ -52,6 +50,8 @@ export default class Session {
     @return boolean
     */
     removeAuthenticatedUserItem(key) {
+        console.info("Session.js", "Removing an item from local browser session.");
+
         sessionStorage.removeItem(key);
         return true;
     }
@@ -62,6 +62,8 @@ export default class Session {
     @return void
      */
     clearUserAppSession() {
+        console.info("Session.js", "Removing local browser session.");
+
         sessionStorage.clear();
     }
 
@@ -73,6 +75,8 @@ export default class Session {
     @return cookie value, or an empty string if not found.
     */
     getCookie(cookieName) {
+        console.info("Session.js", "Getting a cookie value from the browser.");
+
         const name = cookieName + "=";
         const decodedCookie = decodeURIComponent(document.cookie);
         const ca = decodedCookie.split(';');
