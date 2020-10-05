@@ -2,7 +2,8 @@
 Single page application (SPA) built with React; JSX, ECMAscript 2017, react-router, react-strap, SASS, JSON.
 
 ## Points of Interest
-- All points of integration in the UI are tagged with Ping Integration comments. Depending on whether you are in pure ECMAScript or JSX the comment labels will be one of the following, 
+- There are roughly 50+ console.info() entries to show the app flow in the dev tools console. I tried to be conscious and consistent about using the proper console method for the right purpose; info() vs. log() vs. warn() vs. error(). And tried to be diligent about not leaving debugging logging in the code, unless it was long running debug/chore crossing iterations.
+- All points of integration in the UI are tagged with "Ping Integration" comments. Depending on whether you are in pure ECMAScript or JSX the comment labels will be one of the following, 
 
 > 1. Single line integration comment // Ping Integration ...
 > 2. Multi-line integration comment /* Ping Integration ... */ 
