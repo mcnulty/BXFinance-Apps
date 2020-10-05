@@ -15,8 +15,7 @@ import PingData from './PingData';
 export default class OpenBanking {
 
     constructor() {
-        // Didn't abstract these since they shouldn't ever change.
-        //TODO move these out of the constructor. Not sure why I did this. Not necessary. Didn't do it anywhere else. That's what I get for working on a Saturday.
+        // Didn't abstract these since they shouldn't ever change. I say that now.
         this.mockOBConsenthost = "/OpenBanking";
         this.mockOBhost = "https://babbtx-aspsp.herokuapp.com/OpenBanking";
         this.mockOBAPIver = "/v2";
@@ -36,8 +35,10 @@ export default class OpenBanking {
       @param token the access token for the authenticated user.
       @response object
       */
-    provisionAccounts(token, uid) {
+    async provisionAccounts(token) {
         //If we had to time to be cool, we could have extracted the uid from the token.
+        console.info("OpenBanking.js", "Provisioning bank accounts.");
+
         let acctIdsArr = [];
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
@@ -48,17 +49,10 @@ export default class OpenBanking {
             redirect: 'follow'
         };
         const url = this.mockOBhost + this.mockOBAPIver + this.mockOBacctsURI;
-        fetch(url, requestOptions)
-            .then(response => response.json())
-            .then(jsonData => {
-                console.log("jsonData:", JSON.stringify(jsonData));
-                acctIdsArr = this.JSONSearch.findValues(jsonData, "AccountId");
-                console.log("acctIdsArr:", acctIdsArr);
-                this.PingData.updateUserEntry(acctIdsArr, uid);
-            })
-            .catch(error => console.log('error', error));
-        //TODO try catch error handling to return true or false.
-        return true;
+
+        const response = await fetch(url, requestOptions);
+        const jsonData = await response.json();
+        return Promise.resolve(jsonData);
     }
 
     /* 
@@ -67,6 +61,8 @@ export default class OpenBanking {
       @return response object
       */
     getAccountBalances(token) {
+        console.info("OpenBanking.js", "Getting bank account balances.");
+
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
 
@@ -77,10 +73,6 @@ export default class OpenBanking {
         };
         const url = this.mockOBhost + this.mockOBAPIver + this.mockOBbalURI;
         return fetch(url, requestOptions);
-        /* const response = fetch(url, requestOptions);
-        const jsonData = response.json();
-        console.log("accounts json", JSON.stringify(jsonData.Data.Balance));
-        return jsonData.Data.Balance; */
     }
 
     /* 
@@ -90,8 +82,7 @@ export default class OpenBanking {
     @return boolean stating success
     */
     transferMoney(amount, token) {
-        console.log("transferMoney", arguments);
-        console.log("token", token);
+        console.info("OpenBanking.js", "Transferring money.");
 
         let myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
@@ -103,8 +94,5 @@ export default class OpenBanking {
         };
         const url = this.xfrMoneyURI + amount;
         return fetch(url, requestOptions);
-        /* .then(response => response.text())
-        .then(result => console.log("XFR Response",result))
-        .catch(error => console.log('error', error)); */
     }
 }

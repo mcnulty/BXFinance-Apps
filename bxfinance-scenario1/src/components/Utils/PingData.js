@@ -9,7 +9,7 @@ API endpoints.
 
 export default class PingData {
 
-    // Didn't abstract these since they shouldn't ever change. Right??? Maybe move these to JSON data file.
+    // Didn't abstract these since they shouldn't ever change. Right??? Maybe move these to JSON data file?
     pdReSTURI = "/directory/v1/"; //TODO breakout the version segment to its own variable in case it changes.
     pdRootDN = "dc=bxfinance.org";
     pdPeopleRDN = 'ou=People,' + this.pdRootDN;
@@ -51,7 +51,9 @@ export default class PingData {
     @param uid The uid of the user fo which we are updating a user entry
     @return boolean to state success
     */
-    updateUserEntry(acctIds, uid) {
+    async updateUserEntry(acctIds, uid) {
+        console.info("PingData.js", "Updating user entry in PD.");
+
         const userRDN = 'uid=' + uid;
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -73,15 +75,11 @@ export default class PingData {
             redirect: 'follow'
         };
 
-        //TODO add try catch error handling here. And stop the .then() logging. Remove or return the response.
+        //TODO add error handling here in case failed requset. Rare in our environment, butt still.
         const url = this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
-        fetch(url, requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
-
-        return true;
-
+        const response = await fetch(url, requestOptions);
+        const jsonData = await response.json();
+        return Promise.resolve(jsonData);
     }
 
     /* 
@@ -93,6 +91,8 @@ export default class PingData {
     @return response object
     */
     getSearchableUsers({ searchScope = "singleLevel", limit = "100" }) {
+        console.info("PingData.js", "Getting all searchable users (banking customers) from PD.");
+
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
 
@@ -116,6 +116,8 @@ export default class PingData {
     @return consent record in JSON format
     */
     getUserConsents(token, uid, definition) {
+        console.info("PingData.js", "Getting user's consents from PD.");
+
         let myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
 
@@ -137,12 +139,15 @@ export default class PingData {
     @return consent record in JSON format
     */
     createUserConsent(token, consent, uid, definition) {
+        console.info("PingData.js", "Creating user's consent record in PD.");
+
         let myHeaders = new Headers();
         let consentObject = {};
         let raw = "";
         myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
 
+        //  We build the consent object template for the specified definition, and then update the data field with user's consent choices.
         if (definition == "share-account-balances") {
             consentObject = { "status": "accepted", "subject": "", "actor": "", "audience": "BXFinance", "definition": { "id": "", "version": "0.1", "locale": "en-us" }, "titleText": "Share Account Balances", "dataText": "Share Account Balances", "purposeText": "Share Account Balances", "data": { "share-balance": [] }, "consentContext": {} }
             consentObject.subject = uid;
@@ -177,6 +182,8 @@ export default class PingData {
     @return consent record in JSON format
     */
     updateUserConsent(token, consent, consentId, definition) {
+        console.info("PingData.js", "Updating user's consent record' in PD.");
+
         let myHeaders = new Headers();
         let consentObject = { "data": {} };
         let raw = "";
@@ -184,7 +191,8 @@ export default class PingData {
         myHeaders.append("Content-Type", "application/json");
         console.log("updateUserConsent to:", consent);
         
-        if (definition == "share-account-balances") { //TODO should we be passing in the whole updated consent object, including status????
+        //  We build the consent object template for the specified definition, and then update the data field with user's consent choices.
+        if (definition == "share-account-balances") {
             const status = consent.length > 0 ? "accepted" : "revoked";
             consentObject = { "status": status, "data": { "share-balance": [] } };
             consentObject.data["share-balance"] = consent;
@@ -216,6 +224,8 @@ export default class PingData {
     @return response object
     */
     async getUserConsentData(token, forWhom, uid) {
+        console.info("PingData.js", "Getting consented data through DG.");
+
         const myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
         let url;
