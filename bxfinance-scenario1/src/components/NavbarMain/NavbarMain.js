@@ -171,7 +171,7 @@ class NavbarMain extends React.Component {
           .then(response => response.json())
           .then((jsonData) => {
             console.log("Pickup response", jsonData);
-            if (jsonData.resumePath) { // Means we are in a SLO request. SSO doesnt use resumePath.
+            if (jsonData.resumePath) { // Means we are in a SLO request. SSO uses resumeURL.
               this.Session.clearUserAppSession();
               /* 
               SP-init front-channel SLO with AIK won't work in a pure SPA.
@@ -190,7 +190,7 @@ class NavbarMain extends React.Component {
               this.Session.setAuthenticatedUserItem("lastName", jsonData.LastName);
               this.Session.setAuthenticatedUserItem("uid", jsonData.uid);
               this.Session.setAuthenticatedUserItem("bxFinanceUserType", jsonData.bxFinanceUserType);
-            } else if (jsonData.uid) { //banking customer
+            } else { //banking customer
               this.Session.setAuthenticatedUserItem("email", jsonData.Email);
               this.Session.setAuthenticatedUserItem("subject", jsonData.subject);
               this.Session.setAuthenticatedUserItem("firstName", jsonData.FirstName);
@@ -204,7 +204,6 @@ class NavbarMain extends React.Component {
               const fullAddress = jsonData.street + ", " + jsonData.city + ", " + jsonData.postalCode;
               this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
             }
-            // Send them to the target app
             // TODO can we do this SPA style with history.push? We would need to map targetApp to respective Router path.
             window.location.href = targetApp;
           })
