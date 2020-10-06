@@ -1,13 +1,13 @@
+# This YAML file is used for QA, staging, and prod containers.
+# The image definition's tag should be changed according to environment. See
+# .env file's REACT_APP_HOST var for reason for environment specfic images.
+# The Dev environment has its own DockerFile and Compose YAML file because we want 
+# a React dev build that allows for hot code reloading and volume mounted source for
+# development with VSCode Remote.
+ 
 version: '3.3'
 services:
-    bxfinance:
-        stdin_open: true # docker run -i -> Dev only. These two lines are required so
-        tty: true        # docker run -t -> react-scripts does not exit after the container starts.
-        volumes:
-            - '.:/app'
-            - '/app/node_modules'
+    BXFinance:
         ports:
             - '5000:5000'
-        environment:
-            - 'CHOKIDAR_USEPOLLING=true'
-        image: 'bxfinance:dev'
+        image: 'bxfinance-app:prod' # Tag options are qa, stage, prod.

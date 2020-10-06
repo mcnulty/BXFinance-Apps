@@ -9,9 +9,9 @@ API endpoints.
 
 export default class PingData {
 
-    // Didn't abstract these since they shouldn't ever change. Right???
+    // Didn't abstract these since they shouldn't ever change. Right??? Maybe move these to JSON data file?
     pdReSTURI = "/directory/v1/"; //TODO breakout the version segment to its own variable in case it changes.
-    pdRootDN = "dc=" + process.env.REACT_APP_HOST.substring(process.env.REACT_APP_HOST.indexOf('.') + 1);
+    pdRootDN = "dc=bxfinance.org";
     pdPeopleRDN = 'ou=People,' + this.pdRootDN;
     pdConsentURI = "/consent";
     pdConsentVersion = "/v1";
@@ -31,10 +31,6 @@ export default class PingData {
     @return response object
     */
     getUserEntry(uid) {
-        //TODO remove this once dev root DN is fixed.
-        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
-            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
-        }
         const userRDN = 'uid=' + encodeURIComponent(uid);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -45,7 +41,7 @@ export default class PingData {
             headers: myHeaders,
             redirect: 'manual'
         };
-        const url = process.env.REACT_APP_HOST + this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
+        const url = this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
         return fetch(url, requestOptions);
     }
 
@@ -55,24 +51,18 @@ export default class PingData {
     @param uid The uid of the user fo which we are updating a user entry
     @return boolean to state success
     */
-    updateUserEntry(acctIds, uid) {
-        //TODO remove this once dev root DN is fixed.
-        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
-            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
-        }
+    async updateUserEntry(acctIds, uid) {
+        console.info("PingData.js", "Updating user entry in PD.");
+
         const userRDN = 'uid=' + uid;
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
-        //myHeaders.append("Cookie", "PF=YdzsRlxXm67qsRriWenYMf");
 
-        //    console.log("acctIds", acctIds);
         let updateObj = { "modifications": [{ "attributeName": "bxFinanceUserAccountIDs", "modificationType": "set", "values": [{ "ids": [] }] }] };
         updateObj.modifications[0].values[0].ids = acctIds;
-        //    console.log("updateObj", updateObj);
 
         const raw = JSON.stringify(updateObj);
-        //    console.log("raw", raw);
 
         const requestOptions = {
             method: 'PATCH',
@@ -81,15 +71,11 @@ export default class PingData {
             redirect: 'follow'
         };
 
-        //TODO add try catch error handling here. And stop the .then() logging. Remove or return the response.
-        const url = process.env.REACT_APP_HOST + this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
-        fetch(url, requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
-
-        return true;
-
+        //TODO add error handling here in case failed requset. Rare in our environment, butt still.
+        const url = this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
+        const response = await fetch(url, requestOptions);
+        const jsonData = await response.json();
+        return Promise.resolve(jsonData);
     }
 
     /* 
@@ -101,10 +87,8 @@ export default class PingData {
     @return response object
     */
     getSearchableUsers({ searchScope = "singleLevel", limit = "100" }) {
-        //TODO remove this once dev root DN is fixed.
-        if (process.env.REACT_APP_HOST.includes("ping-devops")) {
-            this.pdPeopleRDN = 'ou=People,' + "dc=bxfinance.org";
-        }
+        console.info("PingData.js", "Getting all searchable users (banking customers) from PD.");
+
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
 
@@ -114,7 +98,7 @@ export default class PingData {
             redirect: 'follow'
         };
         // TODO we need some attribute or way to filter user to only include ones created for demos.
-        const url = process.env.REACT_APP_HOST + this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit + "&filter=not(bxFinanceUserType pr)";
+        const url = this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit + "&filter=not(bxFinanceUserType pr)";
 
         return fetch(url, requestOptions);
     }
@@ -128,6 +112,8 @@ export default class PingData {
     @return consent record in JSON format
     */
     getUserConsents(token, uid, definition) {
+        console.info("PingData.js", "Getting user's consents from PD.");
+
         let myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
 
@@ -136,7 +122,7 @@ export default class PingData {
             headers: myHeaders,
             redirect: 'follow'
         };
-        const url = process.env.REACT_APP_HOST + this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "?subject=" + uid + "&definition=" + definition;
+        const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "?subject=" + uid + "&definition=" + definition;
         return fetch(url, requestOptions);
     }
 
@@ -149,12 +135,15 @@ export default class PingData {
     @return consent record in JSON format
     */
     createUserConsent(token, consent, uid, definition) {
+        console.info("PingData.js", "Creating user's consent record in PD.");
+
         let myHeaders = new Headers();
         let consentObject = {};
         let raw = "";
         myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
 
+        //  We build the consent object template for the specified definition, and then update the data field with user's consent choices.
         if (definition == "share-account-balances") {
             consentObject = { "status": "accepted", "subject": "", "actor": "", "audience": "BXFinance", "definition": { "id": "", "version": "0.1", "locale": "en-us" }, "titleText": "Share Account Balances", "dataText": "Share Account Balances", "purposeText": "Share Account Balances", "data": { "share-balance": [] }, "consentContext": {} }
             consentObject.subject = uid;
@@ -176,7 +165,7 @@ export default class PingData {
             body: raw,
             redirect: 'follow'
         };
-        const url = process.env.REACT_APP_HOST + this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource;
+        const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource;
         return fetch(url, requestOptions);
     }
 
@@ -189,14 +178,17 @@ export default class PingData {
     @return consent record in JSON format
     */
     updateUserConsent(token, consent, consentId, definition) {
+        console.info("PingData.js", "Updating user's consent record' in PD.");
+
         let myHeaders = new Headers();
         let consentObject = { "data": {} };
         let raw = "";
         myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
-        console.log("updateUserConsent to:", consent);
+        console.info("Updating it to:", consent);
         
-        if (definition == "share-account-balances") { //TODO should we really be passing in the updated consent object, including status????
+        //  We build the consent object template for the specified definition, and then update the data field with user's consent choices.
+        if (definition == "share-account-balances") {
             const status = consent.length > 0 ? "accepted" : "revoked";
             consentObject = { "status": status, "data": { "share-balance": [] } };
             consentObject.data["share-balance"] = consent;
@@ -215,7 +207,7 @@ export default class PingData {
             body: raw,
             redirect: 'follow'
         };
-        const url = process.env.REACT_APP_HOST + this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "/" + consentId;
+        const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "/" + consentId;
         return fetch(url, requestOptions);
     }
 
@@ -228,6 +220,8 @@ export default class PingData {
     @return response object
     */
     async getUserConsentData(token, forWhom, uid) {
+        console.info("PingData.js", "Getting consented data through DG.");
+
         const myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
         let url;
@@ -239,16 +233,15 @@ export default class PingData {
         };
         
         if (forWhom == "marketing") {
-            console.log("Getting AnyMarketing consent data.");
+            console.info("Getting AnyMarketing consent data.");
             const filterValue = '\"' + uid + '\"';
-            url = process.env.REACT_APP_HOST + this.dgScimURI + this.dgScimVersion + this.dgUsersResource + "?filter=uid eq " + filterValue;
+            url = this.dgScimURI + this.dgScimVersion + this.dgUsersResource + "?filter=uid eq " + filterValue;
         } else {//advisor
-            console.log("Getting AnyWealth Advisor consent data.");
-            url = process.env.REACT_APP_HOST + this.dgOpenBankingURI + this.dgOpenBankingVersion + this.dgBalancesResource
+            console.info("Getting AnyWealth Advisor consent data.");
+            url = this.dgOpenBankingURI + this.dgOpenBankingVersion + this.dgBalancesResource
         }
         const response = await fetch(url, requestOptions);
         const jsonResponse = await response.json();
-        console.log("getUserConsentData", jsonResponse);
         return jsonResponse;
     }
     

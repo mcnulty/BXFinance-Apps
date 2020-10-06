@@ -42,6 +42,11 @@ class AnyWealthAdvisor extends React.Component {
   backToDashboard() {
     window.location.href = "/app/banking";
   }
+  componentDidMount() {
+    // BEGIN PING INTEGRATION
+    const isLoggedOut = (this.Session.getAuthenticatedUserItem("subject") === null || this.Session.getAuthenticatedUserItem("subject") === 'undefined') ? true : false;
+    this.Session.protectPage(isLoggedOut, window.location.pathname, this.Session.getAuthenticatedUserItem("bxFinanceUserType"));
+  }
   /* END PING INTEGRATION: */
   render() {
     return (

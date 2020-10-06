@@ -44,15 +44,15 @@ class AccountsDashboard extends React.Component {
     this.PingData.getUserEntry(this.Session.getAuthenticatedUserItem("uid"))
       .then(response => response.json())
       .then(jsonData => {
-        console.log('UserEntry', JSON.stringify(jsonData));
         acctIDsArr = this.JSONSearch.findValues(jsonData, "bxFinanceUserAccountIDs");
         acctIDsArrSimple = this.JSONSearch.findValues(acctIDsArr, "ids");
-        this.Session.setAuthenticatedUserItem("accts", acctIDsArrSimple[0]);
+        this.Session.setAuthenticatedUserItem("accts", acctIDsArrSimple[0]); //TODO we can re-use this to save the getUserEntry() call. Only call PD if accts not in session.
         if (acctIDsArr.length) {
-          console.log("TEST:", "we see accts array.");
-          this.PingOAuth.getToken({uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent'})
+          // Existing user with accounts already provisioned, so just get balances.
+          console.info("Existing user:", "Getting account balances.");
+          this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
             .then(token => {
-              this.Session.setAuthenticatedUserItem("AT", token); //TODO need to re-use this token everywhere to avoid multiple getToken calls.
+              this.Session.setAuthenticatedUserItem("AT", token); //TODO need to re-use this token everywhere to avoid multiple getToken calls. Need handling for expired tokens though.
               this.OpenBanking.getAccountBalances(token)
                 .then(response => response.json())
                 .then(jsonData => {
@@ -66,29 +66,42 @@ class AccountsDashboard extends React.Component {
               console.error("GetToken Exception", e);
             });
         } else {
-          console.log("TEST:", "we dont see accts arr.");
-          this.PingOAuth.getToken({uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent'})
+          // Brand new registered user, so we need to provision accounts and update PD, then fetch balances.
+          let acctIdsArr = [];
+          console.info("New User:", "Provisioning bank accounts and getting balances.");
+          this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
             .then(token => {
               this.Session.setAuthenticatedUserItem("AT", token);
-              const success = this.OpenBanking.provisionAccounts(token, this.Session.getAuthenticatedUserItem("uid")); //TODO ideally would have error handling around "success" value.
-              this.OpenBanking.getAccountBalances(token)
-                .then(response => response.json())
-                .then(jsonData => {
-                  console.log("balances", JSON.stringify(jsonData));
-                  this.setState({ myAccounts: jsonData.Data.Balance });
-                  acctIDsArr = this.JSONSearch.findValues(jsonData.Data.Balance, "AccountId");
-                  this.Session.setAuthenticatedUserItem("accts", acctIDsArr);
+              this.OpenBanking.provisionAccounts(token)
+                .then(result => {
+                  acctIdsArr = this.JSONSearch.findValues(result, "AccountId");
+                  this.PingData.updateUserEntry(acctIdsArr, this.Session.getAuthenticatedUserItem("uid"))
+                    .then(response => {
+                      this.OpenBanking.getAccountBalances(this.Session.getAuthenticatedUserItem("AT"))
+                        .then(response => response.json())
+                        .then(jsonData => {
+                          this.setState({ myAccounts: jsonData.Data.Balance });
+                          acctIDsArr = this.JSONSearch.findValues(jsonData.Data.Balance, "AccountId");
+                          this.Session.setAuthenticatedUserItem("accts", acctIDsArr); //TODO can we reuse this? Are we anywhere already?
+                        })
+                        .catch(e => {
+                          console.error("Get Account Balances Exception", e)
+                        });
+                    })
+                    .catch(e => {
+                      console.error("Update User Entry Exception", e)
+                    });
                 })
                 .catch(e => {
-                  console.error("GetAccountBalances Exception", e)
+                  console.error("Provision Accounts Exception", e)
                 });
             })
             .catch(e => {
-              console.error("GetToken Exception", e);
+              console.error("Get Token Exception", e);
             });
         }
       }).catch(e => {
-        console.error("GetUserEntry Exception", e);
+        console.error("Get User Entry Exception", e);
       });
   }
   /* END PING INTEGRATION: */

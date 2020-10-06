@@ -52,7 +52,6 @@ class PrivacySecurity extends React.Component {
     this.close = this.close.bind(this);
     this.toggle = this.toggle.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
-    this.toggleConsent = this.toggleConsent.bind(this);
     this.Session = new Session(); /* PING INTEGRATION: */
     this.PingOAuth = new PingOAuth(); /* PING INTEGRATION: */
     this.PingData = new PingData(); /* PING INTEGRATION: */
@@ -67,37 +66,21 @@ class PrivacySecurity extends React.Component {
     /* BEGIN PING INTEGRATION */
     if (this.state.consentId !== "0"
     ) {//User has a consent record, so update.
-      console.log("consentID", this.state.consentId);
-      console.log("TEST", "Updating consents");
-      /* let accountIds = [];
-      let count;
-      count = this.state.acct_0 > 0 && accountIds.push(this.state.acct_0);
-      count = this.state.acct_1 > 0 && accountIds.push(this.state.acct_1);
-      count = this.state.acct_2 > 0 && accountIds.push(this.state.acct_2);
-      const consent = accountIds; */
+      console.info("Consent ID", this.state.consentId);
       this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), this.state.consentedAccts, this.state.consentId, this.consentDef)
         .then(response => response.json())
         .then(consentData => {
-          console.log("UpdateUserConsents", JSON.stringify(consentData));
-          console.log("STATE", this.state);
+          console.info("Updated user consent", JSON.stringify(consentData));
         })
         .catch(e => {
           console.error("UpdateUserConsents Exception", e)
         });
     } else { //User has no consent record, so create.
-      console.log("consentID", this.state.consentId);
-      console.log("TEST", "Creating consents");
-      /* let accountIds = [];
-      let count;
-      count = this.state.acct_0 > 0 && accountIds.push(this.state.acct_0);
-      count = this.state.acct_1 > 0 && accountIds.push(this.state.acct_1);
-      count = this.state.acct_2 > 0 && accountIds.push(this.state.acct_2);
-      const consent = accountIds; */
+      console.info("Consent ID", this.state.consentId);
       this.PingData.createUserConsent(this.Session.getAuthenticatedUserItem("AT"), this.state.consentedAccts, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
-          console.log("CreateUserConsents", JSON.stringify(consentData));
-          console.log("STATE", this.state);
+          console.info("Created user consent", JSON.stringify(consentData));
         })
         .catch(e => {
           console.error("CreateUserConsents Exception", e)
@@ -134,24 +117,6 @@ class PrivacySecurity extends React.Component {
     });
   }
 
-  /* BEGIN PING INTEGRATION:  */
-  //this function sets state of consent. pref. selected soley based on event obj passed in during onclick.
-  // we extract the partner name and consent pref. based on the substrings of the event target ID. I.e "anywealthadvisor_yes".
-  // TODO move this logic into toggle().
-  toggleConsent(event) {
-    /* let consentState = {};
-    let checkedState = {};
-    const delimiterPos = event.target.id.indexOf("_");
-    consentState[event.target.id.substring(0, delimiterPos)] = event.target.id.substring(delimiterPos + 1) == "yes" ? true : false;
-    this.setState(consentState);
-    //If the user clicked "No" for Advisor consent, clear all account IDs from state.
-    // "I don't know... I'm making this up as I go."
-    if (event.target.id.substring(delimiterPos + 1) == "no") {
-      this.setState({ consentedAccts: [] });
-    }*/
-    console.log("STATE", JSON.stringify(this.state));
-  }
-
   toggeAccount(index, acctId) {
     const consentedAcctsArr = this.state.consentedAccts;
     const acctPos = consentedAcctsArr.indexOf(acctId)
@@ -181,7 +146,6 @@ class PrivacySecurity extends React.Component {
       acctState["acct_" + index] = parseInt(acctId);
     });
     this.setState(acctState);
-    console.log("MOUNT STATE", this.state);
 
     if (this.Session.getAuthenticatedUserItem("AT")) {
       // TODO we should move the following code into a method. Duplicating it below based on whether we have a token or not is bad design. Error prone maintenance.
@@ -189,7 +153,7 @@ class PrivacySecurity extends React.Component {
       this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
-          console.log("getUserConsents", JSON.stringify(consentData));
+          console.info("Got user consents", JSON.stringify(consentData));
           if (consentData.count > 0) { //Do we have a consent record? (There is no status if no record)
             this.setState({
               anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
@@ -223,7 +187,7 @@ class PrivacySecurity extends React.Component {
           this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
             .then(response => response.json())
             .then(consentData => {
-              console.log("getUserConsents", JSON.stringify(consentData));
+              console.info("Got user consents", JSON.stringify(consentData));
               if (consentData.count > 0) { //Do we have a consent record? (There is no status if no record)
                 this.setState({
                   anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
@@ -253,7 +217,6 @@ class PrivacySecurity extends React.Component {
           console.error("GetToken Exception", e);
         });
     }
-    console.log("MOUNT STATE", JSON.stringify(this.state));
   }
   /* END PING INTEGRATION: */
 
@@ -318,8 +281,8 @@ class PrivacySecurity extends React.Component {
                           <Row>
                             <Col md={12} lg={4}><img src={process.env.PUBLIC_URL + partner3.logo} alt="" /></Col>
                             <Col md={12} lg={4}>
-                              <CustomInput type="radio" onChange={(event) => this.toggleConsent(event)} id={`${partner3.name}_yes`} checked={this.state[partner3.name]} name={partner3.name} label="Yes" onClick={this.toggle} />
-                              <CustomInput type="radio" onChange={(event) => this.toggleConsent(event)} id={`${partner3.name}_no`} checked={!this.state[partner3.name]} name={partner3.name} label="No" onClick={this.toggle} />
+                              <CustomInput type="radio" id={`${partner3.name}_yes`} checked={this.state[partner3.name]} name={partner3.name} label="Yes" onClick={this.toggle} />
+                              <CustomInput type="radio" id={`${partner3.name}_no`} checked={!this.state[partner3.name]} name={partner3.name} label="No" onClick={this.toggle} />
                             </Col>
                             <Col md={12} lg={4}><a href="#" className="partner-overlay" onClick={this.toggleModal}>{partner3.learn_more}</a></Col>
                           </Row>

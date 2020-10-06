@@ -69,7 +69,7 @@ class ModalLoginPassword extends React.Component {
     } else if (tab == '4') {
       window.location.href = data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
     } else if (tab == '5') {
-      window.location.href = data.pfPwdChangeURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+      window.location.href = data.pfPwdResetURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
     } else {
       /* END PING INTEGRATION */
       this.setState({ // TODO I dont think we need this anymore.
@@ -112,15 +112,13 @@ class ModalLoginPassword extends React.Component {
     const flowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
 
     if (pswd) {
-      console.log("pswd", pswd);
       this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
         .then(response => response.json())
         .then(jsonResults => {
-          console.log("modalLoginPassword jsonResults", jsonResults);
           if (jsonResults.status == "RESUME") {
             this.PingAuthN.handleAuthNflow({flowResponse: jsonResults});
           } else if (jsonResults.code == "VALIDATION_ERROR") {
-            console.log("Validation Error", jsonResults.details[0].userMessage);
+            console.info("Validation Error", jsonResults.details[0].userMessage);
             this.setState({
               loginError: true,
               loginErrorMsg: jsonResults.details[0].userMessage

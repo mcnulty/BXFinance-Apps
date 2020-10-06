@@ -23,11 +23,11 @@ export default class PingAuthN {
     @return response object
     */
     authnAPI({method, flowId, contentType, body}) {
-        console.log("authnAPI ARGS:", arguments);
+        console.info("PingAuthN.js", "Authenticating user with authN API.");
+
         let headers = new Headers();
         headers.append('Accept', 'application/json');
         headers.append('X-XSRF-Header', 'PingFederate');
-        console.log("authnApi flowid", flowId);
         // TODO this look syntactically stupid. Review/refactor.
         let tmp = contentType !== undefined && headers.append('Content-Type', contentType);
 
@@ -37,7 +37,7 @@ export default class PingAuthN {
             body: body,
             credentials: 'include'
         }
-        const url = process.env.REACT_APP_HOST + this.pfAuthnAPIURI + flowId;
+        const url = this.pfAuthnAPIURI + flowId;
         return fetch(url, requestOptions);
     }
 
@@ -47,6 +47,8 @@ export default class PingAuthN {
     @return response object
      */
     pickUpAPI(REF, adapter) {
+        console.info("PingAuthN.js", "Attribute pickup from Agentless IK.");
+
         const refId = REF;
         const myHeaders = new Headers();
         myHeaders.append("ping.instanceid", adapter);
@@ -55,10 +57,10 @@ export default class PingAuthN {
         const requestOptions = {
             method: 'POST',
             headers: myHeaders,
-            redirect: 'follow'
+            credentials: 'include'
         };
 
-        const url = process.env.REACT_APP_HOST + this.pfPickupURI + refId
+        const url = this.pfPickupURI + refId
 
         return fetch(url, requestOptions);
     }
@@ -72,33 +74,31 @@ export default class PingAuthN {
     @param swaprods the user's password if doing password authentication
     */
     handleAuthNflow({flowId, flowResponse, identifier, swaprods, rememberMe}) {
-        console.log("handleAuthNflow ARGS:", arguments);
+        console.info("PingAuthN.js", "Handling flow response from authN API.");
+
         let payload = '{}';
         if (!flowResponse){ flowResponse = {}; } //This won't exist if we only get a flowId. So create it to let switch/case default kick in.
-        console.log("flowResponse.status", flowResponse.status);
+        console.info("flowResponse.status", flowResponse.status);
         switch (flowResponse.status) {
             case "IDENTIFIER_REQUIRED":
-                console.log("handleAuthNflow","IN IDENTIFIER");
+                console.info("PingAuthN.js", "IDENTIFIER_REQUIRED");
                 payload = '{\n  \"identifier\": \"' + identifier + '\"\n}';
                 return this.authnAPI({method:"POST", flowId:flowResponse.id, contentType:"application/vnd.pingidentity.submitIdentifier+json", body:payload});
                 break;
             case "RESUME":
-                console.log("handleAuthNflow", "IN RESUME");
-                console.log("resumeUrl", flowResponse.resumeUrl);
+                console.info("PingAuthN.js", "RESUME");
                 window.location.href = flowResponse.resumeUrl;
                 break;
             case "USERNAME_PASSWORD_REQUIRED":
-                console.log("handleAuthNflow", "IN USERNAME_PASSWORD_REQUIRED");
-                console.log("flowresponse:", flowResponse);
+                console.info("PingAuthN.js", "USERNAME_PASSWORD_REQUIRED");
                 payload = '{\n \"username\": \"' + flowResponse.username + '\", \"password\": \"' + swaprods + '\", \"rememberMyUsername\": \"' + rememberMe + '\", \"captchaResponse\": \"\" \n}';
-                console.log("payload",payload);
                 return this.authnAPI({method:"POST", flowId:flowResponse.id, contentType:"application/vnd.pingidentity.checkUsernamePassword+json", body:payload});
                 break;
             case "FAILED":
-                console.log("handleAuthNflow failed", flowResponse.message);
+                console.info("PingAuthN.js", flowResponse.message);
                 return flowResponse;
             default: // Why are we here???
-                console.log("handleAuthNflow", "In default: getting flow status.");
+                console.info("PingAuthN.js", "In default case: we shouldn't be here. Whisky tango foxtrot?");
                 return this.authnAPI({method:"GET", flowId:flowId});
         }
     }
