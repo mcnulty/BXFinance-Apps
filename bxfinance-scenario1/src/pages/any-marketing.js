@@ -217,6 +217,7 @@ class AnyMarketing extends React.Component {
 
   componentDidMount() {
     const isLoggedOut = (this.Session.getAuthenticatedUserItem("subject") === null || this.Session.getAuthenticatedUserItem("subject") === 'undefined') ? true : false;
+    this.Session.protectPage(isLoggedOut, window.location.pathname, this.Session.getAuthenticatedUserItem("bxFinanceUserType"));
     this.setState({ loggedOut: isLoggedOut});
     // Getting users from PD.
     this.PingData.getSearchableUsers({})

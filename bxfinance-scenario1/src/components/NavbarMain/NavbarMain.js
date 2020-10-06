@@ -21,7 +21,6 @@ import ModalError from '../ModalError'; /* PING INTEGRATION: */
 import './NavbarMain.scss';
 import IdleTimer from 'react-idle-timer'; /* PING INTEGRATION: */
 import { IdleTimeOutModal } from '../ModalTimeout/IdleTimeOutModal'; /* PING INTEGRATION: */
-import { useLocation } from 'react-router-dom' /* PING INTEGRATION: */
 // Data
 import data from './data.json';
 
@@ -116,12 +115,12 @@ class NavbarMain extends React.Component {
   }
   /* BEGIN PING INTEGRATION */
   startSLO() {
-    console.info("NavbarMain.js", "Logging out via SLO.");
+    console.info("NavbarMain.js", "Logging out.");
 
     //end the local app session
     this.Session.clearUserAppSession();
     //An advisor should just be taken back to P14E dock. A partner persona shouldn't get SLO'd.
-    if (window.location.pathname === "/app/advisor/client") {
+    if (window.location.pathname === "/app/advisor/client" || window.location.pathname === "/app/advisor") {
       window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
     } else {
       //Banking customers get SLO'd.
@@ -135,6 +134,8 @@ class NavbarMain extends React.Component {
   componentDidMount() {
     // BEGIN PING INTEGRATION
     const isLoggedOut = (this.Session.getAuthenticatedUserItem("subject") === null || this.Session.getAuthenticatedUserItem("subject") === 'undefined') ? true : false;
+    this.Session.protectPage(isLoggedOut, window.location.pathname, this.Session.getAuthenticatedUserItem("bxFinanceUserType"));
+
     this.setState({ loggedOut: isLoggedOut });
 
     // Check for a querystring; Will be fowId or REF in our current use cases.
@@ -203,6 +204,7 @@ class NavbarMain extends React.Component {
               this.Session.setAuthenticatedUserItem("zipcode", jsonData.postalCode);
               const fullAddress = jsonData.street + ", " + jsonData.city + ", " + jsonData.postalCode;
               this.Session.setAuthenticatedUserItem("fullAddress", fullAddress);
+              this.Session.setAuthenticatedUserItem("bxFinanceUserType", "customer"); //This is the default. Only dynamically set for partner/workforce.
             }
             // TODO can we do this SPA style with history.push? We would need to map targetApp to respective Router path.
             window.location.href = targetApp;
