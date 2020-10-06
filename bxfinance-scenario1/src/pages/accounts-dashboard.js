@@ -80,7 +80,6 @@ class AccountsDashboard extends React.Component {
                       this.OpenBanking.getAccountBalances(this.Session.getAuthenticatedUserItem("AT"))
                         .then(response => response.json())
                         .then(jsonData => {
-                          console.log("balances", JSON.stringify(jsonData));
                           this.setState({ myAccounts: jsonData.Data.Balance });
                           acctIDsArr = this.JSONSearch.findValues(jsonData.Data.Balance, "AccountId");
                           this.Session.setAuthenticatedUserItem("accts", acctIDsArr); //TODO can we reuse this? Are we anywhere already?

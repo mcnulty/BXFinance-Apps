@@ -53,17 +53,17 @@ class NavbarMain extends React.Component {
 
   /* BEGIN PING INTEGRATION: for react-idle-timer */
   _onAction(e) {
-    console.log('user did something', e);
+    console.info("React-idle-timer", 'user did something', e);
     this.setState({ isTimedOut: false });
   }
 
   _onActive(e) {
-    console.log('user is active', e);
+    console.info("React-idle-timer", 'user is active', e);
     this.setState({ isTimedOut: false });
   }
 
   _onIdle(e) {
-    console.log('user is idle', e);
+    console.info("React-idle-timer", 'user is idle', e);
     // const isTimedOut = this.state.isTimedOut;
     if (this.state.isTimedOut) {
       this.startSLO();
@@ -77,12 +77,12 @@ class NavbarMain extends React.Component {
 
   }
   handleClose() {
-    console.log("We are closing the timeout modal.");
+    console.info("We are closing the timeout modal.");
     this.setState({ showTimeoutModal: false });
     window.location.href = this.startSSOURI; //TODO we Send back through PF to renew the session. This should be done via API.
   }
   handleLogout() {
-    console.log("We are logging out from the timeout modal.");
+    console.info("We are logging out from the timeout modal.");
     this.startSLO();
   }
   /* END PING INTEGRATION: */
@@ -170,7 +170,7 @@ class NavbarMain extends React.Component {
         this.PingAuthN.pickUpAPI(REF, adapter)
           .then(response => response.json())
           .then((jsonData) => {
-            console.log("Pickup response", jsonData);
+            console.info("Pickup response", jsonData);
             if (jsonData.resumePath) { // Means we are in a SLO request. SSO uses resumeURL.
               this.Session.clearUserAppSession();
               /* 

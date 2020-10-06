@@ -104,12 +104,9 @@ class ModalLogin extends React.Component {
       const params = new URLSearchParams(window.location.search);
       const flowId = params.get('flowId'); /* TODO will we ever have something other than a flowId to handle? */
 
-      console.log("handlesubmit flowResponse", flowResponse);
-
       this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, identifier: identifier })
         .then(response => response.json())
         .then(jsonResult => {
-          console.log("modalLogin jsonResult", jsonResult);
           if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
             let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
             //Close ModalLogin. We need to get password.

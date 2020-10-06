@@ -58,15 +58,11 @@ export default class PingData {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
-        //myHeaders.append("Cookie", "PF=YdzsRlxXm67qsRriWenYMf");
 
-        //    console.log("acctIds", acctIds);
         let updateObj = { "modifications": [{ "attributeName": "bxFinanceUserAccountIDs", "modificationType": "set", "values": [{ "ids": [] }] }] };
         updateObj.modifications[0].values[0].ids = acctIds;
-        //    console.log("updateObj", updateObj);
 
         const raw = JSON.stringify(updateObj);
-        //    console.log("raw", raw);
 
         const requestOptions = {
             method: 'PATCH',
@@ -189,7 +185,7 @@ export default class PingData {
         let raw = "";
         myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
-        console.log("updateUserConsent to:", consent);
+        console.info("Updating it to:", consent);
         
         //  We build the consent object template for the specified definition, and then update the data field with user's consent choices.
         if (definition == "share-account-balances") {
@@ -237,16 +233,15 @@ export default class PingData {
         };
         
         if (forWhom == "marketing") {
-            console.log("Getting AnyMarketing consent data.");
+            console.info("Getting AnyMarketing consent data.");
             const filterValue = '\"' + uid + '\"';
             url = this.dgScimURI + this.dgScimVersion + this.dgUsersResource + "?filter=uid eq " + filterValue;
         } else {//advisor
-            console.log("Getting AnyWealth Advisor consent data.");
+            console.info("Getting AnyWealth Advisor consent data.");
             url = this.dgOpenBankingURI + this.dgOpenBankingVersion + this.dgBalancesResource
         }
         const response = await fetch(url, requestOptions);
         const jsonResponse = await response.json();
-        console.log("getUserConsentData", jsonResponse);
         return jsonResponse;
     }
     

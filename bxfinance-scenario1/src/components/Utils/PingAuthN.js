@@ -76,10 +76,9 @@ export default class PingAuthN {
     handleAuthNflow({flowId, flowResponse, identifier, swaprods, rememberMe}) {
         console.info("PingAuthN.js", "Handling flow response from authN API.");
 
-        console.log("handleAuthNflow ARGS:", arguments);
         let payload = '{}';
         if (!flowResponse){ flowResponse = {}; } //This won't exist if we only get a flowId. So create it to let switch/case default kick in.
-        console.log("flowResponse.status", flowResponse.status);
+        console.info("flowResponse.status", flowResponse.status);
         switch (flowResponse.status) {
             case "IDENTIFIER_REQUIRED":
                 console.info("PingAuthN.js", "IDENTIFIER_REQUIRED");

@@ -59,33 +59,18 @@ class CommunicationPreferences extends React.Component {
       this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.state.consentId, this.consentDef)
         .then(response => response.json())
         .then(consentData => {
-          console.log("updateUserConsent", JSON.stringify(consentData));
-          if (consentData.count > 0) { //TODO WTH am I resetting state when it was already set in step1. WTF??? Remove and regression test.
-            console.log("Consent updated State:", this.state);
-          }
+          console.info("Updated user consent", JSON.stringify(consentData));
+          
         })
         .catch(e => {
           console.error("UpdateUserConsents Exception", e)
         });
     } else { //Creating new consent record.
-      console.log("TEST", "Creating consent.");
       const consent = { "sms": this.state.sms, "email": this.state.email, "homeAddress": this.state.mail };
       this.PingData.createUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
-          console.log("createUserConsent", JSON.stringify(consentData));
-          if (consentData.count > 0) { //TODO WTH am I resetting state when it was already set in step1. WTF??? Remove and regression test.
-            /* this.setState({
-              sms: consentData._embedded.consents[0].data.sms,
-              email: consentData._embedded.consents[0].data.email,
-              mail: consentData._embedded.consents[0].data.homeAddress,
-              smsChecked: consentData._embedded.consents[0].data.sms == true ? true : false,
-              emailChecked: consentData._embedded.consents[0].data.email == true ? true : false,
-              mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
-              consentId: consentData._embedded.consents[0].id 
-            });*/
-            console.log("STATE", this.state);
-          }
+          console.info("Created user consent", JSON.stringify(consentData));
         })
         .catch(e => {
           console.error("CreateUserConsents Exception", e)
@@ -109,7 +94,6 @@ class CommunicationPreferences extends React.Component {
     this.setState(consentState);
     checkedState[event.target.id.substring(0, delimiterPos) + "Checked"] = event.target.id.substring(delimiterPos + 1) == "yes" ? true : false;
     this.setState(checkedState);
-    console.log("STATE", this.state);
   }
   /* END PING INTEGRATION:  */
 
@@ -121,7 +105,6 @@ class CommunicationPreferences extends React.Component {
       this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
-          console.log("getUserConsents", JSON.stringify(consentData));
           if (consentData.count > 0) {
             this.setState({
               // TODO this is probably overkill having a checked version of the consent. You could probably infer from the consent value.
@@ -133,7 +116,6 @@ class CommunicationPreferences extends React.Component {
               mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
               consentId: consentData._embedded.consents[0].id
             });
-            console.log("STATE", this.state);
           }
         })
         .catch(e => {
@@ -146,7 +128,6 @@ class CommunicationPreferences extends React.Component {
           this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
             .then(response => response.json())
             .then(consentData => {
-              console.log("getUserConsents", JSON.stringify(consentData));
               if (consentData.count > 0) {
                 this.setState({
                   sms: consentData._embedded.consents[0].data.sms,
@@ -157,7 +138,6 @@ class CommunicationPreferences extends React.Component {
                   mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
                   consentId: consentData._embedded.consents[0].id
                 });
-                console.log("STATE", this.state);
               }
             })
             .catch(e => {
