@@ -217,8 +217,8 @@ class CommunicationPreferences extends React.Component {
                           <>
                             <FormGroup key={index} className={classNames({ "gray": (index % 2) })}>
                               <Label for={data.steps[0].communication_types[index].name}>{data.steps[0].communication_types[index].label + '(' + commDetails + ')'}</Label>
-                              <CustomInput type="radio" id={`${data.steps[0].communication_types[index].name}_yes`} name={data.steps[0].communication_types[index].name} checked={this.state[commType + "Checked"]} label="Yes" />
-                              <CustomInput type="radio" id={`${data.steps[0].communication_types[index].name}_no`} name={data.steps[0].communication_types[index].name} checked={!this.state[commType + "Checked"]} label="No" />
+                              <CustomInput type="radio" id={`${data.steps[0].communication_types[index].name}_yes`} name={data.steps[0].communication_types[index].name} checked={this.state[commType + "Checked"]} disabled label="Yes" />
+                              <CustomInput type="radio" id={`${data.steps[0].communication_types[index].name}_no`} name={data.steps[0].communication_types[index].name} checked={!this.state[commType + "Checked"]} disabled label="No" />
                             </FormGroup>
                           </>
                         );

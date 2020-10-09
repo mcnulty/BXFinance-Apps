@@ -44,10 +44,11 @@ class NavbarMain extends React.Component {
     this.onIdle = this._onIdle.bind(this); /* PING INTEGRATION: for react-idle-timer */
     this.handleClose = this.handleClose.bind(this)
     this.handleLogout = this.handleLogout.bind(this)
-    /* END PING INTEGRATION: */
-    //TODO these are replacing the values from the data.json file beacuse we need dynamic params. Need better place for this now.
-    this.pfRegURI = "/sp/startSSO.ping?SpSessionAuthnAdapterId=idprofiledefaultIdentityProfile&TargetResource=" + process.env.REACT_APP_HOST + process.env.PUBLIC_URL + "/?letme=in&PolicyAction=identity.registration";
+    
     this.startSSOURI = "/idp/startSSO.ping?PartnerSpId=" + process.env.REACT_APP_HOST;
+    //The TargetResource param for registration is set to the startSSO endpoint to after reg we immediately trigger a login flow for better UX.
+    this.pfRegURI = "/sp/startSSO.ping?SpSessionAuthnAdapterId=idprofiledefaultIdentityProfile&TargetResource=" + process.env.REACT_APP_HOST + this.startSSOURI + "&PolicyAction=identity.registration";
+    /* END PING INTEGRATION: */
   }
 
   /* BEGIN PING INTEGRATION: for react-idle-timer */
@@ -213,11 +214,7 @@ class NavbarMain extends React.Component {
             console.error("Agentless Pickup Error:", error);
             this.refs.modalError.toggle("Session Pickup Error", error);
           });
-      } //Just came home from registering as a new user, so auto trigger login flow for better UX.
-      else if (params.get("letme")) {
-        console.info("NavbarMain.js", "Returning from registration, so triggering log in process.");
-        this.triggerModalLogin();
-      }
+      } 
     }
     // END PING INTEGRATION
     // Original T3 code in this lifecycle method removed.

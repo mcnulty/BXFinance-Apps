@@ -64,8 +64,7 @@ class PrivacySecurity extends React.Component {
 
   showStep2() {
     /* BEGIN PING INTEGRATION */
-    if (this.state.consentId !== "0"
-    ) {//User has a consent record, so update.
+    if (this.state.consentId !== "0") {//User has a consent record, so update.
       console.info("Consent ID", this.state.consentId);
       this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), this.state.consentedAccts, this.state.consentId, this.consentDef)
         .then(response => response.json())
@@ -179,8 +178,6 @@ class PrivacySecurity extends React.Component {
           console.error("GetUserConsents Exception", e)
         });
     } else {
-      // TODO really need to get away from nested then()s. getToken returns token but as promise. Can we force resolve it like this?
-      // const token = Promise.resolve(this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' }));
       this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
         .then(token => {
           this.Session.setAuthenticatedUserItem("AT", token); //for later reuse to reduce getToken calls.
@@ -342,7 +339,7 @@ class PrivacySecurity extends React.Component {
                                   return (
                                     <FormGroup check>
                                       <Label className="custom-checkbox" check>
-                                        <Input type="checkbox" checked={isChecked} /> {permission.label}
+                                        <Input type="checkbox" checked={isChecked} disabled /> {permission.label}
                                         <span class="checkmark"><span></span></span>
                                       </Label>
                                     </FormGroup>
