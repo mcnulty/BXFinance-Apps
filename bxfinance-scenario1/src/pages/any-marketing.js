@@ -106,7 +106,7 @@ const SearchAutocomplete = () => {
           .then(jsonResults => {
             let fullName;
             try { fullName = jsonResults.Resources[0].cn[0]; }
-            catch (e) { }//Fail with the utmost grace and leisure.
+            catch (e) { fullName = "This customer did not consent to receiving marketing communications."; }//Fail with the utmost grace and leisure.
             let fullAddress;
             try { fullAddress = jsonResults.Resources[0].street[0] + ", " + jsonResults.Resources[0].l[0] + ", " + jsonResults.Resources[0].postalCode[0]; }
             catch (e) { }//Fail with the utmost grace and leisure.
