@@ -56,7 +56,6 @@ const updateSelectedUserAndConsent = (selectedUser, stateCallback) => {
             newState.acct_0 = typeof consentData.Data.Balance[0] !== 'undefined' ? consentData.Data.Balance[0].Amount.Amount : 0;
             newState.acct_1 = typeof consentData.Data.Balance[1] !== 'undefined' ? consentData.Data.Balance[1].Amount.Amount : 0;
             newState.acct_2 = typeof consentData.Data.Balance[2] !== 'undefined' ? consentData.Data.Balance[2].Amount.Amount : 0;
-            console.log("newState", newState);
             stateCallback(newState);
           }
         });
@@ -240,8 +239,6 @@ class AdvisorClient extends React.Component {
                         <Media object src={process.env.PUBLIC_URL + "/images/anywealthadvisor-photo.png"} alt="Generic placeholder image" />
                       </Media>
                       <Media body>
-                        {/* PING INTEGRATION */}
-                        <strong>{this.Session.getAuthenticatedUserItem("firstName") + " " + this.Session.getAuthenticatedUserItem("lastName")}</strong>
                         <span dangerouslySetInnerHTML={{ __html: data.profile.advisor.content }}></span>
                         <Button color="link">{data.profile.advisor.button}</Button>
                       </Media>

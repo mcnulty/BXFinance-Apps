@@ -1,3 +1,9 @@
+# This Dockerfile is used development images only.
+# The .env config file should be updated accordingly before running "docker build...".
+# The Dev environment has its own DockerFile and Compose YAML file because we want 
+# a React "dev build" that allows for hot code reloading and volume mounted source for
+# development with VSCode Remote.
+ 
 # pull official base image
 FROM node:13.12.0-alpine
 
@@ -17,4 +23,4 @@ RUN npm install
 COPY . ./
 
 # start app
-CMD ["npm", "start", ".env.development"]
+CMD ["npm", "start", ".env"]

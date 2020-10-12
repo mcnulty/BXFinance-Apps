@@ -76,7 +76,6 @@ class AccountsTransfer extends React.Component {
         this.OpenBanking.transferMoney(this.state.xfrAmount, this.Session.getAuthenticatedUserItem("AT"))
           .then(response => response.json())
           .then(jsonData => {
-            console.log("xfr response", JSON.stringify(jsonData));
             if (jsonData.status == "Money Transferred!") {
               this.setState({ step: 3 });
             } else {
