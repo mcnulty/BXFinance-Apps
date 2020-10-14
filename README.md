@@ -6,12 +6,15 @@ Single page application (SPA) built with React; JSX, ECMAscript 2017, react-rout
 ### Cloning BXFinance and running the app
 **NOTE:** Any branch other than master is for our SDLC and is NOT considered stable. Clone command below is recommended. All pull requests will be ignored unless previously agreed collaboration is in place.
 
+**Pre-requisites**
+- You must have the Node Package Manager. To install on Mac, `brew install node`. For other OS', @see https://www.npmjs.com/get-npm
+
 1. Clone the repo `git clone --single-branch --branch master https://github.com/Technical-Enablement-PingIdentity/BXFinance-Apps.git`.
 2. Change directory to the source root: `cd BXFinance/bxfinance-scenario1`.
 3. Edit the .env file and modify the following custom environement variables for your host...
 - REACT_APP_HOST (*this is the host name you will use to access your instance of the app. This could be localhost if on your laptop.*)
 - REACT_APP_ENV  (*This is just the name of the environment you are running the app in. It becomes part of the browser tab title.*)
-3. Run the following command to get current React and node package dependencies: `npm install`. This will create a node_modules folder with everything the app needs to run.
+3. Run the following command to get current React and node package dependencies: `npm install`. This will create a node_modules folder with everything the app needs to run. **NOTE:** you may see npm warn about vulerabilities. It will tell you how to resolve them with `npm audit fix`. 
 4. Once that completes, run: `npm start`.
 
 - `npm start` will do a "dev build", spin up the app locally with an embedded web server supporting hot code reloading. This should also pop a browser tab to the running host:port. If not, the terminal output of npm start will instruct you where to browse to see the app. This is the simplest way to get the app up and running on the fly that also allows you to edit the code to customize it for your own demos.
