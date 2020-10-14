@@ -7,10 +7,6 @@
 				"url": "/advisor"
 			},
 			{
-				"title": "Client Profile",
-				"url": "/advisor/client"
-			},
-			{
 				"title": "Tracking",
 				"url": "/advisor/tracking"
 			},
@@ -74,7 +70,7 @@
 	},
 	"clients": {
 		"title": "My Clients",
-		"search_placeholder": "Enter Keywords...",
+		"search_placeholder": "Search Clients...",
 		"suggestions": [
 			"janesmith@gmail.com"
 		]
@@ -193,5 +189,9 @@
 			"modify": "Modify Record"
 		}
 	},
-	"copyright": "© AnyMarketing, 2020 <br /> Member FDIC, Member SIPC <br /> Equal Housing Lender"
+	"copyright": "© AnyMarketing<br /> Member FDIC, Member SIPC <br /> Equal Housing Lender",
+	"Ping Integration removed from menus.primary array": {
+		"title": "Client Profile",
+		"url": "/advisor/client"
+	}
 }

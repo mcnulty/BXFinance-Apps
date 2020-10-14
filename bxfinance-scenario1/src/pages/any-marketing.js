@@ -102,13 +102,11 @@ const SearchAutocomplete = () => {
     setConsentState(initialState); //Clearing previous values so they don't show while modal re-renders.
     pingOAuthObj.getToken({ uid: 'marketingApp', client: 'marketingApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
       .then(consent_token => {
-        console.log("Getting new token");
         pingDataObj.getUserConsentData(consent_token, "marketing", filteredSuggestions[index])
           .then(jsonResults => {
-            console.log("consentdata", JSON.stringify(jsonResults));
             let fullName;
             try { fullName = jsonResults.Resources[0].cn[0]; }
-            catch (e) { }//Fail with the utmost grace and leisure.
+            catch (e) { fullName = "This customer did not consent to receiving marketing communications."; }//Fail with the utmost grace and leisure.
             let fullAddress;
             try { fullAddress = jsonResults.Resources[0].street[0] + ", " + jsonResults.Resources[0].l[0] + ", " + jsonResults.Resources[0].postalCode[0]; }
             catch (e) { }//Fail with the utmost grace and leisure.
@@ -219,6 +217,7 @@ class AnyMarketing extends React.Component {
 
   componentDidMount() {
     const isLoggedOut = (this.Session.getAuthenticatedUserItem("subject") === null || this.Session.getAuthenticatedUserItem("subject") === 'undefined') ? true : false;
+    this.Session.protectPage(isLoggedOut, window.location.pathname, this.Session.getAuthenticatedUserItem("bxFinanceUserType"));
     this.setState({ loggedOut: isLoggedOut});
     // Getting users from PD.
     this.PingData.getSearchableUsers({})
