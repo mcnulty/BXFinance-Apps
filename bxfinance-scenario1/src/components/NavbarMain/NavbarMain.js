@@ -85,7 +85,7 @@ class NavbarMain extends React.Component {
     console.info("We are logging out from the timeout modal.");
     this.startSLO();
   }
-  /* END PING INTEGRATION: */
+  /* END PING INTEGRATION: for react-idle-timer */
 
   triggerModalRegister() {
     this.refs.modalRegister.toggle();
@@ -141,7 +141,6 @@ class NavbarMain extends React.Component {
 
     // Check for a querystring; Will be fowId or REF in our current use cases.
     if (window.location.search) {
-      let testNum = Math.random();
       const params = new URLSearchParams(window.location.search);
 
       // Coming back from authN API or Agentless adapter.
