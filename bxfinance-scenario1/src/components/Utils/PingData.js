@@ -122,7 +122,7 @@ export default class PingData {
             headers: myHeaders,
             redirect: 'follow'
         };
-        const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "?subject=" + uid + "&definition=" + definition;
+        const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "?subject=" + encodeURIComponent(uid) + "&definition=" + definition;
         return fetch(url, requestOptions);
     }
 
