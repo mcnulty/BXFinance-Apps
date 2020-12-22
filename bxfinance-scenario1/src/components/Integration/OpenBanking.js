@@ -9,7 +9,7 @@ I like to call it the OpenBabbitt API.
 @see https://github.com/babbtx/mock-simple-aspsp
 */
 
-import JSONSearch from './JSONSearch';
+import JSONSearch from '../Utils/JSONSearch';
 import PingData from './PingData';
 
 export default class OpenBanking {

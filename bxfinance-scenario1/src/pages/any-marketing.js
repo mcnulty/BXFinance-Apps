@@ -20,9 +20,9 @@ import { faLinkedinIn, faFacebookF, faTwitter, faInstagram } from '@fortawesome/
 
 // Components
 import AccountsSubnav from '../components/AccountsSubnav';
-import PingData from '../components/Utils/PingData'; /* PING INTEGRATION: */
+import PingData from '../components/Integration/PingData'; /* PING INTEGRATION: */
 import Session from '../components/Utils/Session'; /* PING INTEGRATION: */
-import PingOAuth from '../components/Utils/PingOAuth'; /* PING INTEGRATION: */
+import PingOAuth from '../components/Integration/PingOAuth'; /* PING INTEGRATION: */
 import JSONSearch from '../components/Utils/JSONSearch'; /* PING INTEGRATION: */
 import ModalError from '../components/ModalError/'; /* PING INTEGRATION: */
 

@@ -22,7 +22,7 @@ import NavbarMain from '../../components/NavbarMain';
 import FooterMain from '../../components/FooterMain';
 import AccountsSubnav from '../../components/AccountsSubnav';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
-import PingData from '../../components/Utils/PingData'; /* PING INTEGRATION: */
+import PingData from '../../components/Integration/PingData'; /* PING INTEGRATION: */
 import JSONSearch from '../../components/Utils/JSONSearch'; /* PING INTEGRATION: */
 
 // Data

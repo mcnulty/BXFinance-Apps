@@ -8,7 +8,7 @@ OAuth-related API endpoints.
 
 */
 
-import Session from './Session';
+import Session from '../Utils/Session';
 
 export default class PingOAuth {
     constructor() {
@@ -75,15 +75,15 @@ export default class PingOAuth {
     async getToken({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         console.info("PingAuthN.js", "Getting a token.");
 
-        let response = {};
-
         if (responseType == "code") {
             console.info("PingAuthN.js", "Using auth code grant");
             const authCode = await this.getAuthCode({uid:this.Session.getAuthenticatedUserItem("uid"), scopes:scopes});
             let grantType = "authorization_code";
+
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
             myHeaders.append("Authorization", "Basic cGFfd2FtOjJGZWRlcmF0ZU0wcmU=");
+
             const requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
@@ -93,7 +93,7 @@ export default class PingOAuth {
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
-            console.info("PingAuthN.js", "TOKEN: " + token);
+            console.info("PingAuthN.js", "TOKEN: " + token); //TODO file name is wrong in this log entry across entire component.
 
             return token; //TODO there should only be one return statement.
 

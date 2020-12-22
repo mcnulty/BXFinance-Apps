@@ -18,7 +18,7 @@ import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 
 // Components
 import FormPassword from '../../components/FormPassword';
-import PingAuthN from '../Utils/PingAuthN' /* PING INTEGRATION */
+import PingAuthN from '../Integration/PingAuthN' /* PING INTEGRATION */
 import Session from '../Utils/Session' /* PING INTEGRATION: */
  
 
