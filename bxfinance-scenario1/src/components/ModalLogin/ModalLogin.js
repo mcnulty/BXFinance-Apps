@@ -22,8 +22,9 @@ import "./ModalLogin.scss";
 // Data
 import data from './data.json';
 
-import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
+import PingAuthN from '../Integration/PingAuthN'; /* PING INTEGRATION */
 import Session from '../Utils/Session'; /* PING INTEGRATION: */
+import JSONSearch from '../Utils/JSONSearch'; /* PING INTEGRATION: */
 import ModalLoginPassword from '../ModalLoginPassword/ModalLoginPassword'; /* PING INTEGRATION: */
 
 class ModalLogin extends React.Component {
