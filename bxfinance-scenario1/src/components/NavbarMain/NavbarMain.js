@@ -15,7 +15,7 @@ import { Link, NavLink as RRNavLink } from 'react-router-dom';
 import ModalRegister from '../ModalRegister';
 import ModalRegisterConfirm from '../ModalRegisterConfirm';
 import ModalLogin from '../ModalLogin';
-import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
+import PingAuthN from '../Integration/PingAuthN'; /* PING INTEGRATION */
 import Session from '../Utils/Session'; /* PING INTEGRATION */
 import ModalError from '../ModalError'; /* PING INTEGRATION: */
 import './NavbarMain.scss';
