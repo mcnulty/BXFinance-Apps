@@ -74,20 +74,27 @@ export default class PingAuthN {
             case "DEVICE_SELECTION_REQUIRED":
                 console.info("PingAuthN.js", "DEVICE_SELECTION_REQUIRED");
                 payload = '{\n \"deviceRef\": {\n \"id\":\"' + body + '\" \n} \n}';
-                console.log("payload", payload);
                 return this.authnAPI({ method: "POST", flowId: flowResponse.id, payload: payload, action: "selectDevice" });
                 break;
             case "OTP_REQUIRED":
                 console.info("PingAuthN.js", "OTP_REQUIRED");
-                //implementation
+                payload = '{\n \"otp\": \"' + body + '\" \n}';
+                return this.authnAPI({ method: "POST", flowId: flowResponse.id, payload: payload, action: "checkOtp" });
+                break;
+                // this case is a placeholder for mobile push. Needs to be updated.
+            case "PUSH_CONFIRMATION_WAITING":
+                console.info("PingAuthN.js", "fubar_REQUIRED");
+                payload = '{\n \"fubar\": \"' + body + '\" \n}';
+                return this.authnAPI({ method: "POST", flowId: flowResponse.id, action: "poll" });
                 break;
             case "MFA_COMPLETED":
                 console.info("PingAuthN.js", "MFA_COMPLETED");
-                //implementation
+                payload = '{' + body + '}';
+                return this.authnAPI({ method: "POST", flowId: flowResponse.id, payload: payload, action: "continueAuthentication" });
                 break;
             case "RESUME":
                 console.info("PingAuthN.js", "Authentication complete. Redirecting to resumeURL.");
-                window.location.href = flowResponse.resumeUrl;
+                window.location.assign(flowResponse.resumeUrl);
                 break;
             case "FAILED":
                 console.warn("PingAuthN.js", flowResponse.message);

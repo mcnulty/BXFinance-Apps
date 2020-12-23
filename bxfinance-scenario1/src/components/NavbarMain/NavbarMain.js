@@ -122,6 +122,7 @@ class NavbarMain extends React.Component {
     this.Session.clearUserAppSession();
     //An advisor should just be taken back to P14E dock. A partner persona shouldn't get SLO'd.
     if (window.location.pathname === "/app/advisor/client" || window.location.pathname === "/app/advisor") {
+      //TODO this P14E dock needs to be an env_var or injected during spin up in k8s. It will make it easier for anyone that want to clone their own instance of BXF.
       window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
     } else {
       //Banking customers get SLO'd.
@@ -143,26 +144,26 @@ class NavbarMain extends React.Component {
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
 
-      // Coming back from authN API or Agentless adapter.
+      // Coming back from authN API.
       if (params.get("flowId")) {
         this.PingAuthN.handleAuthNflow({ flowId: params.get("flowId") })
           .then(response => response.json())
           .then(jsonResult => {
-            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO do we still need this?
+            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //Browser's sessionStorage object only stores strings.
             if (jsonResult.status == "IDENTIFIER_REQUIRED") {
               //pop the ID first modal. 
               this.refs.modalLogin.toggle();
             } else if (jsonResult.status == "FAILED") {
               this.refs.modalError.toggle("Authentication", jsonResult.userMessage);
             }
-            else if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
+            /* else if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
               //TODO I dont think this needs to be here. we will never hit this case in this component. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
               //pop the username/password modal.
               this.refs.modalLoginPassword.toggle();
-            }
+            } */
           })
           .catch(error => console.error('HANDLESUBMIT ERROR', error));
-      } // Coming back as authenticated user or SLO request from Agentless IK.
+      } // Coming back as authenticated user from AIK or SLO request from Agentless IK.
       else if (params.get("REF")) {
         const REF = params.get("REF");
         let targetApp = decodeURIComponent(params.get("TargetResource"));
