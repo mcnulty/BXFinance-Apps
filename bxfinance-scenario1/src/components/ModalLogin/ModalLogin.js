@@ -271,7 +271,7 @@ class ModalLogin extends React.Component {
             });
           }
           let pollingID = window.setInterval(polling, 3000);
-          break; //This is breaking from the case statement. Not to be confused with the loop break.
+          break;
       }
 
       /* if (jsonResult.status === "RESUME") {

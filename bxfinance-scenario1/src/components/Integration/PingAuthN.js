@@ -84,7 +84,6 @@ export default class PingAuthN {
                 // this case is a placeholder for mobile push. Needs to be updated.
             case "PUSH_CONFIRMATION_WAITING":
                 console.info("PingAuthN.js", "fubar_REQUIRED");
-                payload = '{\n \"fubar\": \"' + body + '\" \n}';
                 return this.authnAPI({ method: "POST", flowId: flowResponse.id, action: "poll" });
                 break;
             case "MFA_COMPLETED":
@@ -129,73 +128,3 @@ export default class PingAuthN {
         return fetch(url, requestOptions);
     }
 }
-
-
-
-/*
-######## OTP FLOW ##########
-
-GET https://demo.bxfinance.xyz/idp/startSSO.ping?PartnerSpId=https://demo.bxfinance.xyz
-response = ?fowId=fubar
-
-GET https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL
-response = "status": "IDENTIFIER_REQUIRED"
-
-POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=submitIdentifier
-{
-  "identifier": "string"
-}
-Response = "status": "AUTHENTICATION_REQUIRED"
-
-POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=authenticate   //with empty object literal
-{}
-response = "status": "DEVICE_SELECTION_REQUIRED"  // device list included in response - lines up with UI from T3.
-
-POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=selectDevice
-{
-   "deviceRef":{
-      "id":"ca5d9af8-8258-407c-9298-899713b09b38"
-   }
-}
-response = "status": "OTP_REQUIRED"
-
-POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=checkOtp
-{
-  "otp": "135298"
-}
-response = "status": "MFA_COMPLETED"
-
-POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=continueAuthentication
-//empty payload
-response = "status": "RESUME" //includes resumeUrl for redirect;
-
-
-
-######## MOBILE APP FLOW ##########
-
-GET https://demo.bxfinance.xyz/idp/startSSO.ping?PartnerSpId=https://demo.bxfinance.xyz
-response = ?fowId=fubar
-
-GET https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL
-response = "status": "IDENTIFIER_REQUIRED"
-
-POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=submitIdentifier
-{
-  "identifier": "string"
-}
-Response = "status": "AUTHENTICATION_REQUIRED"
-
-POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=authenticate   //with empty object literal
-{}
-response = "status": "DEVICE_SELECTION_REQUIRED"  // device list included in response - lines up with UI from T3.
-
-POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=selectDevice
-{
-   "deviceRef":{
-      "id":"ca5d9af8-8258-407c-9298-899713b09b38"
-   }
-}
-response =
-
-
-*/

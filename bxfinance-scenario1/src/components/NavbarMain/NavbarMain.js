@@ -53,7 +53,7 @@ class NavbarMain extends React.Component {
 
   /* BEGIN PING INTEGRATION: for react-idle-timer */
   _onAction(e) {
-    console.info("React-idle-timer", 'user did something', e);
+    // console.info("React-idle-timer", 'user did something', e);
     this.setState({ isTimedOut: false });
   }
 
