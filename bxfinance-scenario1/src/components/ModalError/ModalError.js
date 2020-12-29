@@ -43,8 +43,6 @@ class ModalError extends React.Component {
     });
   }
   continueBtn() {
-    console.log("modalError callback", this.state.callBack);
-    console.log(typeof this.state.callBack);
     if (typeof this.state.callBack === 'function') {
       this.state.callBack();
     } else {
