@@ -34,8 +34,7 @@ export default class PingOAuth {
     @param
     @return string
     */
-   //TODO I *think* we can get rid of the UID and swaprods params now that we aren't using them. Need thorough regression testing when removed.
-    async getAuthCode({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
+    async getAuthCode({client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         console.info("PingOAuth.js", "Getting an auth code for the getToken() call.");
 
         const myHeaders = new Headers();
@@ -70,9 +69,7 @@ export default class PingOAuth {
     @param
     @return string base64 encoded
     */
-   //TODO might need to change syntax for destructuring here. See "named and optional arguments" https://medium.com/dailyjs/named-and-optional-arguments-in-javascript-using-es6-destructuring-292a683d5b4e
-   //TODO I *think* we can get rid of the UID and swaprods params now that we aren't using them. Need thorough regression testing when removed.
-    async getToken({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
+    async getToken({uid, client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         console.info("PingAuthN.js", "Getting a token.");
 
         if (responseType == "code") {
