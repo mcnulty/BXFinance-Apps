@@ -255,7 +255,6 @@ class AnyMarketing extends React.Component {
                     <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} /></NavLink>
                   </NavItem>
                   <NavItem className="logout">
-                    {/* TODO add P1 SLO link for sign out. */}
                     {!this.state.loggedOut && 
                       <a onClick={this.signOut.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</a>}
                     {this.state.loggedOut && 
