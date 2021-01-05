@@ -122,7 +122,7 @@ class NavbarMain extends React.Component {
     this.Session.clearUserAppSession();
     //An advisor should just be taken back to P14E dock. A partner persona shouldn't get SLO'd.
     if (window.location.pathname === "/app/advisor/client" || window.location.pathname === "/app/advisor") {
-      //TODO this P14E dock needs to be an env_var or injected during spin up in k8s. It will make it easier for anyone that want to clone their own instance of BXF.
+      //TODO IMPORTANT this P14E dock needs to be an env_var or injected during spin up in k8s. It will make it easier for anyone that want to clone their own instance of BXF.
       window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
     } else {
       //Banking customers get SLO'd.
@@ -156,11 +156,6 @@ class NavbarMain extends React.Component {
             } else if (jsonResult.status == "FAILED") {
               this.refs.modalError.toggle("Authentication", jsonResult.userMessage);
             }
-            /* else if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
-              //TODO I dont think this needs to be here. we will never hit this case in this component. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
-              //pop the username/password modal.
-              this.refs.modalLoginPassword.toggle();
-            } */
           })
           .catch(error => console.error('HANDLESUBMIT ERROR', error));
       } // Coming back as authenticated user from AIK or SLO request from Agentless IK.
@@ -208,7 +203,7 @@ class NavbarMain extends React.Component {
               this.Session.setAuthenticatedUserItem("bxFinanceUserType", "customer"); //This is the default. Only dynamically set for partner/workforce.
             }
             // TODO can we do this SPA style with history.push? We would need to map targetApp to respective Router path.
-            window.location.href = targetApp;
+            window.location.assign(targetApp);
           })
           .catch(error => {
             console.error("Agentless Pickup Error:", error);

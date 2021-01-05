@@ -20,7 +20,9 @@ import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 import FormPassword from '../../components/FormPassword';
 import PingAuthN from '../Integration/PingAuthN' /* PING INTEGRATION */
 import Session from '../Utils/Session' /* PING INTEGRATION: */
- 
+
+// External scripts
+import { injectExternalScript } from '../Utils/injectExternalScript';
 
 // Styles
 import "./ModalLoginPassword.scss";
@@ -29,6 +31,8 @@ import "./ModalLoginPassword.scss";
 import data from './data.json';
 
 class ModalLoginPassword extends React.Component {
+  
+
   constructor() {
     super();
     this.state = {
@@ -40,10 +44,12 @@ class ModalLoginPassword extends React.Component {
       swaprods: "",                   /* PING INTEGRATION: */
       loginError: false,              /* PING INTEGRATION: */
       loginErrorMsg: "",              /* PING INTEGRATION: */
-      rememberMe: ""                  /* PING INTEGRATION: */
+      rememberMe: "",                 /* PING INTEGRATION: */
+      deviceProfile: []             /* PING INTEGRATION: */
     };
     this.PingAuthN = new PingAuthN(); /* PING INTEGRATION: */
     this.Session = new Session();     /* PING INTEGRATION: */
+    this.buildDeviceProfile = this.buildDeviceProfile.bind(this);
   }
   onClosed() {
     this.setState({
@@ -67,9 +73,9 @@ class ModalLoginPassword extends React.Component {
     if (tab == '2') {
       this.handleSubmit(tab);
     } else if (tab == '4') {
-      window.location.href = data.pfAcctRecoveryURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+      window.location.href = data.pfAcctRecoveryURI;
     } else if (tab == '5') {
-      window.location.href = data.pfPwdResetURI; /* TODO When SSPR with AuthN API and PID SDK is fixed, this ideally should be switched to a fetch(). */
+      window.location.href = data.pfPwdResetURI;
     } else {
       /* END PING INTEGRATION */
       this.setState({ // TODO I dont think we need this anymore.
@@ -95,28 +101,48 @@ class ModalLoginPassword extends React.Component {
       } else {
         document.cookie = "rememberMe=" + this.state.userName;
       }
-      return {rememberMe: !prevState.rememberMe};
+      return { rememberMe: !prevState.rememberMe };
     });
   }
+
   // This is used as a callback function to the child component FormPassword.
   handlePswdChange(event) {
     this.setState({ swaprods: event.target.value }, () => {
     });
   }
+
+  //When user clicks "Next".
   handleSubmit(tab) {
+
+    console.log("handeSubmit tab", tab);
     this.setState({
       loginError: false,
       loginErrorMsg: ""
     });
     const pswd = tab == '2' ? this.state.swaprods : "WTF?"; //TODO Do we care about the tab param here? Toss?
-    const flowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
+    const cachedFlowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
+    console.log("cachedFlowResponse", cachedFlowResponse);
 
     if (pswd) {
-      this.PingAuthN.handleAuthNflow({ flowResponse: flowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
+      let data = "";
+      this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
         .then(response => response.json())
         .then(jsonResults => {
+          let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResults));
+          console.log("risk test", JSON.stringify(jsonResults));
           if (jsonResults.status == "RESUME") {
-            this.PingAuthN.handleAuthNflow({flowResponse: jsonResults});
+            this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
+          } else if (jsonResults.status == "DEVICE_PROFILE_REQUIRED") {
+            window.profileDevice(this.buildDeviceProfile);
+            this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults, body: this.state.deviceProfile })
+              .then(response => response.json())
+              .then(jsonResponse => {
+                let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
+                console.log("risk test 2", JSON.stringify(jsonResponse));
+                if (jsonResponse.status == "RESUME") {
+                  this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
+                }
+              });
           } else if (jsonResults.code == "VALIDATION_ERROR") {
             console.info("Validation Error", jsonResults.details[0].userMessage);
             this.setState({
@@ -128,15 +154,33 @@ class ModalLoginPassword extends React.Component {
           }
         })
         .catch(e => {
-          console.error("HANDLEAUTHNFLOW Exception:", e);
+          console.error("handleAuthNFlow() Exception:", e);
         });
-    } 
+    }
   }
-   componentDidMount() {
-     const rememberMe = this.Session.getCookie("rememberMe");
-     if (rememberMe.length)
-       this.setState({ rememberMe: true });
-   }
+
+  // Callback for P1 Risk profiling scripts.
+  // When P1 Risk profiles the user's device, it will call this method passing the raw device profile.
+  buildDeviceProfile(deviceComponents) {
+    console.log("deviceComponents", JSON.stringify(deviceComponents));
+    console.log("data type before", Array.isArray(deviceComponents));
+    const formattedProfile = window.transformComponentsToDeviceProfile(deviceComponents)
+    console.log("data type after", Array.isArray(formattedProfile));
+    this.setState({
+      deviceProfile: formattedProfile
+    });
+  }
+
+  componentDidMount() {
+    const rememberMe = this.Session.getCookie("rememberMe");
+    if (rememberMe.length) {
+      this.setState({ rememberMe: true });
+    }
+    // Appending scripts for PingOne Risk device profiling.
+    injectExternalScript("/app/scripts/fingerprint2-2.1.4.min.js");
+    injectExternalScript("/app/scripts/pingone-risk-management-profiling.js");
+
+  }
   /* END PING INTEGRATION: */
 
   render() {
@@ -150,10 +194,10 @@ class ModalLoginPassword extends React.Component {
               <TabContent activeTab={this.state.activeTab}>
                 <TabPane tabId="1">
                   <h4>{data.titles.welcome}</h4>
-                  {this.state.loginError && <span style={{color: 'red'}}>{this.state.loginErrorMsg}</span>} {/* PING INTEGRATION */}
+                  {this.state.loginError && <span style={{ color: 'red' }}>{this.state.loginErrorMsg}</span>} {/* PING INTEGRATION */}
                   <FormGroup className="form-group-light">
                     <Label for="username">{data.form.fields.username.label}</Label>
-                    <Input type="text" name="username" id="username" value={this.state.userName} placeholder={data.form.fields.username.placeholder} />
+                    <Input type="text" name="username" readOnly id="username" value={this.state.userName} placeholder={data.form.fields.username.placeholder} />
                   </FormGroup>
                   <FormGroup className="form-group-light">
                     <Label for="password">{data.form.fields.password.label}</Label>
@@ -161,7 +205,7 @@ class ModalLoginPassword extends React.Component {
                   </FormGroup>
                   {/* <FormPassword setPassword={this.handlePswdChange} name="password" label={data.form.fields.password.label} placeholder={data.form.fields.password.placeholder} /> */}
                   <FormGroup className="form-group-light">
-                    <CustomInput onClick={this.handleRememberMeChange.bind(this)} type="checkbox" id="remember" label={data.form.fields.remember.label} checked={this.state.rememberMe} />
+                    <CustomInput onChange={this.handleRememberMeChange.bind(this)} type="checkbox" id="remember" label={data.form.fields.remember.label} checked={this.state.rememberMe} />
                   </FormGroup>
                   <div className="mb-3">
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('2') }}>{data.form.buttons.next}</Button>
@@ -190,7 +234,7 @@ class ModalLoginPassword extends React.Component {
                   </div>
                 </TabPane>
                 <TabPane tabId="3">
-                  <div className="mobile-loading" style={{backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)`}}>
+                  <div className="mobile-loading" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)` }}>
                     <div className="spinner">
                       <FontAwesomeIcon icon={faCircleNotch} size="3x" className="fa-spin" />
                     </div>

@@ -12,7 +12,6 @@ export default class PingAuthN {
     // Didn't abstract these since they shouldn't ever change.
     pfAuthnAPIURI = "/pf-ws/authn/flows/";
     pfPickupURI = "/ext/ref/pickup?REF=";
-    //TODO remove if stable. pfSPRefIdAdapterInstanceId = "BXFSPRefID";
 
     /* 
     AuthN API endpoint
@@ -90,6 +89,11 @@ export default class PingAuthN {
                 console.info("PingAuthN.js", "MFA_COMPLETED");
                 payload = '{' + body + '}';
                 return this.authnAPI({ method: "POST", flowId: flowResponse.id, payload: payload, action: "continueAuthentication" });
+                break;
+            case "DEVICE_PROFILE_REQUIRED":
+                console.info("PingAuthN.js", "DEVICE_PROFILE_REQUIRED");
+                payload = body;
+                return this.authnAPI({ method: "POST", flowId: flowResponse.id, payload: payload, action: "submitDeviceProfile" });
                 break;
             case "RESUME":
                 console.info("PingAuthN.js", "Authentication complete. Redirecting to resumeURL.");
