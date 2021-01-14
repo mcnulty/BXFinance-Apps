@@ -70,7 +70,7 @@ export default class PingOAuth {
     @return string base64 encoded
     */
     async getToken({uid, client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
-        console.info("PingAuthN.js", "Getting a token.");
+        console.info("PingOAuth.js", "Getting a token.");
 
         if (responseType == "code") {
             console.info("PingAuthN.js", "Using auth code grant");
@@ -90,7 +90,7 @@ export default class PingOAuth {
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
-            console.info("PingAuthN.js", "TOKEN: " + token); //TODO file name is wrong in this log entry across entire component.
+            console.info("PingOAuth.js", "TOKEN: " + token);
 
             return token; //TODO there should only be one return statement.
 
@@ -122,7 +122,7 @@ export default class PingOAuth {
                 
         } else {
             // If you ended up here, you coded yourself into this problem.
-            throw new Error("PingAuthN.js", "Unexpected response_type or client exception in getToken().");
+            throw new Error("PingOAuth.js", "Unexpected response_type or client exception in getToken().");
         }
     }
 }
