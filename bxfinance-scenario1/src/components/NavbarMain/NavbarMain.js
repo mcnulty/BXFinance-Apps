@@ -79,7 +79,7 @@ class NavbarMain extends React.Component {
   handleClose() {
     console.info("We are closing the timeout modal.");
     this.setState({ showTimeoutModal: false });
-    window.location.href = this.startSSOURI; //TODO we Send back through PF to renew the session. This should be done via API.
+    window.location.assign(this.startSSOURI); //TODO we Send back through PF to renew the session. This should be done via API.
   }
   handleLogout() {
     console.info("We are logging out from the timeout modal.");
@@ -100,10 +100,10 @@ class NavbarMain extends React.Component {
   triggerModalLogin() {
     /* BEGIN PING INTEGRATION */
     // Decided to just trigger an authn flow anytime we call this method.
-    window.location.href = this.startSSOURI;
+    window.location.assign(this.startSSOURI);
     /* The below logic had the risk of submitting username to an expired flowId if the user just sat there for a time. 
     if (!window.location.search) {
-      window.location.href = this.startSSOURI;
+      window.location.assign(this.startSSOURI);
     }
     else { 
       this.refs.modalLogin.toggle(); //This is left here just in case the user closes the modal and clicks "sign in" after we already have a flowId in the URL.
@@ -123,11 +123,11 @@ class NavbarMain extends React.Component {
     //An advisor should just be taken back to P14E dock. A partner persona shouldn't get SLO'd.
     if (window.location.pathname === "/app/advisor/client" || window.location.pathname === "/app/advisor") {
       //TODO IMPORTANT this P14E dock needs to be an env_var or injected during spin up in k8s. It will make it easier for anyone that want to clone their own instance of BXF.
-      window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
+      window.location.assign("https://desktop.pingone.com/anywealthadvisor/");
     } else {
       //Banking customers get SLO'd.
       const url = "/sp/startSLO.ping?TargetResource=" + process.env.REACT_APP_HOST + process.env.PUBLIC_URL + "/";
-      window.location.href = url;
+      window.location.assign(url);
     }
 
   }
@@ -149,6 +149,7 @@ class NavbarMain extends React.Component {
         this.PingAuthN.handleAuthNflow({ flowId: params.get("flowId") })
           .then(response => response.json())
           .then(jsonResult => {
+            console.log("DEBUG:", JSON.stringify(jsonResult));
             let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //Browser's sessionStorage object only stores strings.
             if (jsonResult.status == "IDENTIFIER_REQUIRED") {
               //pop the ID first modal. 
