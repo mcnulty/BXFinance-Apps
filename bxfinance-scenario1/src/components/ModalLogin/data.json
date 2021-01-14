@@ -5,7 +5,7 @@
 		"welcome": "Welcome back",
 		"login_method": "How would you like to sign in?",
 		"recover_username_success": "Email sent!",
-		"otp_success": "OTP sent! Please wait...",
+		"otp_success": "OTP received! We're signing you in...",
 		"mobile_success": "Mobile app push sent! I'm waiting..."
 	},
 	"form": {
@@ -25,7 +25,7 @@
 				"options": {
 					"email": "Email me a one-time passcode",
 					"text": "Text me a one-time passcode",
-					"faceid": "With FaceID (Mobile App Required)",
+					"faceid": "With the BXfinance mobile app",
 					"totp": "With my authenticator app (I.e. Google Authenticator)"
 				}
 			},
@@ -43,6 +43,6 @@
 		}
 	},
 	"mobile": {
-		"loading": "Please check your selected device to sign in..."
+		"loading": "Please check your selected device to continue sign in..."
 	}
 }
