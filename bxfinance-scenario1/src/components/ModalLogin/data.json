@@ -6,7 +6,7 @@
 		"login_method": "How would you like to sign in?",
 		"recover_username_success": "Email sent!",
 		"otp_success": "OTP received! We're signing you in...",
-		"mobile_success": "Mobile app push sent! I'm waiting..."
+		"mobile_success": "We Ping'd you at your BXFinance mobile app. Please check now..."
 	},
 	"form": {
 		"fields": {
@@ -43,6 +43,6 @@
 		}
 	},
 	"mobile": {
-		"loading": "Please check your selected device to continue sign in..."
+		"loading": "Please check your selected device to continue sign in."
 	}
 }

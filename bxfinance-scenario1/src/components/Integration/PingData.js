@@ -219,9 +219,8 @@ export default class PingData {
     @param uid the uid of the user data being requested
     @return response object
     */
-    async getUserConsentData(token, forWhom, uid) {
+    async getUserConsentedData(token, forWhom, uid) {
         console.info("PingData.js", "Getting consented data through DG.");
-
         const myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
         let url;
@@ -235,7 +234,7 @@ export default class PingData {
         if (forWhom == "marketing") {
             console.info("Getting AnyMarketing consent data.");
             const filterValue = '\"' + uid + '\"';
-            url = this.dgScimURI + this.dgScimVersion + this.dgUsersResource + "?filter=uid eq " + filterValue;
+            url = this.dgScimURI + this.dgScimVersion + this.dgUsersResource + "?filter=uid eq " + encodeURIComponent(filterValue);
         } else {//advisor
             console.info("Getting AnyWealth Advisor consent data.");
             url = this.dgOpenBankingURI + this.dgOpenBankingVersion + this.dgBalancesResource

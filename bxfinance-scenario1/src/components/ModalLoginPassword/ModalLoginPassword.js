@@ -45,11 +45,12 @@ class ModalLoginPassword extends React.Component {
       loginError: false,              /* PING INTEGRATION: */
       loginErrorMsg: "",              /* PING INTEGRATION: */
       rememberMe: "",                 /* PING INTEGRATION: */
-      deviceProfile: []             /* PING INTEGRATION: */
+      deviceProfile: {}             /* PING INTEGRATION: */
     };
     this.PingAuthN = new PingAuthN(); /* PING INTEGRATION: */
     this.Session = new Session();     /* PING INTEGRATION: */
-    this.buildDeviceProfile = this.buildDeviceProfile.bind(this);
+    this.buildDeviceProfile = this.buildDeviceProfile.bind(this); /* PING INTEGRATION: */
+    this.deviceProfileString = ''; /* PING INTEGRATION: */
   }
   onClosed() {
     this.setState({
@@ -65,20 +66,16 @@ class ModalLoginPassword extends React.Component {
     });
   }
   toggleTab(tab) {
-    /* BEGIN PING INTEGRATION: 
-    tab 2 modal is device selection 
-    which we don't use so we don't change state. Only call our handler. 
-    Tab 4 is forgot username, so send them to PF endpoint. */
-
+    /* BEGIN PING INTEGRATION: */
     if (tab == '2') {
       this.handleSubmit(tab);
     } else if (tab == '4') {
-      window.location.href = data.pfAcctRecoveryURI;
+      window.location.assign(data.pfAcctRecoveryURI);
     } else if (tab == '5') {
-      window.location.href = data.pfPwdResetURI;
+      window.location.assign(data.pfPwdResetURI);
     } else {
       /* END PING INTEGRATION */
-      this.setState({ // TODO I dont think we need this anymore.
+      this.setState({ // TODO I dont think we need this anymore. Need to validate and if removed, regression test.
         activeTab: tab
       });
     }
@@ -114,14 +111,12 @@ class ModalLoginPassword extends React.Component {
   //When user clicks "Next".
   handleSubmit(tab) {
 
-    console.log("handeSubmit tab", tab);
     this.setState({
       loginError: false,
       loginErrorMsg: ""
     });
     const pswd = tab == '2' ? this.state.swaprods : "WTF?"; //TODO Do we care about the tab param here? Toss?
     const cachedFlowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
-    console.log("cachedFlowResponse", cachedFlowResponse);
 
     if (pswd) {
       let data = "";
@@ -129,20 +124,21 @@ class ModalLoginPassword extends React.Component {
         .then(response => response.json())
         .then(jsonResults => {
           let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResults));
-          console.log("risk test", JSON.stringify(jsonResults));
           if (jsonResults.status == "RESUME") {
             this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
           } else if (jsonResults.status == "DEVICE_PROFILE_REQUIRED") {
             window.profileDevice(this.buildDeviceProfile);
-            this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults, body: this.state.deviceProfile })
+            //BEGIN DELAY: P1Risk device profiling scripts take just long enough to run that we were trying to send the profile to the authN API before we had it.
+            let intervalId = setInterval(() => {this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults, body: this.deviceProfileString })
               .then(response => response.json())
               .then(jsonResponse => {
                 let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
-                console.log("risk test 2", JSON.stringify(jsonResponse));
                 if (jsonResponse.status == "RESUME") {
+                  clearTimeout(intervalId);
                   this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
                 }
-              });
+              });}, 1000, jsonResults, this.deviceProfileString);
+              //END DELAY.
           } else if (jsonResults.code == "VALIDATION_ERROR") {
             console.info("Validation Error", jsonResults.details[0].userMessage);
             this.setState({
@@ -162,13 +158,8 @@ class ModalLoginPassword extends React.Component {
   // Callback for P1 Risk profiling scripts.
   // When P1 Risk profiles the user's device, it will call this method passing the raw device profile.
   buildDeviceProfile(deviceComponents) {
-    console.log("deviceComponents", JSON.stringify(deviceComponents));
-    console.log("data type before", Array.isArray(deviceComponents));
     const formattedProfile = window.transformComponentsToDeviceProfile(deviceComponents)
-    console.log("data type after", Array.isArray(formattedProfile));
-    this.setState({
-      deviceProfile: formattedProfile
-    });
+    this.deviceProfileString = JSON.stringify(formattedProfile);
   }
 
   componentDidMount() {
@@ -179,7 +170,6 @@ class ModalLoginPassword extends React.Component {
     // Appending scripts for PingOne Risk device profiling.
     injectExternalScript("/app/scripts/fingerprint2-2.1.4.min.js");
     injectExternalScript("/app/scripts/pingone-risk-management-profiling.js");
-
   }
   /* END PING INTEGRATION: */
 

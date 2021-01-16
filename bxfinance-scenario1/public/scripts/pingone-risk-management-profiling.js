@@ -35,7 +35,6 @@ function encodeDeviceProfile(deviceProfile) {
 
 function transformComponentsToDeviceProfile(components) {
     var deviceProfile = {};
-    console.log("deviceprofile arg type", Array.isArray(components));
     components.map(function (component) {
         var key = component.key;
         var value = component.value;

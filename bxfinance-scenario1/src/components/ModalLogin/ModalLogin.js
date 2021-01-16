@@ -36,8 +36,10 @@ class ModalLogin extends React.Component {
       activeTab: '1',
       loginMethodUnset: true,
       loginMethodFormGroupClass: '',
-      deviceRef: "",          /* PING INTEGRATION: */
-      loginMethod: "",        /* PING INTEGRATION: */
+      deviceRef: "",          /* PING INTEGRATION: Selected device's Id */
+      deviceName: "",         /* PING INTEGRATION: Device name if using mobile app. I.e. iPhone XS Max */
+      loginMethod: "",        /* PING INTEGRATION: SMS, Email, iPhone, TOTP */
+      loginTarget: "",        /* PING INTEGRATION: number or email of selected login method. */
       deviceList: [],         /* PING INTEGRATION: */
       otp: "",                /* PING INTEGRATION: */
       userName: '',           /* PING INTEGRATION */
@@ -67,9 +69,10 @@ class ModalLogin extends React.Component {
     this.setState({
       activeTab: '1',
       loginMethodUnset: true,
+      deviceRef: "",          /* PING INTEGRATION: */
       loginMethod: "",        /* PING INTEGRATION: */
       deviceList: [],         /* PING INTEGRATION: */
-      nextTab: "",            /* PING INTEGRATION: */
+      loginTarget: "",        /* PING INTEGRATION: */
       loginMethodFormGroupClass: '' // Doubt we need this. See comment below on same var.
     });
   }
@@ -88,41 +91,63 @@ class ModalLogin extends React.Component {
     /* END PING INTEGRATION: */
   }
   toggleTab(tab) {
-    console.log("toggleTab tab", tab);
     this.setState({
       activeTab: tab
     });
   }
 
   setLoginMethod(event) {
-    /* BEGIN PING INTEGRATION: */
-    const delimiterPos = event.target.id.lastIndexOf("_");
-    const deviceSelection = event.target.id.substring(delimiterPos + 1);
+    /* BEGIN PING INTEGRATION: had to make this kind of polymorphic due to a late feature add of the "default device" concept in P1MFA. */
+    let deviceSelection = "";
+    let deviceId = "";
+    let deviceRefIndex;
+    let target = "";
+    let name = "";
     const deviceList = this.state.deviceList;
-    const deviceRefIndex = deviceList.findIndex((element, index) => { 
-      return element.includes(deviceSelection); 
-    });
-    console.log("deviceRefIndex", deviceRefIndex);
 
-    this.setState(previousState => {
+    if (typeof event === "string") { //This will be the defaulted device Id.
+      deviceId = event;
+      deviceRefIndex = deviceList.findIndex((element, index) => {
+        return element.includes(deviceId);
+      });
+      deviceSelection = deviceList[deviceRefIndex][0];
+    } else { //We got the selected device from the user in the device selection UI.
+      const delimiterPos = event.target.id.lastIndexOf("_");
+      deviceSelection = event.target.id.substring(delimiterPos + 1);
+      deviceRefIndex = deviceList.findIndex((element, index) => {
+        return element.includes(deviceSelection);
+      });
+      deviceId = deviceList[deviceRefIndex][1];
+    }
+
+    deviceRefIndex = deviceList.findIndex((element, index) => {
+      return element.includes(deviceSelection);
+    });
+    target = deviceList[deviceRefIndex][2];
+    name = deviceList[deviceRefIndex][3];
+
+    this.setState(previousState => {//TODO not referencing previousState anymore. should get rid of this and just do standard setState instead of arrow function.
       return {
-        deviceRef: previousState.deviceList[deviceRefIndex][1],
+        deviceRef: deviceId,
+        loginTarget: target,
+        loginMethod: deviceSelection,
+        deviceName: name,
         loginMethodUnset: false,
-        loginMethod: deviceSelection, /* TODO PING INTEGRATION:  don't think we need this anymore. Could be kept around for validation against deviceRef. */
         loginMethodFormGroupClass: 'form-group-light' //Doubt we need this. Was probably T3 placeholder since they didn't know how we would Implement Ping integration.
       }
     });
-    console.log("deviceRef", this.state.deviceRef);
-    console.log("nextTab", this.state.nextTab);
-    
     /* END PING INTEGRATION: */
   }
 
   // BEGIN PING INTEGRATIONS
+  getDeviceType() {
+
+  }
+
   handleIDChange(event) {
     // grabbing whatever the user is typing in the ID first form as they type, and
     // saving it to state. (Controlled input).
-    this.setState({ userName: event.target.value });
+    this.setState({ userName: event.target.value.trim() });
   }
 
   handleOTPChange(event) {
@@ -143,10 +168,8 @@ class ModalLogin extends React.Component {
   // TODO T3 used numeric IDs for the TabPanes in render(). With our handler, 
   // it would be easier to visually map in the code if they had text IDs related to the UI of the TabPane. I.e. "IDF", "Devices", etc.
   handleSubmit(tab) {
-    console.log("handeSubmit tab", tab);
     //Need to parse this as JSON because the browser's sessionStorage object only stores strings.
     const cachedFlowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
-    console.log("cachedFlowResponse", cachedFlowResponse);
 
     if (window.location.search) {/* TODO what do we do if they submit with no querystring? Is that even possible? If not, do we even need the test for window.location.search??? */
       let data = "";
@@ -163,27 +186,36 @@ class ModalLogin extends React.Component {
             .then(response => response.json())
             .then(jsonResult => {
               let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult));
-              console.log("jsonResult test", JSON.stringify(jsonResult));
               if (jsonResult.status === "USERNAME_PASSWORD_REQUIRED") {
                 //Close ModalLogin. We need to get password.
                 this.toggle();
-                //pop the username/password modal.
+                //swap modals for username/password modal.
                 this.refs.modalLoginPassword.toggle(this.state.userName);
               } else if (jsonResult.status === "AUTHENTICATION_REQUIRED") {
                 this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult, body: "" })
                   .then(response => response.json())
                   .then(jsonResponse => {
                     let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
+                    // We always get back a list of devices whether they have a default or not.
+                    let devices = jsonResponse.devices.map((device) => {
+                      return [device.type, device.id, device.target, device.name];
+                    });
+                    this.setState({ deviceList: devices });
+
+                    //Because we might have a default device in P1MFA.
+                    if (jsonResponse.selectedDeviceRef) {
+                      this.setLoginMethod(jsonResponse.selectedDeviceRef.id);
+                    }
+
                     if (jsonResponse.status === "DEVICE_SELECTION_REQUIRED") {
-                      let devices = jsonResponse.devices.map((device) => {
-                        return [device.type, device.id];
-                      });
-                      console.log("devices", devices.toString());
-                      this.setState({ deviceList: devices });
                       this.toggleTab(tab);
-                      console.log("jsonResponse", JSON.stringify(jsonResponse));
-                      console.log("state", JSON.stringify(this.state));
-                    } // TODO do we need to handle something other than device selection???
+                      //If we're below here it's because the user has a default device in P1MFA.
+                    } else if (jsonResponse.status === "OTP_REQUIRED") {
+                      this.toggleTab("3");
+                    } else { // This assumes their default device response was PUSH_CONFIRMATION_WAITING
+                      this.toggleTab("7");
+                      this.handleSubmit("7");
+                    }
                   });
               }
             })
@@ -197,12 +229,9 @@ class ModalLogin extends React.Component {
             .then(response => response.json())
             .then(jsonResult => {
               let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
-              console.log("jsonResult test", JSON.stringify(jsonResult));
               if (jsonResult.status === "OTP_REQUIRED") {
-                console.log("after submitting otp device", JSON.stringify(jsonResult));
                 this.toggleTab(tab);
               } else if (jsonResult.status === "PUSH_CONFIRMATION_WAITING") {
-                console.log("after submitting mobile device", JSON.stringify(jsonResult));
                 this.handleSubmit("7");
               }
             })
@@ -227,13 +256,11 @@ class ModalLogin extends React.Component {
             .then(response => response.json())
             .then(jsonResponse => {
               let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
-              console.log("jsonResponse", JSON.stringify(jsonResponse));
               if (jsonResponse.status === "MFA_COMPLETED") {
                 this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse, body: "" })
                   .then(response => response.json())
                   .then(jsonResult => {
                     let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
-                    console.log("jsonResult test", JSON.stringify(jsonResult));
                     if (jsonResult.status === "RESUME") {
                       this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult })
                     }
@@ -249,36 +276,28 @@ class ModalLogin extends React.Component {
           this.toggleTab(tab);
           const polling = () => {
             this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse })
-            .then(response => response.json())
-            .then(jsonResponse => {
-              let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
-              console.log("jsonResponse", JSON.stringify(jsonResponse));
-              if (jsonResponse.status === "MFA_COMPLETED") {
-                this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse, body: "" })
-                  .then(response => response.json())
-                  .then(jsonResult => {
-                    let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
-                    console.log("jsonResult test", JSON.stringify(jsonResult));
-                    if (jsonResult.status === "RESUME") {
-                      window.clearInterval(pollingID);
-                      this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult })
-                    }
-                  });
-              }
-            })
-            .catch(e => {
-              console.error("handleAuthNflow exception:", e);
-            });
+              .then(response => response.json())
+              .then(jsonResponse => {
+                let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
+                if (jsonResponse.status === "MFA_COMPLETED") {
+                  this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse, body: "" })
+                    .then(response => response.json())
+                    .then(jsonResult => {
+                      let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
+                      if (jsonResult.status === "RESUME") {
+                        window.clearInterval(pollingID);
+                        this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult })
+                      }
+                    });
+                }
+              })
+              .catch(e => {
+                console.error("handleAuthNflow exception:", e);
+              });
           }
           let pollingID = window.setInterval(polling, 3000);
           break;
       }
-
-      /* if (jsonResult.status === "RESUME") {
-        let success = this.Session.removeAuthenticatedUserItem("flowResponse");
-        // Let handleAuthNflow handle it.
-        this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult });
-      }  *///TODO do we need an else{} to catch other status? Is that possible in our demo use cases?
     }
   }
 
@@ -335,7 +354,8 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="3">{/* MFA sent, check phone msg. */}
+                <TabPane tabId="3">{/* MFA sent, check phone msg. */} {/* TODO jump to here for default device if OTP_REQUIRED */}
+                Using {this.state.loginMethod} at {this.state.loginTarget}.
                   <div className="mobile-loading" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)` }}>
                     <div className="spinner">
                       <FontAwesomeIcon icon={faCircleNotch} size="3x" className="fa-spin" />
@@ -343,15 +363,15 @@ class ModalLogin extends React.Component {
                     <p>{data.mobile.loading}</p>
                   </div>
                   {/* BEGIN PING INTEGRATION: adding missing OTP entry text field. */}
-                  {this.state.deviceSelection !== "iPhone" && 
-                  <FormGroup className="form-group-light">
-                    <Label for="otp">{data.form.fields.otp.label}</Label>
-                    <Input onChange={this.handleOTPChange.bind(this)} type="text" name="otp" id="otp" placeholder={data.form.fields.otp.placeholder} value={this.state.otp} />
+                  {this.state.loginMethod !== "iPhone" &&
+                    <FormGroup className="form-group-light">
+                      <Label for="otp">{data.form.fields.otp.label}</Label>
+                      <Input onChange={this.handleOTPChange.bind(this)} type="text" name="otp" id="otp" placeholder={data.form.fields.otp.placeholder} value={this.state.otp} />
                     </FormGroup>}
-                  {this.state.deviceSelection !== "iPhone" &&
-                  <div className="mb-3">
-                    <Button type="button" color="primary" onClick={() => { this.handleSubmit('6'); }}>{data.form.buttons.next}</Button> {/* PING INTEGRATION see onClick function. */}
-                  </div>}
+                  {this.state.loginMethod !== "iPhone" &&
+                    <div className="mb-3">
+                      <Button type="button" color="primary" onClick={() => { this.handleSubmit('6'); }}>{data.form.buttons.next}</Button> {/* PING INTEGRATION see onClick function. */}
+                    </div>}
                   {/* END PING INTEGRATION */}
                   <div className="mt-4 text-center">
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
@@ -380,8 +400,9 @@ class ModalLogin extends React.Component {
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="7">{/* Mobile app push sent. */}
-                  <h4>{data.titles.mobile_success}</h4>
+                <TabPane tabId="7">{/* Mobile app push sent. */} {/* TODO jump to here for default device if mobile PUSH_CONFIRMATION_WAITING */}
+                Using your {this.state.deviceName ? this.state.deviceName : this.state.loginMethod}.
+                  <h4 data-toggle="tooltip" title="See what we did there?">{data.titles.mobile_success}</h4>
                   <div className="mt-4 text-center">
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>

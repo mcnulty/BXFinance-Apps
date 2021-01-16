@@ -50,7 +50,7 @@ const updateSelectedUserAndConsent = (selectedUser, stateCallback) => {
   let consentData = {};
   pingOAuthObj.getToken({ uid: selectedUser, client: 'anywealthadvisorApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
     .then(consentToken => {
-      pingDataObj.getUserConsentData(consentToken, "advisor")
+      pingDataObj.getUserConsentedData(consentToken, "advisor")
         .then(consentData => {
           if (consentData.Data !== undefined) {//In case we have no consent record.
             newState.acct_0 = typeof consentData.Data.Balance[0] !== 'undefined' ? consentData.Data.Balance[0].Amount.Amount : 0;

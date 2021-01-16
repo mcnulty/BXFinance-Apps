@@ -9,7 +9,7 @@ import {
   Nav,
   NavItem,
   NavLink,
-  Media,
+  Media, //TODO this shows unused. validate and remove.
   Modal,
   ModalHeader,
   ModalBody
@@ -102,7 +102,7 @@ const SearchAutocomplete = () => {
     setConsentState(initialState); //Clearing previous values so they don't show while modal re-renders.
     pingOAuthObj.getToken({ uid: 'marketingApp', client: 'marketingApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
       .then(consent_token => {
-        pingDataObj.getUserConsentData(consent_token, "marketing", filteredSuggestions[index])
+        pingDataObj.getUserConsentedData(consent_token, "marketing", filteredSuggestions[index])
           .then(jsonResults => {
             let fullName;
             try { fullName = jsonResults.Resources[0].cn[0]; }
@@ -120,7 +120,7 @@ const SearchAutocomplete = () => {
             setConsentState(newState);
           })
           .catch(error => {
-            console.error("getUserConsentData Exception", error);
+            console.error("getUserConsentedData Exception", error);
           });
       })
       .catch(error => {
@@ -212,7 +212,7 @@ class AnyMarketing extends React.Component {
     // end the local app session.
     this.Session.clearUserAppSession();
     //A marketing rep should just be taken back to P14E dock. A workforce persona shouldn't get SLO'd.
-    window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
+    window.location.assign("https://desktop.pingone.com/anywealthadvisor/");
   }
 
   componentDidMount() {

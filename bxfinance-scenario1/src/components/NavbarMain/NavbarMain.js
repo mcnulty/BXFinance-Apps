@@ -149,7 +149,6 @@ class NavbarMain extends React.Component {
         this.PingAuthN.handleAuthNflow({ flowId: params.get("flowId") })
           .then(response => response.json())
           .then(jsonResult => {
-            console.log("DEBUG:", JSON.stringify(jsonResult));
             let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //Browser's sessionStorage object only stores strings.
             if (jsonResult.status == "IDENTIFIER_REQUIRED") {
               //pop the ID first modal. 
