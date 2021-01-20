@@ -31,7 +31,7 @@ import "./ModalLoginPassword.scss";
 import data from './data.json';
 
 class ModalLoginPassword extends React.Component {
-  
+
 
   constructor() {
     super();
@@ -40,18 +40,40 @@ class ModalLoginPassword extends React.Component {
       activeTab: '1',
       loginMethodUnset: true,
       loginMethodFormGroupClass: '',
+      deviceRef: "",                  /* PING INTEGRATION: Selected device's Id */
+      deviceName: "",                 /* PING INTEGRATION: Device name if using mobile app. I.e. iPhone XS Max */
+      loginMethod: "",                /* PING INTEGRATION: SMS, Email, iPhone, TOTP */
+      loginTarget: "",                /* PING INTEGRATION: number or email of selected login method. */
+      deviceList: [],                 /* PING INTEGRATION: */
+      otp: "",                        /* PING INTEGRATION: */
       userName: "",                   /* PING INTEGRATION: */
       swaprods: "",                   /* PING INTEGRATION: */
       loginError: false,              /* PING INTEGRATION: */
       loginErrorMsg: "",              /* PING INTEGRATION: */
       rememberMe: "",                 /* PING INTEGRATION: */
-      deviceProfile: {}             /* PING INTEGRATION: */
+      deviceProfile: {}               /* PING INTEGRATION: */
     };
     this.PingAuthN = new PingAuthN(); /* PING INTEGRATION: */
     this.Session = new Session();     /* PING INTEGRATION: */
     this.buildDeviceProfile = this.buildDeviceProfile.bind(this); /* PING INTEGRATION: */
     this.deviceProfileString = ''; /* PING INTEGRATION: */
   }
+
+  /* BEGIN PING INTEGRATION: */
+  // function as class property. // Note: Per reactjs.org this syntax is experimental and not standardized yet. (Stage 3 proposal).
+  //Used to update device selection tabPane based on user's list of paired devices.
+  deviceExists = (type) => {
+    let deviceFound = false;
+    const deviceListFlat = this.state.deviceList.flat();
+
+    if (deviceListFlat.indexOf(type) > -1) {
+      deviceFound = true;
+    }
+
+    return deviceFound;
+  }
+  /* END PING INTEGRATION: */
+
   onClosed() {
     this.setState({
       activeTab: '1',
@@ -80,11 +102,47 @@ class ModalLoginPassword extends React.Component {
       });
     }
   }
-  setLoginMethod() {
-    this.setState({
-      loginMethodUnset: false,
-      loginMethodFormGroupClass: 'form-group-light'
+  setLoginMethod(event) {
+    /* BEGIN PING INTEGRATION: had to make this kind of polymorphic due to a late feature add of the "default device" concept in P1MFA. */
+    let deviceSelection = "";
+    let deviceId = "";
+    let deviceRefIndex;
+    let target = "";
+    let name = "";
+    const deviceList = this.state.deviceList;
+
+    if (typeof event === "string") { //This will be the defaulted device Id.
+      deviceId = event;
+      deviceRefIndex = deviceList.findIndex((element, index) => {
+        return element.includes(deviceId);
+      });
+      deviceSelection = deviceList[deviceRefIndex][0];
+    } else { //We got the selected device from the user in the device selection UI.
+      const delimiterPos = event.target.id.lastIndexOf("_");
+      deviceSelection = event.target.id.substring(delimiterPos + 1);
+      deviceRefIndex = deviceList.findIndex((element, index) => {
+        return element.includes(deviceSelection);
+      });
+      deviceId = deviceList[deviceRefIndex][1];
+    }
+
+    deviceRefIndex = deviceList.findIndex((element, index) => {
+      return element.includes(deviceSelection);
     });
+    target = deviceList[deviceRefIndex][2];
+    name = deviceList[deviceRefIndex][3];
+
+    this.setState(previousState => {//TODO not referencing previousState anymore. should get rid of this and just do standard setState instead of arrow function.
+      return {
+        deviceRef: deviceId,
+        loginTarget: target,
+        loginMethod: deviceSelection,
+        deviceName: name,
+        loginMethodUnset: false,
+        loginMethodFormGroupClass: 'form-group-light' //Doubt we need this. Was probably T3 placeholder since they didn't know how we would Implement Ping integration.
+      }
+    });
+    /* END PING INTEGRATION: */
   }
 
   /* BEGIN PING INTEGRATION: */
@@ -108,9 +166,27 @@ class ModalLoginPassword extends React.Component {
     });
   }
 
+  handleOTPChange(event) {
+    // grabbing whatever the user is typing in the OTP form as they type, and
+    // saving it to state. (Controlled input).
+    this.setState({ otp: event.target.value });
+  }
+
+  handleEmailChange(event) {
+    //This is not used since PF is handling SSPR to demo Velocity templates.
+    // Keeping it here in case Velocity templates get nixed from demos.
+    // Grabbing whatever the user is typing in the email form as they type, and
+    // saving it to state.
+    this.setState({ email: event.target.value });
+  }
+
   //When user clicks "Next".
+  // Handler for various TabPane UIs.
+  // TODO T3 used numeric IDs for the TabPanes in render(). With our handler, 
+  // it would be easier to visually map in the code if they had text IDs related to the UI of the TabPane. I.e. "IDF", "Devices", etc.
   handleSubmit(tab) {
 
+    // Clear error state for next pass through.
     this.setState({
       loginError: false,
       loginErrorMsg: ""
@@ -118,46 +194,166 @@ class ModalLoginPassword extends React.Component {
     const pswd = tab == '2' ? this.state.swaprods : "WTF?"; //TODO Do we care about the tab param here? Toss?
     const cachedFlowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
 
-    if (pswd) {
+    if (pswd) { //TODO do we need this test anymore?
       let data = "";
-      this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
-        .then(response => response.json())
-        .then(jsonResults => {
-          let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResults));
-          if (jsonResults.status == "RESUME") {
-            this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
-          } else if (jsonResults.status == "DEVICE_PROFILE_REQUIRED") {
-            window.profileDevice(this.buildDeviceProfile);
-            //BEGIN DELAY: P1Risk device profiling scripts take just long enough to run that we were trying to send the profile to the authN API before we had it.
-            let intervalId = setInterval(() => {this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults, body: this.deviceProfileString })
+
+      switch (tab) {
+        case "1":
+          // Usernmae/password form. This is the default state. Will probably never be called from here.
+          this.toggleTab("1");
+          break;
+        case "2":
+          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
+            .then(response => response.json())
+            .then(jsonResults => {
+              let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResults));
+              if (jsonResults.status == "RESUME") {
+                this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
+              } else if (jsonResults.status == "DEVICE_PROFILE_REQUIRED") {
+                console.info("ModalLoginPassword.js","PingOne Risk eval needs device profile.");
+                window.profileDevice(this.buildDeviceProfile);
+                //BEGIN DELAY: P1Risk device profiling scripts take just long enough to run that we were trying to send the profile to the authN API before we had it.
+                let intervalId = setInterval(() => {
+                  this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults, body: this.deviceProfileString })
+                    .then(response => response.json())
+                    .then(jsonResponse => {
+                      console.log("response to my profile", JSON.stringify(jsonResponse));
+                      let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
+                      if (jsonResponse.status === "RESUME") {
+                        clearTimeout(intervalId);
+                        this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
+                      } else if (jsonResponse.status === "AUTHENTICATION_REQUIRED") {
+                        clearTimeout(intervalId);
+                        this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse, body: "" })
+                          .then(response => response.json())
+                          .then(jsonResponse => {
+                            console.log("test 1", JSON.stringify(jsonResponse));
+                            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
+                            // We always get back a list of devices whether they have a default or not.
+                            let devices = jsonResponse.devices.map((device) => {
+                              return [device.type, device.id, device.target, device.name];
+                            });
+                            this.setState({ deviceList: devices });
+
+                            //Because we might have a default device in P1MFA.
+                            if (jsonResponse.selectedDeviceRef) {
+                              this.setLoginMethod(jsonResponse.selectedDeviceRef.id);
+                            }
+
+                            if (jsonResponse.status === "DEVICE_SELECTION_REQUIRED") {
+                              this.toggleTab(tab);
+                              //If we're below here it's because the user has a default device in P1MFA.
+                            } else if (jsonResponse.status === "OTP_REQUIRED") {
+                              this.toggleTab("3");
+                            } else { // This assumes their default device response was PUSH_CONFIRMATION_WAITING
+                              this.toggleTab("7");
+                              this.handleSubmit("7");
+                            }
+                          });
+                      }
+                    });
+                }, 1000, jsonResults, this.deviceProfileString);
+                //END DELAY.
+              } else if (jsonResults.code == "VALIDATION_ERROR") {
+                console.info("Validation Error", jsonResults.details[0].userMessage);
+                this.setState({
+                  loginError: true,
+                  loginErrorMsg: jsonResults.details[0].userMessage
+                });
+              } else {
+                throw "Flow Status Exception: Unexpected status."; //TODO This is probably a corner case, but we need to use ModalError.js for this.
+              }
+            })
+            .catch(e => {
+              console.error("handleAuthNFlow() Exception:", e);
+            });
+          break;
+        case "3":
+          data = this.state.deviceRef;
+          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: data })
+            .then(response => response.json())
+            .then(jsonResult => {
+              let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
+              if (jsonResult.status === "OTP_REQUIRED") {
+                this.toggleTab(tab);
+              } else if (jsonResult.status === "PUSH_CONFIRMATION_WAITING") {
+                this.handleSubmit("7");
+              }
+            })
+            .catch(e => {
+              console.error("handleAuthNflow exception:", e);
+            });
+          break;
+        case "4":
+          //Tab 4 is forgot username, so send them to PF endpoint so we can demo Velocity templates.
+          window.location.assign(data.pfAcctRecoveryURI);
+          break;
+        case "5":
+          // We should never hit this case since PF is handling SSPR.
+          // Need implementation if we move SSPR to authN API.
+          this.toggleTab(tab);
+          break;
+        case "6":
+          // Tab 6 is newly created for OTP submitted/success.
+          data = this.state.otp;
+          this.toggleTab(tab);
+          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: data })
+            .then(response => response.json())
+            .then(jsonResponse => {
+              let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
+              if (jsonResponse.status === "MFA_COMPLETED") {
+                this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse, body: "" })
+                  .then(response => response.json())
+                  .then(jsonResult => {
+                    let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
+                    if (jsonResult.status === "RESUME") {
+                      this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult })
+                    }
+                  });
+              }
+            })
+            .catch(e => {
+              console.error("handleAuthNflow exception:", e);
+            });
+          break;
+        case "7":
+          // Tab 7 is newly created for mobile push sent/success.
+          this.toggleTab(tab);
+          const polling = () => {
+            this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse })
               .then(response => response.json())
               .then(jsonResponse => {
                 let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
-                if (jsonResponse.status == "RESUME") {
-                  clearTimeout(intervalId);
-                  this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
+                if (jsonResponse.status === "MFA_COMPLETED") {
+                  this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse, body: "" })
+                    .then(response => response.json())
+                    .then(jsonResult => {
+                      let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
+                      if (jsonResult.status === "RESUME") {
+                        window.clearInterval(pollingID);
+                        this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult })
+                      }
+                    });
                 }
-              });}, 1000, jsonResults, this.deviceProfileString);
-              //END DELAY.
-          } else if (jsonResults.code == "VALIDATION_ERROR") {
-            console.info("Validation Error", jsonResults.details[0].userMessage);
-            this.setState({
-              loginError: true,
-              loginErrorMsg: jsonResults.details[0].userMessage
-            });
-          } else {
-            throw "Flow Status Exception: Unexpected status."; //TODO This is probably a corner case, but we need to use ModalError.js for this.
+              })
+              .catch(e => {
+                console.error("handleAuthNflow exception:", e);
+              });
           }
-        })
-        .catch(e => {
-          console.error("handleAuthNFlow() Exception:", e);
-        });
+          let pollingID = window.setInterval(polling, 3000);
+          break;
+        case "8":
+          //TODO  need implementation? Do we ever get here? or is this another case handled by PF UIs?
+          break;
+      }
+      
     }
   }
 
   // Callback for P1 Risk profiling scripts.
   // When P1 Risk profiles the user's device, it will call this method passing the raw device profile.
   buildDeviceProfile(deviceComponents) {
+    console.log("deviceComponents", deviceComponents);
     const formattedProfile = window.transformComponentsToDeviceProfile(deviceComponents)
     this.deviceProfileString = JSON.stringify(formattedProfile);
   }
@@ -182,7 +378,7 @@ class ModalLoginPassword extends React.Component {
           <ModalBody>
             <form>
               <TabContent activeTab={this.state.activeTab}>
-                <TabPane tabId="1">
+                <TabPane tabId="1"> {/* Username/password */}
                   <h4>{data.titles.welcome}</h4>
                   {this.state.loginError && <span style={{ color: 'red' }}>{this.state.loginErrorMsg}</span>} {/* PING INTEGRATION */}
                   <FormGroup className="form-group-light">
@@ -198,53 +394,70 @@ class ModalLoginPassword extends React.Component {
                     <CustomInput onChange={this.handleRememberMeChange.bind(this)} type="checkbox" id="remember" label={data.form.fields.remember.label} checked={this.state.rememberMe} />
                   </FormGroup>
                   <div className="mb-3">
-                    <Button type="button" color="primary" onClick={() => { this.toggleTab('2') }}>{data.form.buttons.next}</Button>
+                    <Button type="button" color="primary" onClick={() => { this.handleSubmit('2') }}>{data.form.buttons.next}</Button>
                   </div>
                   <div>
-                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('4'); }}>{data.form.buttons.reset}</Button>
+                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.handleSubmit('4'); }}>{data.form.buttons.reset}</Button>
                   </div>
                   <div>
-                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('5'); }}>{data.form.buttons.reset_password}</Button>
+                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.handleSubmit('5'); }}>{data.form.buttons.reset_password}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="2">
+                <TabPane tabId="2"> {/* Device/login selection. */}
                   <h4>{data.titles.login_method}</h4>
                   <FormGroup className={this.state.loginMethodFormGroupClass}>
-                    <div>
-                      <CustomInput type="radio" id="login_method_email" name="login_method" label={data.form.fields.login_method.options.email} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />
-                      <CustomInput type="radio" id="login_method_text" name="login_method" label={data.form.fields.login_method.options.text} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />
-                      <CustomInput type="radio" id="login_method_faceid" name="login_method" label={data.form.fields.login_method.options.faceid} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />
-                    </div>
+                    <div>{/* BEGIN PING INTEGRATION */}
+                      {this.deviceExists("iPhone") &&
+                        <CustomInput type="radio" id="login_method_faceid" name="login_method" label={data.form.fields.login_method.options.faceid} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
+                      {/* NOT SUPPORTING THIS FOR DEMOS {this.deviceExists("TOTP") &&
+                        <CustomInput type="radio" id="login_method_TOTP" name="login_method" label={data.form.fields.login_method.options.totp} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />} */}
+                      {this.deviceExists("SMS") &&
+                        <CustomInput type="radio" id="login_method_text" name="login_method" label={data.form.fields.login_method.options.text} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
+                      {this.deviceExists("Email") &&
+                        <CustomInput type="radio" id="login_method_email" name="login_method" label={data.form.fields.login_method.options.email} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
+                    </div>{/* END PING INTEGRATION */}
                   </FormGroup>
                   <div className="mb-4 text-center">
-                    <Button type="button" color="primary" disabled={this.state.loginMethodUnset} onClick={() => { this.toggleTab('3'); }}>{data.form.buttons.login}</Button>
+                    <Button type="button" color="primary" disabled={this.state.loginMethodUnset} onClick={() => { this.handleSubmit('3'); }}>{data.form.buttons.login}</Button>
                   </div>
                   <div className="text-center">
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="3">
+                <TabPane tabId="3">{/* MFA sent, check phone msg. */} {/* TODO jump to here for default device if OTP_REQUIRED */}
+                  Using {this.state.loginMethod} at {this.state.loginTarget}.
                   <div className="mobile-loading" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/login-device-outline.jpg)` }}>
                     <div className="spinner">
                       <FontAwesomeIcon icon={faCircleNotch} size="3x" className="fa-spin" />
                     </div>
                     <p>{data.mobile.loading}</p>
                   </div>
+                  {/* BEGIN PING INTEGRATION: adding missing OTP entry text field. */}
+                  {this.state.loginMethod !== "iPhone" &&
+                    <FormGroup className="form-group-light">
+                      <Label for="otp">{data.form.fields.otp.label}</Label>
+                      <Input onChange={this.handleOTPChange.bind(this)} type="text" name="otp" id="otp" placeholder={data.form.fields.otp.placeholder} value={this.state.otp} />
+                    </FormGroup>}
+                  {this.state.loginMethod !== "iPhone" &&
+                    <div className="mb-3">
+                      <Button type="button" color="primary" onClick={() => { this.handleSubmit('6'); }}>{data.form.buttons.next}</Button> {/* PING INTEGRATION see onClick function. */}
+                    </div>}
+                  {/* END PING INTEGRATION */}
                   <div className="mt-4 text-center">
                     <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="4">
+                <TabPane tabId="4">{/* Recover userName. This is now handled by PF to demo Velocity templates. */}
                   <h4>{data.form.buttons.recover_username}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="email">{data.form.fields.email.label}</Label>
-                    <Input type="text" name="email" id="email" placeholder={data.form.fields.email.placeholder} />
+                    <Input onChange={this.handleEmailChange.bind(this)} type="text" name="email" id="email" placeholder={data.form.fields.email.placeholder} />
                   </FormGroup>
                   <div className="mb-3">
-                    <Button type="button" color="primary" onClick={() => { this.toggleTab('6'); }}>{data.form.buttons.recover_username}</Button>
+                    <Button type="button" color="primary" onClick={() => { this.handleSubmit('5'); }}>{data.form.buttons.recover_username}</Button>{/* PING INTEGRATION: See onClick function. */}
                   </div>
                 </TabPane>
-                <TabPane tabId="5">
+                <TabPane tabId="5">{/* Not using TabPane 5. SSPR handled by PF. May use in the future. */}
                   <h4>{data.form.buttons.recover_password}</h4>
                   <FormGroup className="form-group-light">
                     <Label for="email">{data.form.fields.email.label}</Label>
@@ -254,7 +467,22 @@ class ModalLoginPassword extends React.Component {
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('6'); }}>{data.form.buttons.recover_password}</Button>
                   </div>
                 </TabPane>
-                <TabPane tabId="6">
+                {/* BEGIN PING INTEGRATION: added TabPanes for OTP submission and mobile push success. */}
+                <TabPane tabId="6">{/* OTP sent. */}
+                  <h4>{data.titles.otp_success}</h4>
+                  <div className="mt-4 text-center">
+                    <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
+                  </div>
+                </TabPane>
+                <TabPane tabId="7">{/* Mobile app push sent. */} {/* TODO jump to here for default device if mobile PUSH_CONFIRMATION_WAITING */}
+                Using your {this.state.deviceName ? this.state.deviceName : this.state.loginMethod}.
+                  <h4 data-toggle="tooltip" title="See what we did there?">{data.titles.mobile_success}</h4>
+                  <div className="mt-4 text-center">
+                    <Button type="button" color="link" size="sm" className="text-info" onClick={this.toggle.bind(this)}>{data.form.buttons.help}</Button>
+                  </div>
+                </TabPane>
+                {/* END PING INTEGRATION */}
+                <TabPane tabId="8"> {/* This used to be tabId 6 in the original T3 supplied UI. Just FYI for historical reference. */}
                   <h4>{data.titles.recover_username_success}</h4>
                   <div className="mb-3 text-center">
                     <Button type="button" color="primary" onClick={() => { this.toggleTab('1'); }}>{data.form.buttons.login}</Button>
