@@ -138,3 +138,5 @@ class PingAuthN {
         return fetch(url, requestOptions);
     }
 }
+
+export default PingAuthN;
