@@ -1,4 +1,32 @@
-/** 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: integration/PingAuthN.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: integration/PingAuthN.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** 
 PING INTEGRATION:
 This entire component is Ping-developed.
 Implements functions to integrate with PingFederate
@@ -12,6 +40,7 @@ class PingAuthN {
     // Didn't abstract these since they shouldn't ever change.
     pfAuthnAPIURI = "/pf-ws/authn/flows/";
     pfPickupURI = "/ext/ref/pickup?REF=";
+    //TODO remove if stable. pfSPRefIdAdapterInstanceId = "BXFSPRefID";
 
     /** 
     AuthN API:
@@ -86,18 +115,13 @@ class PingAuthN {
                 // this case is a placeholder for mobile push. Needs to be updated.
             case "PUSH_CONFIRMATION_WAITING":
                 console.info("PingAuthN.js", "fubar_REQUIRED");
+                payload = '{\n \"fubar\": \"' + body + '\" \n}';
                 return this.authnAPI({ method: "POST", flowId: flowResponse.id, action: "poll" });
                 break;
             case "MFA_COMPLETED":
                 console.info("PingAuthN.js", "MFA_COMPLETED");
                 payload = '{' + body + '}';
                 return this.authnAPI({ method: "POST", flowId: flowResponse.id, payload: payload, action: "continueAuthentication" });
-                break;
-            case "DEVICE_PROFILE_REQUIRED":
-                console.info("PingAuthN.js", "DEVICE_PROFILE_REQUIRED");
-                console.info("Device Profile", body);
-                payload = body;
-                return this.authnAPI({ method: "POST", flowId: flowResponse.id, payload: payload, action: "submitDeviceProfile" });
                 break;
             case "RESUME":
                 console.info("PingAuthN.js", "Authentication complete. Redirecting to resumeURL.");
@@ -137,4 +161,96 @@ class PingAuthN {
 
         return fetch(url, requestOptions);
     }
+};
+
+export default PingAuthN;
+
+/*
+######## OTP FLOW ##########
+
+GET https://demo.bxfinance.xyz/idp/startSSO.ping?PartnerSpId=https://demo.bxfinance.xyz
+response = ?fowId=fubar
+
+GET https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL
+response = "status": "IDENTIFIER_REQUIRED"
+
+POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=submitIdentifier
+{
+  "identifier": "string"
 }
+Response = "status": "AUTHENTICATION_REQUIRED"
+
+POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=authenticate   //with empty object literal
+{}
+response = "status": "DEVICE_SELECTION_REQUIRED"  // device list included in response - lines up with UI from T3.
+
+POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=selectDevice
+{
+   "deviceRef":{
+      "id":"ca5d9af8-8258-407c-9298-899713b09b38"
+   }
+}
+response = "status": "OTP_REQUIRED"
+
+POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=checkOtp
+{
+  "otp": "135298"
+}
+response = "status": "MFA_COMPLETED"
+
+POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=continueAuthentication
+//empty payload
+response = "status": "RESUME" //includes resumeUrl for redirect;
+
+
+
+######## MOBILE APP FLOW ##########
+
+GET https://demo.bxfinance.xyz/idp/startSSO.ping?PartnerSpId=https://demo.bxfinance.xyz
+response = ?fowId=fubar
+
+GET https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL
+response = "status": "IDENTIFIER_REQUIRED"
+
+POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=submitIdentifier
+{
+  "identifier": "string"
+}
+Response = "status": "AUTHENTICATION_REQUIRED"
+
+POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=authenticate   //with empty object literal
+{}
+response = "status": "DEVICE_SELECTION_REQUIRED"  // device list included in response - lines up with UI from T3.
+
+POST https://demo.bxfinance.xyz/pf-ws/authn/flows/dEEpL?action=selectDevice
+{
+   "deviceRef":{
+      "id":"ca5d9af8-8258-407c-9298-899713b09b38"
+   }
+}
+response =
+
+
+*/</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="GeoLocate.html">GeoLocate</a></li><li><a href="JSONSearch.html">JSONSearch</a></li><li><a href="OpenBanking.html">OpenBanking</a></li><li><a href="PingAuthN.html">PingAuthN</a></li><li><a href="PingData.html">PingData</a></li><li><a href="PingOAuth.html">PingOAuth</a></li><li><a href="Session.html">Session</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Jan 13 2021 13:49:06 GMT-0700 (Mountain Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
