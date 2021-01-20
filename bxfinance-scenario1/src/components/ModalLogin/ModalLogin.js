@@ -24,7 +24,6 @@ import data from './data.json';
 
 import PingAuthN from '../Integration/PingAuthN'; /* PING INTEGRATION */
 import Session from '../Utils/Session'; /* PING INTEGRATION: */
-import JSONSearch from '../Utils/JSONSearch'; /* PING INTEGRATION: */
 import ModalLoginPassword from '../ModalLoginPassword/ModalLoginPassword'; /* PING INTEGRATION: */
 
 class ModalLogin extends React.Component {
@@ -45,9 +44,8 @@ class ModalLogin extends React.Component {
       userName: '',           /* PING INTEGRATION */
       email: ''               /* PING INTEGRATION */
     };
-    this.PingAuthN = new PingAuthN();
-    this.Session = new Session();
-    this.JSONSearch = new JSONSearch();
+    this.PingAuthN = new PingAuthN();   /* PING INTEGRATION: */
+    this.Session = new Session();       /* PING INTEGRATION: */
   }
 
   /* BEGIN PING INTEGRATION: */
@@ -140,10 +138,6 @@ class ModalLogin extends React.Component {
   }
 
   // BEGIN PING INTEGRATIONS
-  getDeviceType() {
-
-  }
-
   handleIDChange(event) {
     // grabbing whatever the user is typing in the ID first form as they type, and
     // saving it to state. (Controlled input).
@@ -151,7 +145,7 @@ class ModalLogin extends React.Component {
   }
 
   handleOTPChange(event) {
-    // grabbing whatever the user is typing in the ID first form as they type, and
+    // grabbing whatever the user is typing in the OTP form as they type, and
     // saving it to state. (Controlled input).
     this.setState({ otp: event.target.value });
   }
@@ -164,6 +158,7 @@ class ModalLogin extends React.Component {
     this.setState({ email: event.target.value });
   }
 
+  // When user clicks "Next".
   // Handler for various TabPane UIs.
   // TODO T3 used numeric IDs for the TabPanes in render(). With our handler, 
   // it would be easier to visually map in the code if they had text IDs related to the UI of the TabPane. I.e. "IDF", "Devices", etc.
@@ -176,11 +171,11 @@ class ModalLogin extends React.Component {
 
       switch (tab) {
         case "1":
-          // IDF form. This is the default state. Will probably never called from here.
+          // IDF form. This is the default state. Will probably never be called from here.
           this.toggleTab("1");
           break;
         case "2":
-          //Password modal or P1MFA. If password, we toggle to a new UI.
+          //Password modal or device selection. If password, we toggle to a new UI.
           data = this.state.userName;
           this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: data })
             .then(response => response.json())
