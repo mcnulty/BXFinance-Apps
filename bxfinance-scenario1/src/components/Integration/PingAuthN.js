@@ -92,6 +92,7 @@ export default class PingAuthN {
                 break;
             case "DEVICE_PROFILE_REQUIRED":
                 console.info("PingAuthN.js", "DEVICE_PROFILE_REQUIRED");
+                console.info("Device Profile", body);
                 payload = body;
                 return this.authnAPI({ method: "POST", flowId: flowResponse.id, payload: payload, action: "submitDeviceProfile" });
                 break;
