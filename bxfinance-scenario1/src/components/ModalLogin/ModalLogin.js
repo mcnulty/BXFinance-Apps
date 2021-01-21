@@ -42,7 +42,7 @@ class ModalLogin extends React.Component {
       deviceList: [],         /* PING INTEGRATION: */
       otp: "",                /* PING INTEGRATION: */
       userName: '',           /* PING INTEGRATION */
-      email: ''               /* PING INTEGRATION */
+      email: ''              /* PING INTEGRATION */
     };
     this.PingAuthN = new PingAuthN();   /* PING INTEGRATION: */
     this.Session = new Session();       /* PING INTEGRATION: */
@@ -250,7 +250,7 @@ class ModalLogin extends React.Component {
           this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: payload })
             .then(response => response.json())
             .then(jsonResponse => {
-              let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
+              if (jsonResponse.status) {let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));}
               if (jsonResponse.status === "MFA_COMPLETED") {
                 this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse, body: "" })
                   .then(response => response.json())
@@ -260,6 +260,10 @@ class ModalLogin extends React.Component {
                       this.PingAuthN.handleAuthNflow({ flowResponse: jsonResult })
                     }
                   });
+              } else {
+                console.log("DEBUG", JSON.stringify(jsonResponse));
+                // User got the OTP wrong. Try again.
+                this.toggleTab("3");
               }
             })
             .catch(e => {
