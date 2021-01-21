@@ -122,6 +122,7 @@ class ModalLoginPassword extends React.Component {
       deviceRefIndex = deviceList.findIndex((element, index) => {
         return element.includes(deviceSelection);
       });
+      
       deviceId = deviceList[deviceRefIndex][1];
     }
 
@@ -184,7 +185,6 @@ class ModalLoginPassword extends React.Component {
   // TODO T3 used numeric IDs for the TabPanes in render(). With our handler, 
   // it would be easier to visually map in the code if they had text IDs related to the UI of the TabPane. I.e. "IDF", "Devices", etc.
   handleSubmit(tab) {
-    console.log("handlesubmit tab", tab);
     // Clear error state for next pass through.
     this.setState({
       loginError: false,
@@ -205,8 +205,10 @@ class ModalLoginPassword extends React.Component {
           this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, swaprods: this.state.swaprods, rememberMe: this.state.rememberMe })
             .then(response => response.json())
             .then(jsonResults => {
-              let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResults));
-              if (jsonResults.status == "RESUME") {
+              //We only want to cache the flow response if it has a status. Otherwise it's an error of some kind.
+              if (jsonResults.status) {let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResults));}
+              
+              if (jsonResults.status === "RESUME") {
                 this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults });//Don't need to do anything more than call handleAuthNFlow(). RESUME always results in a redireect to the TargetResource.
               } else if (jsonResults.status == "DEVICE_PROFILE_REQUIRED") {
                 console.info("ModalLoginPassword.js","PingOne Risk eval needs device profile.");
@@ -216,7 +218,6 @@ class ModalLoginPassword extends React.Component {
                   this.PingAuthN.handleAuthNflow({ flowResponse: jsonResults, body: this.deviceProfileString })
                     .then(response => response.json())
                     .then(jsonResponse => {
-                      console.log("response to my profile", JSON.stringify(jsonResponse));
                       let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
                       if (jsonResponse.status === "RESUME") {
                         clearTimeout(intervalId);
@@ -226,7 +227,6 @@ class ModalLoginPassword extends React.Component {
                         this.PingAuthN.handleAuthNflow({ flowResponse: jsonResponse, body: "" })
                           .then(response => response.json())
                           .then(jsonResponse => {
-                            console.log("test 1", JSON.stringify(jsonResponse));
                             let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
                             // We always get back a list of devices whether they have a default or not.
                             let devices = jsonResponse.devices.map((device) => {
@@ -353,7 +353,6 @@ class ModalLoginPassword extends React.Component {
   // Callback for P1 Risk profiling scripts.
   // When P1 Risk profiles the user's device, it will call this method passing the raw device profile.
   buildDeviceProfile(deviceComponents) {
-    console.log("deviceComponents", deviceComponents);
     const formattedProfile = window.transformComponentsToDeviceProfile(deviceComponents)
     this.deviceProfileString = JSON.stringify(formattedProfile);
   }
@@ -408,13 +407,13 @@ class ModalLoginPassword extends React.Component {
                   <FormGroup className={this.state.loginMethodFormGroupClass}>
                     <div>{/* BEGIN PING INTEGRATION */}
                       {this.deviceExists("iPhone") &&
-                        <CustomInput type="radio" id="login_method_faceid" name="login_method" label={data.form.fields.login_method.options.faceid} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
+                        <CustomInput type="radio" id="login_method_iPhone" name="login_method" label={data.form.fields.login_method.options.faceid} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
                       {/* NOT SUPPORTING THIS FOR DEMOS {this.deviceExists("TOTP") &&
                         <CustomInput type="radio" id="login_method_TOTP" name="login_method" label={data.form.fields.login_method.options.totp} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />} */}
                       {this.deviceExists("SMS") &&
-                        <CustomInput type="radio" id="login_method_text" name="login_method" label={data.form.fields.login_method.options.text} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
+                        <CustomInput type="radio" id="login_method_SMS" name="login_method" label={data.form.fields.login_method.options.text} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
                       {this.deviceExists("Email") &&
-                        <CustomInput type="radio" id="login_method_email" name="login_method" label={data.form.fields.login_method.options.email} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
+                        <CustomInput type="radio" id="login_method_Email" name="login_method" label={data.form.fields.login_method.options.email} className="form-check-inline" onClick={this.setLoginMethod.bind(this)} />}
                     </div>{/* END PING INTEGRATION */}
                   </FormGroup>
                   <div className="mb-4 text-center">
