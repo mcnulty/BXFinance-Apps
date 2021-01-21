@@ -167,7 +167,7 @@ class ModalLogin extends React.Component {
     const cachedFlowResponse = JSON.parse(this.Session.getAuthenticatedUserItem("flowResponse"));
 
     if (window.location.search) {/* TODO what do we do if they submit with no querystring? Is that even possible? If not, do we even need the test for window.location.search??? */
-      let data = "";
+      let payload = "";
 
       switch (tab) {
         case "1":
@@ -176,8 +176,8 @@ class ModalLogin extends React.Component {
           break;
         case "2":
           //Password modal or device selection. If password, we toggle to a new UI.
-          data = this.state.userName;
-          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: data })
+          payload = this.state.userName;
+          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: payload })
             .then(response => response.json())
             .then(jsonResult => {
               let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult));
@@ -219,8 +219,8 @@ class ModalLogin extends React.Component {
             });
           break;
         case "3":
-          data = this.state.deviceRef;
-          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: data })
+          payload = this.state.deviceRef;
+          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: payload })
             .then(response => response.json())
             .then(jsonResult => {
               let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO is there a better solution for this?
@@ -245,9 +245,9 @@ class ModalLogin extends React.Component {
           break;
         case "6":
           // Tab 6 is newly created for OTP submitted/success.
-          data = this.state.otp;
+          payload = this.state.otp;
           this.toggleTab(tab);
-          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: data })
+          this.PingAuthN.handleAuthNflow({ flowResponse: cachedFlowResponse, body: payload })
             .then(response => response.json())
             .then(jsonResponse => {
               let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResponse));
