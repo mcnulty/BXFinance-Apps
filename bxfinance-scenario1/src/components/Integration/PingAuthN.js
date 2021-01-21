@@ -53,7 +53,7 @@ class PingAuthN {
     */
     handleAuthNflow({ flowId, flowResponse, swaprods, rememberMe, body }) {
         console.info("PingAuthN.js", "Handling flow response from authN API.");
-        console.log("flowResponse", JSON.stringify(flowResponse));
+        console.info("FlowResponse was", JSON.stringify(flowResponse));
 
         let payload = '{}';
         if (!flowResponse) { flowResponse = {}; } //This won't exist if we only get a flowId. So create it to let switch/case default kick in.
