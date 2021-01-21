@@ -88,16 +88,15 @@ class ModalLoginPassword extends React.Component {
     });
   }
   toggleTab(tab) {
-    /* BEGIN PING INTEGRATION: */
-    if (tab == '2') {
-      this.handleSubmit(tab);
-    } else if (tab == '4') {
+    /* BEGIN PING INTEGRATION: We're letting PF handle SSPR to demo Velocity templates. */
+    if (tab == '4') {
       window.location.assign(data.pfAcctRecoveryURI);
     } else if (tab == '5') {
       window.location.assign(data.pfPwdResetURI);
     } else {
       /* END PING INTEGRATION */
-      this.setState({ // TODO I dont think we need this anymore. Need to validate and if removed, regression test.
+
+      this.setState({
         activeTab: tab
       });
     }
@@ -185,7 +184,7 @@ class ModalLoginPassword extends React.Component {
   // TODO T3 used numeric IDs for the TabPanes in render(). With our handler, 
   // it would be easier to visually map in the code if they had text IDs related to the UI of the TabPane. I.e. "IDF", "Devices", etc.
   handleSubmit(tab) {
-
+    console.log("handlesubmit tab", tab);
     // Clear error state for next pass through.
     this.setState({
       loginError: false,
@@ -285,13 +284,14 @@ class ModalLoginPassword extends React.Component {
             });
           break;
         case "4":
-          //Tab 4 is forgot username, so send them to PF endpoint so we can demo Velocity templates.
-          window.location.assign(data.pfAcctRecoveryURI);
+          // We should never hit this case since PF is handling SSPR.
+          // Need implementation if we move SSPR to authN API.
+          // @see this.toggleTab(tab);
           break;
         case "5":
           // We should never hit this case since PF is handling SSPR.
           // Need implementation if we move SSPR to authN API.
-          this.toggleTab(tab);
+          // @see this.toggleTab(tab);
           break;
         case "6":
           // Tab 6 is newly created for OTP submitted/success.
@@ -397,10 +397,10 @@ class ModalLoginPassword extends React.Component {
                     <Button type="button" color="primary" onClick={() => { this.handleSubmit('2') }}>{data.form.buttons.next}</Button>
                   </div>
                   <div>
-                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.handleSubmit('4'); }}>{data.form.buttons.reset}</Button>
+                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('4'); }}>{data.form.buttons.reset}</Button>
                   </div>
                   <div>
-                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.handleSubmit('5'); }}>{data.form.buttons.reset_password}</Button>
+                    <Button type="button" color="link" size="sm" className="text-info pl-0" onClick={() => { this.toggleTab('5'); }}>{data.form.buttons.reset_password}</Button>
                   </div>
                 </TabPane>
                 <TabPane tabId="2"> {/* Device/login selection. */}
