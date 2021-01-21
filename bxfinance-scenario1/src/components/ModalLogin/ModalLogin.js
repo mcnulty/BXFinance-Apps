@@ -298,8 +298,7 @@ class ModalLogin extends React.Component {
 
   componentDidMount() {
     const rememberMe = this.Session.getCookie("rememberMe");
-    if (rememberMe.length)
-      this.setState({ userName: rememberMe });
+    if (rememberMe.length) { this.setState({ userName: rememberMe }); }
   }
   // END PING INTEGRATIONS
 
