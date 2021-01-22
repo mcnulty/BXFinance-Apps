@@ -23,7 +23,6 @@ import AccountsSubnav from '../../components/AccountsSubnav';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
 import PingData from '../../components/Integration/PingData'; /* PING INTEGRATION: */
 import JSONSearch from '../../components/Utils/JSONSearch'; /* PING INTEGRATION: */
-import PingOAuth from '../../components/Integration/PingOAuth'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/advisor.json';
@@ -34,7 +33,6 @@ import '../../styles/pages/advisor.scss';
 /* BEGIN PING INTEGRATION: */
 const updateSelectedUserAndConsent = (selectedUser, stateCallback) => {
   const sessionObj = new Session();
-  const pingOAuthObj = new PingOAuth();
   const pingDataObj = new PingData();
   let newState = {
     fullName: "",
@@ -47,19 +45,14 @@ const updateSelectedUserAndConsent = (selectedUser, stateCallback) => {
     acct_2: 0
   };
 
-  let consentData = {};
-  pingOAuthObj.getToken({ uid: selectedUser, client: 'anywealthadvisorApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
-    .then(consentToken => {
-      pingDataObj.getUserConsentedData(consentToken, "advisor")
-        .then(consentData => {
-          if (consentData.Data !== undefined) {//In case we have no consent record.
-            newState.acct_0 = typeof consentData.Data.Balance[0] !== 'undefined' ? consentData.Data.Balance[0].Amount.Amount : 0;
-            newState.acct_1 = typeof consentData.Data.Balance[1] !== 'undefined' ? consentData.Data.Balance[1].Amount.Amount : 0;
-            newState.acct_2 = typeof consentData.Data.Balance[2] !== 'undefined' ? consentData.Data.Balance[2].Amount.Amount : 0;
-            stateCallback(newState);
-          }
-        });
-
+  pingDataObj.getUserConsentedData("advisor")
+    .then(consentData => {
+      if (consentData.Data !== undefined) {//In case we have no consent record.
+        newState.acct_0 = typeof consentData.Data.Balance[0] !== 'undefined' ? consentData.Data.Balance[0].Amount.Amount : 0;
+        newState.acct_1 = typeof consentData.Data.Balance[1] !== 'undefined' ? consentData.Data.Balance[1].Amount.Amount : 0;
+        newState.acct_2 = typeof consentData.Data.Balance[2] !== 'undefined' ? consentData.Data.Balance[2].Amount.Amount : 0;
+        stateCallback(newState);
+      }
     });
 
   //Get the selected users entry in PD.

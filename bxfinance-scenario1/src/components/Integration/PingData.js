@@ -7,6 +7,8 @@ API endpoints.
 @author Michael Sanchez
 */
 
+import PingAuthN from './PingAuthN';
+
 class PingData {
 
     // Didn't abstract these since they shouldn't ever change. Right??? Maybe move these to JSON data file?
@@ -24,7 +26,7 @@ class PingData {
     dgOpenBankingVersion = "/v2";
     dgBalancesResource = "/balances";
     
-    /** 
+    /**
     Get User Entry:
     Fetches a user record from PingDirectory.
 
@@ -33,20 +35,15 @@ class PingData {
     */
     getUserEntry(uid) {
         const userRDN = 'uid=' + encodeURIComponent(uid);
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ=="); /* TODO this should be obfuscated somehow. */
-
         const requestOptions = {
             method: 'GET',
-            headers: myHeaders,
             redirect: 'manual'
         };
         const url = this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
-        return fetch(url, requestOptions);
+        return PingAuthN.useSession().then(() => fetch(url, requestOptions));
     }
 
-    /** 
+    /**
     Update User Entry:
     Update user entry with bank accounts.
 
@@ -60,7 +57,6 @@ class PingData {
         const userRDN = 'uid=' + uid;
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
 
         let updateObj = { "modifications": [{ "attributeName": "bxFinanceUserAccountIDs", "modificationType": "set", "values": [{ "ids": [] }] }] };
         updateObj.modifications[0].values[0].ids = acctIds;
@@ -75,13 +71,14 @@ class PingData {
         };
 
         //TODO add error handling here in case failed requset. Rare in our environment, butt still.
+        await PingAuthN.useSession();
         const url = this.pdReSTURI + userRDN + ',' + this.pdPeopleRDN;
         const response = await fetch(url, requestOptions);
         const jsonData = await response.json();
         return Promise.resolve(jsonData);
     }
 
-    /** 
+    /**
     Get Searchable Users:
     Fetches all users in the people DN for the suggestable search feature in the AnyAdvisor/Marketing portals.
     We filter out user that have the attribute bxFinanceUserType, because they are not banking users, but partners in the demo.
@@ -93,61 +90,50 @@ class PingData {
     getSearchableUsers({ searchScope = "singleLevel", limit = "100" }) {
         console.info("PingData.js", "Getting all searchable users (banking customers) from PD.");
 
-        var myHeaders = new Headers();
-        myHeaders.append("Authorization", "Basic Y249ZG1hbmFnZXI6MkZlZGVyYXRlTTByZQ==");
-
         var requestOptions = {
             method: 'GET',
-            headers: myHeaders,
             redirect: 'follow'
         };
         // TODO we need some attribute or way to filter user to only include ones created for demos.
         const url = this.pdReSTURI + this.pdPeopleRDN + this.pdSubtreeResource + "searchScope=" + searchScope + "&limit=" + limit + "&filter=not(bxFinanceUserType pr)";
 
-        return fetch(url, requestOptions);
+        return PingAuthN.useSession().then(() => fetch(url, requestOptions));
     }
 
-    /** 
+    /**
     Get User Consents:
     This is called from customer apps for consent management from PingDirectory.
 
-    @param {string} token The access token for the authenticated user.
     @param {string} uid The user's uid from their user record.
     @param {string} definition The consent definition ID.
     @return {object} Consent record in JSON format.
     */
-    getUserConsents(token, uid, definition) {
+    getUserConsents(uid, definition) {
         console.info("PingData.js", "Getting user's consents from PD.");
-
-        let myHeaders = new Headers();
-        myHeaders.append("Authorization", "Bearer " + token);
 
         const requestOptions = {
             method: 'GET',
-            headers: myHeaders,
             redirect: 'follow'
         };
         const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "?subject=" + encodeURIComponent(uid) + "&definition=" + definition;
-        return fetch(url, requestOptions);
+        return PingAuthN.useSession().then(() => fetch(url, requestOptions));
     }
 
-    /** 
+    /**
     Create User Consent:
-    Creates the user's consent record in PingDirectory. 
+    Creates the user's consent record in PingDirectory.
 
-    @param {string} token The access token for the authenticated user.
     @param {object} consent The JSON object of consents to update the "data" property of the consent object.
     @param {string} uid The uid of the user fo which we are creating a consent record.
     @param {string} definition The consent definition ID.
     @return {object} Consent record in JSON format.
     */
-    createUserConsent(token, consent, uid, definition) {
+    createUserConsent(consent, uid, definition) {
         console.info("PingData.js", "Creating user's consent record in PD.");
 
         let myHeaders = new Headers();
         let consentObject = {};
         let raw = "";
-        myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
 
         //  We build the consent object template for the specified definition, and then update the data field with user's consent choices.
@@ -173,26 +159,24 @@ class PingData {
             redirect: 'follow'
         };
         const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource;
-        return fetch(url, requestOptions);
+        return PingAuthN.useSession().then(() => fetch(url, requestOptions));
     }
 
-    /** 
+    /**
     Update User Consent:
     Updates the user's consent record in PingDirectory.
 
-    @param {string} token The access token for the authenticated user.
     @param {object} consent The JSON object of consents to update the "data" property of the consent object.
     @param {string} consentId The id of the user's existing consent record.
     @param {string} definition The consent definition ID.
     @return {object} Consent record in JSON format.
     */
-    updateUserConsent(token, consent, consentId, definition) {
+    updateUserConsent(consent, consentId, definition) {
         console.info("PingData.js", "Updating user's consent record' in PD.");
 
         let myHeaders = new Headers();
         let consentObject = { "data": {} };
         let raw = "";
-        myHeaders.append("Authorization", "Bearer " + token);
         myHeaders.append("Content-Type", "application/json");
         console.info("Updating it to:", consent);
         
@@ -217,27 +201,22 @@ class PingData {
             redirect: 'follow'
         };
         const url = this.pdConsentURI + this.pdConsentVersion + this.pdConsentResource + "/" + consentId;
-        return fetch(url, requestOptions);
+        return PingAuthN.useSession().then(() => fetch(url, requestOptions));
     }
 
-    /** 
+    /**
     Get User Consented Data:
     This is called from AnyWealth Advisor and AnyMarketing portals. Uses DataGovernance for consent enforcement.
-    
-    @param {string} token The access token of the marketingApp.
+
     @param {string} forWhom Whether this DataGovernance call is for an AnyWealthAdvisor or AnyMarketing rep.
     @param {string} uid The uid of the user data being requested.
     @return {object} The response JSON object.
     */
-    async getUserConsentedData(token, forWhom, uid) {
+    async getUserConsentedData(forWhom, uid) {
         console.info("PingData.js", "Getting consented data through DG.");
-        const myHeaders = new Headers();
-        myHeaders.append("Authorization", "Bearer " + token);
         let url;
-    
         var requestOptions = {
             method: 'GET',
-            headers: myHeaders,
             redirect: 'follow'
         };
         
@@ -249,6 +228,7 @@ class PingData {
             console.info("Getting AnyWealth Advisor consent data.");
             url = this.dgOpenBankingURI + this.dgOpenBankingVersion + this.dgBalancesResource
         }
+        await PingAuthN.useSession();
         const response = await fetch(url, requestOptions);
         const jsonResponse = await response.json();
         return jsonResponse;

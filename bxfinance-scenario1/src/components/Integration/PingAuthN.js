@@ -13,7 +13,9 @@ class PingAuthN {
     pfAuthnAPIURI = "/pf-ws/authn/flows/";
     pfPickupURI = "/ext/ref/pickup?REF=";
 
-    /** 
+    static session = null;
+
+    /**
     AuthN API:
     Authenticating user with AuthN API.
 
@@ -137,6 +139,26 @@ class PingAuthN {
 
         return fetch(url, requestOptions);
     }
+
+    static establishPaSession() {
+        this.session = new Promise(resolve => {
+            fetch("/app/login/silent", {
+                 method: 'GET',
+                 mode: 'no-cors',
+                 credentials: 'include'
+            }).then(() => {
+                 console.info("API session established");
+                 resolve();
+            }).catch(() => {
+                 console.error("Failed to establish session");
+                 resolve();
+            });
+        });
+  }
+
+  static useSession() {
+    return this.session || Promise.resolve();
+  }
 }
 
 export default PingAuthN;

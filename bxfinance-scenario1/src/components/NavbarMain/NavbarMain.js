@@ -211,6 +211,10 @@ class NavbarMain extends React.Component {
           });
       } 
     }
+
+    if (!isLoggedOut) {
+      PingAuthN.establishPaSession();
+    }
     // END PING INTEGRATION
     // Original T3 code in this lifecycle method removed.
   }

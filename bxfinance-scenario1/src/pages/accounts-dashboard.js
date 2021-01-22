@@ -12,7 +12,6 @@ import CardRewards from '../components/CardRewards';
 import Session from '../components/Utils/Session'; /* PING INTEGRATION */
 import PingData from '../components/Integration/PingData'; /* PING INTEGRATION */
 import JSONSearch from '../components/Utils/JSONSearch'; /* PING INTEGRATION */
-import PingOAuth from '../components/Integration/PingOAuth'; /* PING INTEGRATION: */
 import OpenBanking from '../components/Integration/OpenBanking'; /* PING INTEGRATION: */
 
 // Data
@@ -28,7 +27,6 @@ class AccountsDashboard extends React.Component {
     this.Session = new Session();
     this.PingData = new PingData();
     this.JSONSearch = new JSONSearch();
-    this.PingOAuth = new PingOAuth();
     this.OpenBanking = new OpenBanking();
     this.state = {
       myAccounts: []
@@ -49,55 +47,40 @@ class AccountsDashboard extends React.Component {
         this.Session.setAuthenticatedUserItem("accts", acctIDsArrSimple[0]); //TODO we can re-use this to save the getUserEntry() call. Only call PD if accts not in session.
         if (acctIDsArr.length) {
           // Existing user with accounts already provisioned, so just get balances.
-          console.info("Existing user:", "Getting account balances.");
-          this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
-            .then(token => {
-              this.Session.setAuthenticatedUserItem("AT", token); //TODO need to re-use this token everywhere to avoid multiple getToken calls. Need handling for expired tokens though.
-              this.OpenBanking.getAccountBalances(token)
-                .then(response => response.json())
-                .then(jsonData => {
-                  this.setState({ myAccounts: jsonData.Data.Balance });
-                })
-                .catch(e => {
-                  console.error("GetAccountBalances Exception", e)
-                });
+          this.OpenBanking.getAccountBalances()
+            .then(response => response.json())
+            .then(jsonData => {
+              this.setState({ myAccounts: jsonData.Data.Balance });
             })
             .catch(e => {
-              console.error("GetToken Exception", e);
+              console.error("GetAccountBalances Exception", e)
             });
         } else {
           // Brand new registered user, so we need to provision accounts and update PD, then fetch balances.
           let acctIdsArr = [];
           console.info("New User:", "Provisioning bank accounts and getting balances.");
-          this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
-            .then(token => {
-              this.Session.setAuthenticatedUserItem("AT", token);
-              this.OpenBanking.provisionAccounts(token)
-                .then(result => {
-                  acctIdsArr = this.JSONSearch.findValues(result, "AccountId");
-                  this.PingData.updateUserEntry(acctIdsArr, this.Session.getAuthenticatedUserItem("uid"))
-                    .then(response => {
-                      this.OpenBanking.getAccountBalances(this.Session.getAuthenticatedUserItem("AT"))
-                        .then(response => response.json())
-                        .then(jsonData => {
-                          this.setState({ myAccounts: jsonData.Data.Balance });
-                          acctIDsArr = this.JSONSearch.findValues(jsonData.Data.Balance, "AccountId");
-                          this.Session.setAuthenticatedUserItem("accts", acctIDsArr); //TODO can we reuse this? Are we anywhere already?
-                        })
-                        .catch(e => {
-                          console.error("Get Account Balances Exception", e)
-                        });
+          this.OpenBanking.provisionAccounts()
+            .then(result => {
+              acctIdsArr = this.JSONSearch.findValues(result, "AccountId");
+              this.PingData.updateUserEntry(acctIdsArr, this.Session.getAuthenticatedUserItem("uid"))
+                .then(response => {
+                  this.OpenBanking.getAccountBalances()
+                    .then(response => response.json())
+                    .then(jsonData => {
+                      this.setState({ myAccounts: jsonData.Data.Balance });
+                      acctIDsArr = this.JSONSearch.findValues(jsonData.Data.Balance, "AccountId");
+                      this.Session.setAuthenticatedUserItem("accts", acctIDsArr); //TODO can we reuse this? Are we anywhere already?
                     })
                     .catch(e => {
-                      console.error("Update User Entry Exception", e)
+                      console.error("Get Account Balances Exception", e)
                     });
                 })
                 .catch(e => {
-                  console.error("Provision Accounts Exception", e)
+                  console.error("Update User Entry Exception", e)
                 });
             })
             .catch(e => {
-              console.error("Get Token Exception", e);
+              console.error("Provision Accounts Exception", e)
             });
         }
       }).catch(e => {

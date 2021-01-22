@@ -18,7 +18,6 @@ import AccountsDropdown from '../../components/AccountsDropdown';
 import AccountsSectionNav from '../../components/AccountsSectionNav';
 import CardRewards from '../../components/CardRewards';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
-import PingOAuth from '../../components/Integration/PingOAuth'; /* PING INTEGRATION: */
 import PingData from '../../components/Integration/PingData'; /* PING INTEGRATION: */
 
 // Data
@@ -47,7 +46,6 @@ class CommunicationPreferences extends React.Component {
     this.close = this.close.bind(this);
     this.toggleConsent = this.toggleConsent.bind(this); /* PING INTEGRATION: */
     this.Session = new Session(); /* PING INTEGRATION: */
-    this.PingOAuth = new PingOAuth(); /* PING INTEGRATION: */
     this.PingData = new PingData(); /* PING INTEGRATION: */
     this.consentDef = "share-comm-preferences"; /* PING INTEGRATION: */
   }
@@ -56,7 +54,7 @@ class CommunicationPreferences extends React.Component {
     /* BEGIN PING INTEGRATION */
     if (this.state.consentId !== "0") { //Updating existing consent record.
       const consent = { "sms": this.state.sms, "email": this.state.email, "homeAddress": this.state.mail };
-      this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.state.consentId, this.consentDef)
+      this.PingData.updateUserConsent(consent, this.state.consentId, this.consentDef)
         .then(response => response.json())
         .then(consentData => {
           console.info("Updated user consent", JSON.stringify(consentData));
@@ -67,7 +65,7 @@ class CommunicationPreferences extends React.Component {
         });
     } else { //Creating new consent record.
       const consent = { "sms": this.state.sms, "email": this.state.email, "homeAddress": this.state.mail };
-      this.PingData.createUserConsent(this.Session.getAuthenticatedUserItem("AT"), consent, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
+      this.PingData.createUserConsent(consent, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
           console.info("Created user consent", JSON.stringify(consentData));
@@ -100,54 +98,25 @@ class CommunicationPreferences extends React.Component {
 
   /* BEGIN PING INTEGRATION */
   componentDidMount() {
-    if (this.Session.getAuthenticatedUserItem("AT")) {
-      const token = this.Session.getAuthenticatedUserItem("AT");
-      this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
-        .then(response => response.json())
-        .then(consentData => {
-          if (consentData.count > 0) {
-            this.setState({
-              // TODO this is probably overkill having a checked version of the consent. You could probably infer from the consent value.
-              sms: consentData._embedded.consents[0].data.sms,
-              email: consentData._embedded.consents[0].data.email,
-              mail: consentData._embedded.consents[0].data.homeAddress,
-              smsChecked: consentData._embedded.consents[0].data.sms == true ? true : false,
-              emailChecked: consentData._embedded.consents[0].data.email == true ? true : false,
-              mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
-              consentId: consentData._embedded.consents[0].id
-            });
-          }
-        })
-        .catch(e => {
-          console.error("GetUserConsents Exception", e)
-        });
-    } else {
-      this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
-        .then(token => {
-          this.Session.setAuthenticatedUserItem("AT", token); //for later reuse to reduce getToken calls.
-          this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
-            .then(response => response.json())
-            .then(consentData => {
-              if (consentData.count > 0) {
-                this.setState({
-                  sms: consentData._embedded.consents[0].data.sms,
-                  email: consentData._embedded.consents[0].data.email,
-                  mail: consentData._embedded.consents[0].data.homeAddress,
-                  smsChecked: consentData._embedded.consents[0].data.sms == true ? true : false,
-                  emailChecked: consentData._embedded.consents[0].data.email == true ? true : false,
-                  mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
-                  consentId: consentData._embedded.consents[0].id
-                });
-              }
-            })
-            .catch(e => {
-              console.error("GetUserConsents Exception", e)
-            });
-        })
-        .catch(e => {
-          console.error("GetToken Exception", e);
-        });
-    }
+    this.PingData.getUserConsents(this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
+      .then(response => response.json())
+      .then(consentData => {
+        if (consentData.count > 0) {
+          this.setState({
+            // TODO this is probably overkill having a checked version of the consent. You could probably infer from the consent value.
+            sms: consentData._embedded.consents[0].data.sms,
+            email: consentData._embedded.consents[0].data.email,
+            mail: consentData._embedded.consents[0].data.homeAddress,
+            smsChecked: consentData._embedded.consents[0].data.sms == true ? true : false,
+            emailChecked: consentData._embedded.consents[0].data.email == true ? true : false,
+            mailChecked: consentData._embedded.consents[0].data.homeAddress == true ? true : false,
+            consentId: consentData._embedded.consents[0].id
+          });
+        }
+      })
+      .catch(e => {
+        console.error("GetUserConsents Exception", e)
+      });
   }
   /* END PING INTEGRATION */
 

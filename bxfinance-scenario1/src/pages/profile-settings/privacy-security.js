@@ -20,7 +20,6 @@ import AccountsSubnav from '../../components/AccountsSubnav';
 import AccountsDropdown from '../../components/AccountsDropdown';
 import CardRewards from '../../components/CardRewards';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
-import PingOAuth from '../../components/Integration/PingOAuth'; /* PING INTEGRATION: */
 import PingData from '../../components/Integration/PingData'; /* PING INTEGRATION: */
 import { Link } from 'react-router-dom' /* PING INTEGRATION: */
 
@@ -53,7 +52,6 @@ class PrivacySecurity extends React.Component {
     this.toggle = this.toggle.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
     this.Session = new Session(); /* PING INTEGRATION: */
-    this.PingOAuth = new PingOAuth(); /* PING INTEGRATION: */
     this.PingData = new PingData(); /* PING INTEGRATION: */
     this.consentDef = "share-account-balances"; /* PING INTEGRATION: */
   }
@@ -66,7 +64,7 @@ class PrivacySecurity extends React.Component {
     /* BEGIN PING INTEGRATION */
     if (this.state.consentId !== "0") {//User has a consent record, so update.
       console.info("Consent ID", this.state.consentId);
-      this.PingData.updateUserConsent(this.Session.getAuthenticatedUserItem("AT"), this.state.consentedAccts, this.state.consentId, this.consentDef)
+      this.PingData.updateUserConsent(this.state.consentedAccts, this.state.consentId, this.consentDef)
         .then(response => response.json())
         .then(consentData => {
           console.info("Updated user consent", JSON.stringify(consentData));
@@ -76,7 +74,7 @@ class PrivacySecurity extends React.Component {
         });
     } else { //User has no consent record, so create.
       console.info("Consent ID", this.state.consentId);
-      this.PingData.createUserConsent(this.Session.getAuthenticatedUserItem("AT"), this.state.consentedAccts, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
+      this.PingData.createUserConsent(this.state.consentedAccts, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
         .then(response => response.json())
         .then(consentData => {
           console.info("Created user consent", JSON.stringify(consentData));
@@ -146,74 +144,34 @@ class PrivacySecurity extends React.Component {
     });
     this.setState(acctState);
 
-    if (this.Session.getAuthenticatedUserItem("AT")) {
-      // TODO we should move the following code into a method. Duplicating it below based on whether we have a token or not is bad design. Error prone maintenance.
-      const token = this.Session.getAuthenticatedUserItem("AT");
-      this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
-        .then(response => response.json())
-        .then(consentData => {
-          console.info("Got user consents", JSON.stringify(consentData));
-          if (consentData.count > 0) { //Do we have a consent record? (There is no status if no record)
-            this.setState({
-              anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
-              consentId: consentData._embedded.consents[0].id
-            });
-            //loop over share-balance array updating account consent state.
-            // This loop ensures we handle n number of accts on someones record to avoid complexity, 
-            // in case we get more than 3 accts in the future. (We dont control the OpenBanking Mock API). 
-            // Otherwise the loop would need to exit after array[2].
-            consentedAcctsArr = consentData._embedded.consents[0].data["share-balance"];
-            consentedAcctsArr.forEach((acctId, index) => {
-              //If the acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
-              consentState.push(acctId);
+    this.PingData.getUserConsents(this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
+      .then(response => response.json())
+      .then(consentData => {
+        console.info("Got user consents", JSON.stringify(consentData));
+        if (consentData.count > 0) { //Do we have a consent record? (There is no status if no record)
+          this.setState({
+            anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
+            consentId: consentData._embedded.consents[0].id
+          });
+          //loop over share-balance array updating account consent state.
+          // This loop ensures we handle n number of accts on someones record to avoid complexity,
+          // in case we get more than 3 accts in the future. (We dont control the OpenBanking Mock API).
+          // Otherwise the loop would need to exit after array[2].
+          consentedAcctsArr = consentData._embedded.consents[0].data["share-balance"];
+          consentedAcctsArr.forEach((acctId, index) => {
+            //If the acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
+            consentState.push(acctId);
 
-            });
-            this.setState({
-              consentedAccts: consentState,
-              isOpen: consentData._embedded.consents[0].status === "accepted" ? true : false
-            });
-          }
-        })
-        .catch(e => {
-          console.error("GetUserConsents Exception", e)
-        });
-    } else {
-      this.PingOAuth.getToken({ uid: this.Session.getAuthenticatedUserItem("uid"), scopes: 'urn:pingdirectory:consent' })
-        .then(token => {
-          this.Session.setAuthenticatedUserItem("AT", token); //for later reuse to reduce getToken calls.
-          this.PingData.getUserConsents(token, this.Session.getAuthenticatedUserItem("uid"), this.consentDef)
-            .then(response => response.json())
-            .then(consentData => {
-              console.info("Got user consents", JSON.stringify(consentData));
-              if (consentData.count > 0) { //Do we have a consent record? (There is no status if no record)
-                this.setState({
-                  anywealthadvisor: consentData._embedded.consents[0].data["share-balance"].length ? true : false,
-                  consentId: consentData._embedded.consents[0].id
-                });
-                //loop over share-balance array updating account consent state.
-                // This loop ensures we handle n number of accts on someones record to avoid complexity, 
-                // in case we get more than 3 accts in the future. (We dont control the OpenBanking Mock API). 
-                // Otherwise the loop would need to exit after array[2].
-                consentedAcctsArr = consentData._embedded.consents[0].data["share-balance"];
-                consentedAcctsArr.forEach((acctId, index) => {
-                  //If the acct ID exists, then they've given consent. These state items are later correlated with the existing acct IDs already set.
-                  consentState.push(acctId);
-
-                });
-                this.setState({
-                  consentedAccts: consentState,
-                  isOpen: consentData._embedded.consents[0].status === "accepted" ? true : false
-                });
-              }
-            })
-            .catch(e => {
-              console.error("GetUserConsents Exception", e)
-            });
-        })
-        .catch(e => {
-          console.error("GetToken Exception", e);
-        });
-    }
+          });
+          this.setState({
+            consentedAccts: consentState,
+            isOpen: consentData._embedded.consents[0].status === "accepted" ? true : false
+          });
+        }
+      })
+      .catch(e => {
+        console.error("GetUserConsents Exception", e)
+      });
   }
   /* END PING INTEGRATION: */
 

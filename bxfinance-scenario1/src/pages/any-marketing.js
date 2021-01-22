@@ -22,7 +22,6 @@ import { faLinkedinIn, faFacebookF, faTwitter, faInstagram } from '@fortawesome/
 import AccountsSubnav from '../components/AccountsSubnav';
 import PingData from '../components/Integration/PingData'; /* PING INTEGRATION: */
 import Session from '../components/Utils/Session'; /* PING INTEGRATION: */
-import PingOAuth from '../components/Integration/PingOAuth'; /* PING INTEGRATION: */
 import JSONSearch from '../components/Utils/JSONSearch'; /* PING INTEGRATION: */
 import ModalError from '../components/ModalError/'; /* PING INTEGRATION: */
 
@@ -97,34 +96,27 @@ const SearchAutocomplete = () => {
   };
   const onSelectSuggestion = index => {
     /* BEING PING INTEGRATION */
-    const pingOAuthObj = new PingOAuth(); /* PING INTEGRATION: */
     const pingDataObj = new PingData(); /* PING INTEGRATION: */
     setConsentState(initialState); //Clearing previous values so they don't show while modal re-renders.
-    pingOAuthObj.getToken({ uid: 'marketingApp', client: 'marketingApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
-      .then(consent_token => {
-        pingDataObj.getUserConsentedData(consent_token, "marketing", filteredSuggestions[index])
-          .then(jsonResults => {
-            let fullName;
-            try { fullName = jsonResults.Resources[0].cn[0]; }
-            catch (e) { fullName = "This customer did not consent to receiving marketing communications."; }//Fail with the utmost grace and leisure.
-            let fullAddress;
-            try { fullAddress = jsonResults.Resources[0].street[0] + ", " + jsonResults.Resources[0].l[0] + ", " + jsonResults.Resources[0].postalCode[0]; }
-            catch (e) { }//Fail with the utmost grace and leisure.
-            let email;
-            try { email = jsonResults.Resources[0].mail[0]; }
-            catch (e) { }//Fail with the utmost grace and leisure.
-            let mobileNumber;
-            try { mobileNumber = jsonResults.Resources[0].mobile[0]; }
-            catch (e) { }//Fail with the utmost grace and leisure.
-            const newState = { fullName: fullName, homeAddress: fullAddress, email: email, mobileNumber: mobileNumber };
-            setConsentState(newState);
-          })
-          .catch(error => {
-            console.error("getUserConsentedData Exception", error);
-          });
+    pingDataObj.getUserConsentedData("marketing", filteredSuggestions[index])
+      .then(jsonResults => {
+        let fullName;
+        try { fullName = jsonResults.Resources[0].cn[0]; }
+        catch (e) { fullName = "This customer did not consent to receiving marketing communications."; }//Fail with the utmost grace and leisure.
+        let fullAddress;
+        try { fullAddress = jsonResults.Resources[0].street[0] + ", " + jsonResults.Resources[0].l[0] + ", " + jsonResults.Resources[0].postalCode[0]; }
+        catch (e) { }//Fail with the utmost grace and leisure.
+        let email;
+        try { email = jsonResults.Resources[0].mail[0]; }
+        catch (e) { }//Fail with the utmost grace and leisure.
+        let mobileNumber;
+        try { mobileNumber = jsonResults.Resources[0].mobile[0]; }
+        catch (e) { }//Fail with the utmost grace and leisure.
+        const newState = { fullName: fullName, homeAddress: fullAddress, email: email, mobileNumber: mobileNumber };
+        setConsentState(newState);
       })
       .catch(error => {
-        console.error("getToken Exception", error);
+        console.error("getUserConsentedData Exception", error);
       });
     /* END PING INTEGRATION: */
 
@@ -198,7 +190,6 @@ class AnyMarketing extends React.Component {
     };
     this.PingData = new PingData(); /* PING INTEGRATION: */
     this.Session = new Session(); /* PING INTEGRATION: */
-    this.PingOAuth = new PingOAuth(); /* PING INTEGRATION: */
     this.JSONSearch = new JSONSearch(); /* PING INTEGRATION: */
   }
   toggle() {
