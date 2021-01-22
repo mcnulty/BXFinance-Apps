@@ -1,16 +1,15 @@
-/*
-PING INTEGRATION
+import Session from '../Utils/Session';
+
+/**
+PING INTEGRATION:
 This entire component is Ping developed.
-Implements functions to integrate with PingFed
+Implements functions to integrate with PingFederate
 OAuth-related API endpoints.
 
 @author Michael Sanchez
-
 */
 
-import Session from './Session';
-
-export default class PingOAuth {
+class PingOAuth {
     constructor() {
         this.Session = new Session();
     }
@@ -19,23 +18,20 @@ export default class PingOAuth {
     pfAuthZAPIURI = "/as/authorization.oauth2?";
     pfTokenAPIURI = "/as/token.oauth2?";
 
-    /* 
-    Get AuthZ Code
+    /** 
+    Get AuthZ Code:
     We defaulted all params except for uid, 
-    which is user specifc. As a demo site we only have 1
+    which is user specifc. As a demo site, we only have 1
     auth code client. But if we add more in the future, this
     will already support that.
 
-    @param
-    @param
-    @param
-    @param
-    @param
-    @param
-    @return string
+    @param {string} client The OAuth client. Default is pa_wam .
+    @param {string} responseType The OAuth client-supported response type. Default is code.
+    @param {string} redirectURI The OAuth client-allowed redirect URI(s). Default is https://demo.bxfinance.org/app/banking .
+    @param {string} scopes Optional OAuth scopes. Default is an empty string.
+    @return {string} AuthZ code.
     */
-   //TODO I *think* we can get rid of the UID and swaprods params now that we aren't using them. Need thorough regression testing when removed.
-    async getAuthCode({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
+    async getAuthCode({client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
         console.info("PingOAuth.js", "Getting an auth code for the getToken() call.");
 
         const myHeaders = new Headers();
@@ -58,32 +54,31 @@ export default class PingOAuth {
         return authCode;
     }
 
-    /* 
-    Get Token
+    /** 
+    Get Token:
     We defaulted all params except for code,
-    which is code flow specifc. As a demo site we only have 1
+    which is code flow specifc. As a demo site, we only have 1
     auth code client. But if we add more in the future, this
     will already support that.
 
-    @param
-    @param
-    @param
-    @return string base64 encoded
+    @param {string} client The OAuth client. Default is pa_wam .
+    @param {string} responseType The OAuth client-supported response type. Default is code.
+    @param {string} redirectURI The OAuth client-allowed redirect URI(s). Default is https://demo.bxfinance.org/app/banking .
+    @param {string} scopes Optional OAuth scopes. Default is an empty string.
+    @return {string} OAuth access token, base64 encoded.
     */
-   //TODO might need to change syntax for destructuring here. See "named and optional arguments" https://medium.com/dailyjs/named-and-optional-arguments-in-javascript-using-es6-destructuring-292a683d5b4e
-   //TODO I *think* we can get rid of the UID and swaprods params now that we aren't using them. Need thorough regression testing when removed.
-    async getToken({uid, swaprods = "2FederateM0re!", client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
-        console.info("PingAuthN.js", "Getting a token.");
-
-        let response = {};
+    async getToken({uid, client = "pa_wam", responseType = "code", redirectURI = process.env.REACT_APP_HOST + "/app/banking", scopes = ""} = {}) {
+        console.info("PingOAuth.js", "Getting a token.");
 
         if (responseType == "code") {
             console.info("PingAuthN.js", "Using auth code grant");
             const authCode = await this.getAuthCode({uid:this.Session.getAuthenticatedUserItem("uid"), scopes:scopes});
             let grantType = "authorization_code";
+
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/x-www-form-urlEncodedBody");
             myHeaders.append("Authorization", "Basic cGFfd2FtOjJGZWRlcmF0ZU0wcmU=");
+
             const requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
@@ -93,7 +88,7 @@ export default class PingOAuth {
             const response = await fetch(url, requestOptions);
             const jsonData = await response.json();
             const token = await jsonData.access_token;
-            console.info("PingAuthN.js", "TOKEN: " + token);
+            console.info("PingOAuth.js", "TOKEN: " + token);
 
             return token; //TODO there should only be one return statement.
 
@@ -125,7 +120,9 @@ export default class PingOAuth {
                 
         } else {
             // If you ended up here, you coded yourself into this problem.
-            throw new Error("PingAuthN.js", "Unexpected response_type or client exception in getToken().");
+            throw new Error("PingOAuth.js", "Unexpected response_type or client exception in getToken().");
         }
     }
-}
+};
+
+export default PingOAuth;

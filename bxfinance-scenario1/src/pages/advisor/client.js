@@ -21,9 +21,9 @@ import NavbarMain from '../../components/NavbarMain';
 import FooterMain from '../../components/FooterMain';
 import AccountsSubnav from '../../components/AccountsSubnav';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
-import PingData from '../../components/Utils/PingData'; /* PING INTEGRATION: */
+import PingData from '../../components/Integration/PingData'; /* PING INTEGRATION: */
 import JSONSearch from '../../components/Utils/JSONSearch'; /* PING INTEGRATION: */
-import PingOAuth from '../../components/Utils/PingOAuth'; /* PING INTEGRATION: */
+import PingOAuth from '../../components/Integration/PingOAuth'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/advisor.json';
@@ -50,7 +50,7 @@ const updateSelectedUserAndConsent = (selectedUser, stateCallback) => {
   let consentData = {};
   pingOAuthObj.getToken({ uid: selectedUser, client: 'anywealthadvisorApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
     .then(consentToken => {
-      pingDataObj.getUserConsentData(consentToken, "advisor")
+      pingDataObj.getUserConsentedData(consentToken, "advisor")
         .then(consentData => {
           if (consentData.Data !== undefined) {//In case we have no consent record.
             newState.acct_0 = typeof consentData.Data.Balance[0] !== 'undefined' ? consentData.Data.Balance[0].Amount.Amount : 0;

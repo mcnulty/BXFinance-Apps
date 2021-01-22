@@ -1,20 +1,22 @@
-/* 
-PING INTEGRATION
+/** 
+PING INTEGRATION:
 A recursive JSON search algorithm.
 Originally written by shakhal in classic JS.
-Refactored to ES6 by...
+Refactored to ES6 by dr-mohamed-benkhalifa.
 
 @author dr-mohamed-benkhalifa
 @see https://gist.github.com/shakhal/3cf5402fc61484d58c8d
 */
 
-export default class JSONSearch {
+class JSONSearch { 
 
-    /* 
-    Find values by key in a JSON object
-    @param obj the JSON object to be searched recursively
-    @param key the key for which to search
-    @return array of results
+    /**
+    JSONSearch:
+    Find values by key in a JSON object.
+    
+    @param {object} obj The JSON object to be searched recursively.
+    @param {string} key The key for which to search.
+    @return {array} An array of search results.
     */
     findValues(obj, key) {
         console.info("JSONSearch.js", "Recursively searching your object for " + key);
@@ -39,4 +41,6 @@ export default class JSONSearch {
         }
         return list;
     }
-}
+};
+
+export default JSONSearch;

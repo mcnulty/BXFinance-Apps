@@ -20,8 +20,8 @@ import AccountsSubnav from '../../components/AccountsSubnav';
 import AccountsDropdown from '../../components/AccountsDropdown';
 import CardRewards from '../../components/CardRewards';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
-import PingOAuth from '../../components/Utils/PingOAuth'; /* PING INTEGRATION: */
-import PingData from '../../components/Utils/PingData'; /* PING INTEGRATION: */
+import PingOAuth from '../../components/Integration/PingOAuth'; /* PING INTEGRATION: */
+import PingData from '../../components/Integration/PingData'; /* PING INTEGRATION: */
 import { Link } from 'react-router-dom' /* PING INTEGRATION: */
 
 // Data

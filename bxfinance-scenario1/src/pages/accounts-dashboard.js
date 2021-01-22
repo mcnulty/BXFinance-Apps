@@ -10,10 +10,10 @@ import AccountsDropdown from '../components/AccountsDropdown';
 import AccountsBalance from '../components/AccountsBalance';
 import CardRewards from '../components/CardRewards';
 import Session from '../components/Utils/Session'; /* PING INTEGRATION */
-import PingData from '../components/Utils/PingData'; /* PING INTEGRATION */
+import PingData from '../components/Integration/PingData'; /* PING INTEGRATION */
 import JSONSearch from '../components/Utils/JSONSearch'; /* PING INTEGRATION */
-import PingOAuth from '../components/Utils/PingOAuth'; /* PING INTEGRATION: */
-import OpenBanking from '../components/Utils/OpenBanking'; /* PING INTEGRATION: */
+import PingOAuth from '../components/Integration/PingOAuth'; /* PING INTEGRATION: */
+import OpenBanking from '../components/Integration/OpenBanking'; /* PING INTEGRATION: */
 
 // Data
 import data from '../data/accounts-dashboard.json';
