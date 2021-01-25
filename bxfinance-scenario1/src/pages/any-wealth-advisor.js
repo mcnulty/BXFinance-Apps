@@ -40,7 +40,7 @@ class AnyWealthAdvisor extends React.Component {
   }
   /* BEGIN PING INTEGRATION: */
   backToDashboard() {
-    window.location.href = "/app/banking";
+    window.location.assign("/app/banking");
   }
   componentDidMount() {
     // BEGIN PING INTEGRATION

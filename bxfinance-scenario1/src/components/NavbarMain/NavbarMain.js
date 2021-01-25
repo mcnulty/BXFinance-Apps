@@ -15,7 +15,7 @@ import { Link, NavLink as RRNavLink } from 'react-router-dom';
 import ModalRegister from '../ModalRegister';
 import ModalRegisterConfirm from '../ModalRegisterConfirm';
 import ModalLogin from '../ModalLogin';
-import PingAuthN from '../Utils/PingAuthN'; /* PING INTEGRATION */
+import PingAuthN from '../Integration/PingAuthN'; /* PING INTEGRATION */
 import Session from '../Utils/Session'; /* PING INTEGRATION */
 import ModalError from '../ModalError'; /* PING INTEGRATION: */
 import './NavbarMain.scss';
@@ -53,7 +53,7 @@ class NavbarMain extends React.Component {
 
   /* BEGIN PING INTEGRATION: for react-idle-timer */
   _onAction(e) {
-    console.info("React-idle-timer", 'user did something', e);
+    // console.info("React-idle-timer", 'user did something', e);
     this.setState({ isTimedOut: false });
   }
 
@@ -79,13 +79,13 @@ class NavbarMain extends React.Component {
   handleClose() {
     console.info("We are closing the timeout modal.");
     this.setState({ showTimeoutModal: false });
-    window.location.href = this.startSSOURI; //TODO we Send back through PF to renew the session. This should be done via API.
+    window.location.assign(this.startSSOURI); //TODO we Send back through PF to renew the session. This should be done via API.
   }
   handleLogout() {
     console.info("We are logging out from the timeout modal.");
     this.startSLO();
   }
-  /* END PING INTEGRATION: */
+  /* END PING INTEGRATION: for react-idle-timer */
 
   triggerModalRegister() {
     this.refs.modalRegister.toggle();
@@ -100,10 +100,10 @@ class NavbarMain extends React.Component {
   triggerModalLogin() {
     /* BEGIN PING INTEGRATION */
     // Decided to just trigger an authn flow anytime we call this method.
-    window.location.href = this.startSSOURI;
+    window.location.assign(this.startSSOURI);
     /* The below logic had the risk of submitting username to an expired flowId if the user just sat there for a time. 
     if (!window.location.search) {
-      window.location.href = this.startSSOURI;
+      window.location.assign(this.startSSOURI);
     }
     else { 
       this.refs.modalLogin.toggle(); //This is left here just in case the user closes the modal and clicks "sign in" after we already have a flowId in the URL.
@@ -122,11 +122,12 @@ class NavbarMain extends React.Component {
     this.Session.clearUserAppSession();
     //An advisor should just be taken back to P14E dock. A partner persona shouldn't get SLO'd.
     if (window.location.pathname === "/app/advisor/client" || window.location.pathname === "/app/advisor") {
-      window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
+      //TODO IMPORTANT this P14E dock needs to be an env_var or injected during spin up in k8s. It will make it easier for anyone that want to clone their own instance of BXF.
+      window.location.assign("https://desktop.pingone.com/anywealthadvisor/");
     } else {
       //Banking customers get SLO'd.
       const url = "/sp/startSLO.ping?TargetResource=" + process.env.REACT_APP_HOST + process.env.PUBLIC_URL + "/";
-      window.location.href = url;
+      window.location.assign(url);
     }
 
   }
@@ -141,29 +142,23 @@ class NavbarMain extends React.Component {
 
     // Check for a querystring; Will be fowId or REF in our current use cases.
     if (window.location.search) {
-      let testNum = Math.random();
       const params = new URLSearchParams(window.location.search);
 
-      // Coming back from authN API or Agentless adapter.
+      // Coming back from authN API.
       if (params.get("flowId")) {
         this.PingAuthN.handleAuthNflow({ flowId: params.get("flowId") })
           .then(response => response.json())
           .then(jsonResult => {
-            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //TODO do we still need this?
+            let success = this.Session.setAuthenticatedUserItem("flowResponse", JSON.stringify(jsonResult)); //Browser's sessionStorage object only stores strings.
             if (jsonResult.status == "IDENTIFIER_REQUIRED") {
               //pop the ID first modal. 
               this.refs.modalLogin.toggle();
             } else if (jsonResult.status == "FAILED") {
               this.refs.modalError.toggle("Authentication", jsonResult.userMessage);
             }
-            else if (jsonResult.status == "USERNAME_PASSWORD_REQUIRED") {
-              //TODO I dont think this needs to be here. we will never hit this case in this component. we always start with IDENTIFIER_REQUIRED so we've moved over to ModalLogin.js.
-              //pop the username/password modal.
-              this.refs.modalLoginPassword.toggle();
-            }
           })
           .catch(error => console.error('HANDLESUBMIT ERROR', error));
-      } // Coming back as authenticated user or SLO request from Agentless IK.
+      } // Coming back as authenticated user from AIK or SLO request from Agentless IK.
       else if (params.get("REF")) {
         const REF = params.get("REF");
         let targetApp = decodeURIComponent(params.get("TargetResource"));
@@ -208,7 +203,7 @@ class NavbarMain extends React.Component {
               this.Session.setAuthenticatedUserItem("bxFinanceUserType", "customer"); //This is the default. Only dynamically set for partner/workforce.
             }
             // TODO can we do this SPA style with history.push? We would need to map targetApp to respective Router path.
-            window.location.href = targetApp;
+            window.location.assign(targetApp);
           })
           .catch(error => {
             console.error("Agentless Pickup Error:", error);

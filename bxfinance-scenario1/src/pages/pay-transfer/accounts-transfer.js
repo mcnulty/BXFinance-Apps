@@ -18,7 +18,7 @@ import AccountsSubnav from '../../components/AccountsSubnav';
 import AccountsDropdown from '../../components/AccountsDropdown';
 import CardRewards from '../../components/CardRewards';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
-import OpenBanking from '../../components/Utils/OpenBanking'; /* PING INTEGRATION: */
+import OpenBanking from '../../components/Integration/OpenBanking'; /* PING INTEGRATION: */
 import { Link } from 'react-router-dom' /* PING INTEGRATION: */
 
 // Data
