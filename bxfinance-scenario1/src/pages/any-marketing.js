@@ -9,7 +9,7 @@ import {
   Nav,
   NavItem,
   NavLink,
-  Media,
+  Media, //TODO this shows unused. validate and remove.
   Modal,
   ModalHeader,
   ModalBody
@@ -20,9 +20,9 @@ import { faLinkedinIn, faFacebookF, faTwitter, faInstagram } from '@fortawesome/
 
 // Components
 import AccountsSubnav from '../components/AccountsSubnav';
-import PingData from '../components/Utils/PingData'; /* PING INTEGRATION: */
+import PingData from '../components/Integration/PingData'; /* PING INTEGRATION: */
 import Session from '../components/Utils/Session'; /* PING INTEGRATION: */
-import PingOAuth from '../components/Utils/PingOAuth'; /* PING INTEGRATION: */
+import PingOAuth from '../components/Integration/PingOAuth'; /* PING INTEGRATION: */
 import JSONSearch from '../components/Utils/JSONSearch'; /* PING INTEGRATION: */
 import ModalError from '../components/ModalError/'; /* PING INTEGRATION: */
 
@@ -102,7 +102,7 @@ const SearchAutocomplete = () => {
     setConsentState(initialState); //Clearing previous values so they don't show while modal re-renders.
     pingOAuthObj.getToken({ uid: 'marketingApp', client: 'marketingApp', responseType: '', scopes: 'urn:pingdirectory:consent' })
       .then(consent_token => {
-        pingDataObj.getUserConsentData(consent_token, "marketing", filteredSuggestions[index])
+        pingDataObj.getUserConsentedData(consent_token, "marketing", filteredSuggestions[index])
           .then(jsonResults => {
             let fullName;
             try { fullName = jsonResults.Resources[0].cn[0]; }
@@ -120,7 +120,7 @@ const SearchAutocomplete = () => {
             setConsentState(newState);
           })
           .catch(error => {
-            console.error("getUserConsentData Exception", error);
+            console.error("getUserConsentedData Exception", error);
           });
       })
       .catch(error => {
@@ -212,7 +212,7 @@ class AnyMarketing extends React.Component {
     // end the local app session.
     this.Session.clearUserAppSession();
     //A marketing rep should just be taken back to P14E dock. A workforce persona shouldn't get SLO'd.
-    window.location.href = "https://desktop.pingone.com/anywealthadvisor/";
+    window.location.assign("https://desktop.pingone.com/anywealthadvisor/");
   }
 
   componentDidMount() {
@@ -255,7 +255,6 @@ class AnyMarketing extends React.Component {
                     <NavLink><img src={process.env.PUBLIC_URL + "/images/icons/support.svg"} alt={data.menus.utility.support} /></NavLink>
                   </NavItem>
                   <NavItem className="logout">
-                    {/* TODO add P1 SLO link for sign out. */}
                     {!this.state.loggedOut && 
                       <a onClick={this.signOut.bind(this)} className="nav-link"><img src={process.env.PUBLIC_URL + "/images/icons/user.svg"} alt={data.menus.utility.logout} className="mr-1" /> {data.menus.utility.logout}</a>}
                     {this.state.loggedOut && 

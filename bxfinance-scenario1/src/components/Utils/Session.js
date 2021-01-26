@@ -1,25 +1,25 @@
-/*
-PING INTEGRATION
-This entire component is Ping developed.
+/**
+PING INTEGRATION:
+This entire component is Ping-developed.
 Implements functions to integrate with the browser
 session storage API to maintain user state during
 an authenticated session.
 
 @author Michael Sanchez
-@see https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
+@see {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage}
 */
 
-export default class Session {
+class Session {
 
-    /* 
-    Protect Page
+    /** 
+    Protect Page:
     Ensures a user doesn't access pages when unauthenticated or 
-    when not the right user type. As a SPA, page requests do not
-    run through PA, (not HTTP requests), so we need to replicate those access rules.
+    when not the right user type. As a Single Page Application (SPA), page requests do not
+    run through PingAccess, (not HTTP requests), so we need to replicate those access rules.
 
-    @param loggedIn whether the user is logged in
-    @param path where the user is trying to go
-    @param userType customer, advisor, or marketing
+    @param {boolean} loggedOut Whether the user is logged in or not.
+    @param {string} path Where the user is trying to go.
+    @param {string} userType AnyWealthAdvisor, AnyMarketing, or customer.
     */
    protectPage(loggedOut, path, userType) {
        const advisorAllowedPaths = ["/app/advisor", "/app/advisor/client", "/app/advisor/tracking", "/app/advisor/prospecting", "/app/advisor/other-services"];
@@ -52,16 +52,17 @@ export default class Session {
                    }
                    break;
                default:
-                   console.warn("Unkown bxFinanceUserType", "Not authenticated yet.");
+                   console.warn("Unknown bxFinanceUserType", "Not authenticated yet.");
            }
         }        
    }
 
-    /* 
-    Get Authenticated User Item
+    /** 
+    Get Authenticated User Item:
     Gets an item from the current origin's session storage.
-    @param key the item name in storage
-    @return DOMString
+
+    @param {string} key The item name in storage.
+    @return {string} DOM String.
     */
     getAuthenticatedUserItem(key) {
         console.info("Session.js", "Getting a item from local browser session.");
@@ -69,13 +70,14 @@ export default class Session {
         return sessionStorage.getItem(key);
     }
 
-    /* 
-    Set Authenticated User Item
+    /** 
+    Set Authenticated User Item:
     Sets an item in the current origin's sessions storage.
-    @param key the item name to set in storage
-    @param value the string value of the key
-    @return boolean
-    @throws storageFullException Particularly, in Mobile Safari 
+
+    @param {string} key The item name to set in storage.
+    @param {string} value The string value of the key.
+    @return {boolean} Success state of item storage.
+    @throws {storageFullException} Particularly, in Mobile Safari 
                                 (since iOS 5) it always throws when 
                                 the user enters private mode. 
                                 (Safari sets the quota to 0 bytes in 
@@ -90,11 +92,12 @@ export default class Session {
         return true;
     }
 
-    /* 
-    Remove Authenticated User Item
+    /** 
+    Remove Authenticated User Item:
     Removes an item from the current origin's session storage.
-    @param key the item name in storage to remove 
-    @return boolean
+
+    @param {string} key The item name in storage to remove.
+    @return {boolean} Success state of item removal from storage.
     */
     removeAuthenticatedUserItem(key) {
         console.info("Session.js", "Removing an item from local browser session.");
@@ -103,10 +106,11 @@ export default class Session {
         return true;
     }
 
-    /* 
-    Clear user App Session
+    /** 
+    Clear User App Session:
     Clears out everything in the current origin's session storage.
-    @return void
+
+    @return {void} Void. 
      */
     clearUserAppSession() {
         console.info("Session.js", "Removing local browser session.");
@@ -114,12 +118,13 @@ export default class Session {
         sessionStorage.clear();
     }
 
-    /* 
-    Get cookie
+    /** 
+    Get Cookie:
     We set a cookie when users check "Remember Me" when logging in.
     We need to check for this cookie in a couple different places to set state.
-    @param cookieName the name of the cookie we want the value of.
-    @return cookie value, or an empty string if not found.
+    
+    @param {string} cookieName The name of the cookie we want the value of.
+    @return {string} Cookie value, or an empty string if not found.
     */
     getCookie(cookieName) {
         console.info("Session.js", "Getting a cookie value from the browser.");
@@ -138,4 +143,6 @@ export default class Session {
         }
         return "";
     }
-}
+};
+
+export default Session;

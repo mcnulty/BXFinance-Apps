@@ -1,39 +1,43 @@
-/*
-PING INTEGRATION
-This entire component is Ping developed.
+/**
+PING INTEGRATION:
+This entire component is Ping-developed.
 Implements functions to integrate with 
 David Babbit's mock OpenBanking APIs, hosted on Heroku.
 I like to call it the OpenBabbitt API.
 
 @author Michael Sanchez
-@see https://github.com/babbtx/mock-simple-aspsp
+@see {@link https://github.com/babbtx/mock-simple-aspsp}
 */
 
-import JSONSearch from './JSONSearch';
-import PingData from './PingData';
+class OpenBanking {
 
-export default class OpenBanking {
+    /**
+    Configurations for the OpenBanking API. 
 
+    @property {string} mockOBConsentHost Consent OpenBanking host /OpenBanking pointing to DataGovernance to secure data for consent enforcement.
+    @property {string} mockOBhost OpenBaking API host.
+    @property {string} mockOBAPIver OpenBanking API version.
+    @property {string} mockOBbalURI OpenBanking API account balances path.
+    @property {string} mockOBacctsURI OpenBanking API accounts path.
+    @property {string} xfrMoneyURI OpenBanking API transfer money path.
+    */
     constructor() {
         // Didn't abstract these since they shouldn't ever change. I say that now.
-        this.mockOBConsenthost = "/OpenBanking";
         this.mockOBhost = "https://babbtx-aspsp.herokuapp.com/OpenBanking";
         this.mockOBAPIver = "/v2";
         this.mockOBbalURI = "/balances";
         this.mockOBacctsURI = "/accounts";
-        this.JSONSearch = new JSONSearch();
-        this.PingData = new PingData();
         this.xfrMoneyURI = "/transferMoney?amount=";
     }
 
-
-    /* 
-      Provision Banking Accounts
-      Provisions new accounts and balances and updates the user entry in PD.
+    /** 
+      Provision Banking Accounts:
+      Provisions new accounts and balances and updates the user entry in PingDirectory.
       Design pattern debate: Whether to just return the accounts response (strict single responsiblilty), or
       or as is now, fulfills all tasks of "provisioning an acct", which should include upating the user entry.
-      @param token the access token for the authenticated user.
-      @response object
+
+      @param {string} token The access token for the authenticated user.
+      @return {object} The response JSON object.
       */
     async provisionAccounts(token) {
         //If we had to time to be cool, we could have extracted the uid from the token.
@@ -55,10 +59,12 @@ export default class OpenBanking {
         return Promise.resolve(jsonData);
     }
 
-    /* 
-      Get Account Balances
-      @param token the access token for the authenticated user.
-      @return response object
+    /** 
+      Get Account Balances:
+      Retreives account balances to display on the Accounts Dashboard.
+
+      @param {string} token The access token for the authenticated user.
+      @return {object} The response JSON object.
       */
     getAccountBalances(token) {
         console.info("OpenBanking.js", "Getting bank account balances.");
@@ -75,11 +81,13 @@ export default class OpenBanking {
         return fetch(url, requestOptions);
     }
 
-    /* 
-    Transfer Money
-    @param amount the dollar amount the user wants to transfer
-    @param token the access token from PF for the authenticated user
-    @return boolean stating success
+    /** 
+    Transfer Money:
+    Initiates a money transfer between accounts.
+
+    @param {number} amount The dollar amount the user wants to transfer.
+    @param {string} token The access token from PF for the authenticated user.
+    @return {boolean} Success state of the transfer.
     */
     transferMoney(amount, token) {
         console.info("OpenBanking.js", "Transferring money.");
@@ -95,4 +103,6 @@ export default class OpenBanking {
         const url = this.xfrMoneyURI + amount;
         return fetch(url, requestOptions);
     }
-}
+};
+
+export default OpenBanking; 

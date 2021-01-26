@@ -18,8 +18,8 @@ import AccountsDropdown from '../../components/AccountsDropdown';
 import AccountsSectionNav from '../../components/AccountsSectionNav';
 import CardRewards from '../../components/CardRewards';
 import Session from '../../components/Utils/Session'; /* PING INTEGRATION: */
-import PingOAuth from '../../components/Utils/PingOAuth'; /* PING INTEGRATION: */
-import PingData from '../../components/Utils/PingData'; /* PING INTEGRATION: */
+import PingOAuth from '../../components/Integration/PingOAuth'; /* PING INTEGRATION: */
+import PingData from '../../components/Integration/PingData'; /* PING INTEGRATION: */
 
 // Data
 import data from '../../data/profile-settings/communication-preferences.json';
